@@ -47,7 +47,11 @@ const Login = ({ setIslogin }) => {
         // Check if the user is SHG or not, and navigate accordingly
         if (response.data.user.is_shg) {
           navigate('/admin/home');  // Redirect to SHG dashboard
-        } else {
+        }
+        else if(response.data.user.is_superuser){
+          navigate('/home');
+        }
+         else{
           navigate('/home');   // Redirect to regular user home page
         }
       } else {

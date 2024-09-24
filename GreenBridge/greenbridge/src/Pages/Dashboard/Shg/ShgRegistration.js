@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import '../Shg/ShgRegistration.css';
-import backgroundImage from '../../../assets/honey.jpg'; // Correct path to your image
+import backgroundImage from '../../../../src/assets/honey.jpg'; // Provide correct path
 
 const ShgRegistration = () => {
     const [formData, setFormData] = useState({
@@ -33,72 +32,148 @@ const ShgRegistration = () => {
         }
     };
 
+    // Inline CSS styles
+    const styles = {
+        backgroundContainer: {
+            backgroundImage: `url(${backgroundImage})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            height: '100vh',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+        },
+        registrationContainer: {
+            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+            padding: '40px',
+            borderRadius: '10px',
+            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+            maxWidth: '500px',
+            width: '100%',
+            textAlign: 'center',
+        },
+        mainHeading: {
+            fontSize: '36px',
+            color: '#333',
+            marginBottom: '10px',
+        },
+        subHeading: {
+            fontSize: '18px',
+            color: '#777',
+            marginBottom: '20px',
+        },
+        formHeading: {
+            fontSize: '24px',
+            color: '#333',
+            marginBottom: '20px',
+        },
+        formGroup: {
+            marginBottom: '15px',
+            textAlign: 'left',
+        },
+        formLabel: {
+            display: 'block',
+            fontWeight: 'bold',
+            color: '#555',
+            marginBottom: '5px',
+        },
+        formInput: {
+            width: '100%',
+            padding: '10px',
+            border: '1px solid #ccc',
+            borderRadius: '5px',
+            fontSize: '16px',
+        },
+        submitButton: {
+            backgroundColor: '#4CAF50',
+            color: 'white',
+            padding: '12px 20px',
+            border: 'none',
+            borderRadius: '5px',
+            fontSize: '16px',
+            cursor: 'pointer',
+            width: '100%',
+            marginTop: '15px',
+        },
+        submitButtonHover: {
+            backgroundColor: '#45a049',
+        },
+        successMessage: {
+            color: 'green',
+        },
+        errorMessage: {
+            color: 'red',
+        },
+    };
+
     return (
-        <div 
-            className="background-container"
-            style={{
-                backgroundImage: `url(${backgroundImage})`  // Only the background image is set in JS
-            }}
-        >
-            <div className="registration-container">
-                <h1 className="main-heading">Welcome to SHG Registration</h1>
-                <h3 className="sub-heading">Empower your community by joining our Self-Help Group (SHG)</h3>
+        <div style={styles.backgroundContainer}>
+            <div style={styles.registrationContainer}>
+                <h1 style={styles.mainHeading}>Welcome to SHG Registration</h1>
+                <h3 style={styles.subHeading}>Empower your community by joining our Self-Help Group (SHG)</h3>
 
-                {message && <p className="success-message">{message}</p>}
-                {error && <p className="error-message">{error}</p>}
+                {message && <p style={styles.successMessage}>{message}</p>}
+                {error && <p style={styles.errorMessage}>{error}</p>}
 
-                <form onSubmit={handleSubmit} className="registration-form">
-                    <h2 className="form-heading">Register Below</h2>
+                <form onSubmit={handleSubmit}>
+                    <h2 style={styles.formHeading}>Register Below</h2>
 
-                    <div className="form-group">
-                        <label>Name</label>
+                    <div style={styles.formGroup}>
+                        <label style={styles.formLabel}>Name</label>
                         <input
                             type="text"
                             name="name"
                             value={formData.name}
                             onChange={handleChange}
                             required
-                            className="form-input"
+                            style={styles.formInput}
                         />
                     </div>
 
-                    <div className="form-group">
-                        <label>Email</label>
+                    <div style={styles.formGroup}>
+                        <label style={styles.formLabel}>Email</label>
                         <input
                             type="email"
                             name="email"
                             value={formData.email}
                             onChange={handleChange}
                             required
-                            className="form-input"
+                            style={styles.formInput}
                         />
                     </div>
 
-                    <div className="form-group">
-                        <label>Password</label>
+                    <div style={styles.formGroup}>
+                        <label style={styles.formLabel}>Password</label>
                         <input
                             type="password"
                             name="password"
                             value={formData.password}
                             onChange={handleChange}
                             required
-                            className="form-input"
+                            style={styles.formInput}
                         />
                     </div>
 
-                    <div className="form-group">
-                        <label>Registration Number</label>
+                    <div style={styles.formGroup}>
+                        <label style={styles.formLabel}>Registration Number</label>
                         <input
                             type="text"
                             name="registration_number"
                             value={formData.registration_number}
                             onChange={handleChange}
                             required
-                            className="form-input"
+                            style={styles.formInput}
                         />
                     </div>
 
-                    <button type="submit" className="submit-button">Submit</button>
+                    <button 
+                        type="submit" 
+                        style={styles.submitButton}
+                        onMouseOver={e => e.target.style.backgroundColor = styles.submitButtonHover.backgroundColor}
+                        onMouseOut={e => e.target.style.backgroundColor = styles.submitButton.backgroundColor}
+                    >
+                        Submit
+                    </button>
                 </form>
             </div>
         </div>
