@@ -7,6 +7,8 @@ import blackad from './assets/bamboo.jpeg';
 import bed1 from './assets/chair.jpeg';
 import table from '../assets/table.jpg';
 
+
+
 const AdComponent = () => {
     return (
         <div className="ad-carousel-container">
@@ -14,7 +16,7 @@ const AdComponent = () => {
                 <Carousel.Item>
                     <div className="ad-container" style={{ backgroundImage: `url(${blackad})` }}>
                         <div className="ad-content">
-                            <p className="ad-subtitle">NOW ON SALE!</p>
+                            <p className="ad-subtitle">NOW ON SALE! buy now</p>
                             <h1 className="ad-title">DESK DECOR</h1>
                             <p className="ad-description">
                                 Find the perfect decor for your desk. Explore our extensive and varied range.
