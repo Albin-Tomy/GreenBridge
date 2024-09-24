@@ -1,0 +1,302 @@
+/* General */
+body, html {
+    margin: 0;
+    padding: 0;
+    font-family: 'Arial', sans-serif;
+    overflow-x: hidden;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background-color: #2E8B57;
+}
+
+.brand-logo {
+    height: 50px;
+}
+
+.brand-name {
+    color: white;
+    margin-left: 10px;
+}
+
+.nav-links {
+    list-style-type: none;
+}
+
+.nav-links li {
+    display: inline;
+    margin: 0 15px;
+}
+
+.nav-links a {
+    color: white;
+    text-decoration: none;
+}
+
+.nav-links a:hover {
+    text-decoration: underline;
+}
+
+/* Hero Section */
+.hero {
+    background-size: cover;
+    padding: 100px 20px;
+    color: white;
+    text-align: center;
+    background-color: #2E8B57; /* Fallback background */
+}
+
+.hero-text h2 {
+    font-size: 3rem;
+}
+
+.hero-text p {
+    font-size: 1.5rem;
+}
+
+.cta-btn {
+    background-color: #2E8B57;
+    color: white;
+    padding: 10px 20px;
+    text-decoration: none;
+    font-size: 1.2rem;
+    border-radius: 5px;
+    margin-top: 20px;
+    display: inline-block;
+}
+
+.cta-btn:hover {
+    background-color: #3CAA6D;
+}
+
+/* Featured Products */
+.featured-products {
+    padding: 50px 20px;
+    text-align: center;
+}
+
+.product-grid {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap; /* Ensure the products wrap on smaller screens */
+}
+
+.product-item {
+    text-align: center;
+    width: 250px;
+}
+
+.product-item img {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+}
+
+.product-item h3 {
+    margin-top: 15px;
+}
+
+.product-btn {
+    background-color: #2E8B57;
+    color: white;
+    padding: 8px 15px;
+    text-decoration: none;
+    display: inline-block;
+    margin-top: 10px;
+}
+
+.product-btn:hover {
+    background-color: #3CAA6D;
+}
+
+/* Testimonials */
+.testimonials {
+    background-color: #f4f4f4;
+    padding: 50px 20px;
+    text-align: center;
+}
+
+.testimonial-grid {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap; /* Ensures testimonials wrap on smaller screens */
+}
+
+.testimonial-item {
+    width: 250px;
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.testimonial-item h4 {
+    margin-top: 10px;
+}
+
+/* Newsletter */
+.newsletter {
+    padding: 50px 20px;
+    background-color: #2E8B57;
+    color: white;
+    text-align: center;
+}
+
+.newsletter-form {
+    margin-top: 20px;
+}
+
+.newsletter-form input {
+    padding: 10px;
+    width: 300px;
+    border-radius: 5px;
+    border: none;
+    margin-right: 10px;
+}
+
+.newsletter-btn {
+    padding: 10px 20px;
+    background-color: white;
+    color: #2E8B57;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.newsletter-btn:hover {
+    background-color: #f4f4f4;
+}
+
+/* Footer */
+footer {
+    padding: 20px;
+    background-color: #333;
+    color: white;
+    text-align: center;
+}
+
+.footer-links {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+.footer-links li {
+    display: inline;
+    margin: 0 10px;
+}
+
+.footer-links a {
+    color: white;
+    text-decoration: none;
+}
+
+.footer-links a:hover {
+    text-decoration: underline;
+}
+
+/* Responsive Styles */
+
+/* Medium screens */
+@media (max-width: 992px) {
+    .hero-text h2 {
+        font-size: 2.5rem;
+    }
+
+    .hero-text p {
+        font-size: 1.2rem;
+    }
+
+    .cta-btn {
+        padding: 8px 16px;
+        font-size: 1rem;
+    }
+    
+    .product-grid, .testimonial-grid {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .testimonial-item, .product-item {
+        width: 220px;
+    }
+}
+
+/* Small screens */
+@media (max-width: 768px) {
+    header {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 10px 20px;
+    }
+
+    .nav-links li {
+        display: block;
+        margin: 10px 0;
+    }
+
+    .hero {
+        padding: 80px 10px;
+    }
+
+    .hero-text h2 {
+        font-size: 2rem;
+    }
+
+    .hero-text p {
+        font-size: 1.2rem;
+    }
+
+    .cta-btn {
+        padding: 8px 14px;
+        font-size: 1rem;
+    }
+
+    .product-item {
+        width: 200px;
+    }
+
+    .testimonial-item {
+        width: 200px;
+    }
+}
+
+/* Extra small screens */
+@media (max-width: 576px) {
+    .product-grid, .testimonial-grid {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .testimonial-item, .product-item {
+        width: 90%;
+    }
+
+    .hero-text h2 {
+        font-size: 1.8rem;
+    }
+
+    .hero-text p {
+        font-size: 1rem;
+    }
+
+    .cta-btn {
+        padding: 8px 12px;
+        font-size: 0.9rem;
+    }
+
+    .newsletter-form input {
+        width: 90%;
+        margin-bottom: 10px;
+    }
+
+    .newsletter-btn {
+        width: 90%;
+    }
+}

@@ -1,0 +1,201 @@
+.container{
+    width: 100vw;
+    display: flex;
+    flex-direction: column;
+}
+
+.menus{
+    width: 100%;
+    height: 55px;
+    margin-top: 2.5rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 15px;
+    padding: 0 2rem;
+    margin-bottom: 2rem;
+}
+
+.menu-container{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0 9%;
+}
+
+.submenu{
+    width: 100%;
+    height: 40px;
+    margin-top: 0.2rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 15px;
+    padding: 0 2rem;
+    margin-bottom: 2rem;
+}
+
+.table-container{
+    width: 100%;
+    padding: 0 11%;
+}
+
+.add-button-container{
+    margin: 0 11%;
+    margin-right: 12.5%;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: end;
+}
+
+.add-button{
+    height: 80%;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    background: #abe2bd;
+    border-radius: 8px;
+    border: 1px solid #59c87c;
+    padding: 0 15px;
+    transition: background-color 0.3s ease;
+    cursor: pointer;
+}
+
+.add-button:hover {
+    background: #8edca1;
+}
+
+/* Approval/Rejection Button Container */
+.approval-button-container{
+    display: flex;
+    justify-content: flex-end;
+    padding: 0 11%;
+    margin-bottom: 1.5rem;
+}
+
+.approval-button, .rejection-button{
+    height: 40px;
+    padding: 0 20px;
+    border-radius: 8px;
+    border: none;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.approval-button{
+    background-color: #4CAF50; /* Green for approval */
+    color: white;
+}
+
+.approval-button:hover{
+    background-color: #45a049;
+}
+
+.rejection-button{
+    background-color: #f44336; /* Red for rejection */
+    color: white;
+    margin-left: 10px;
+}
+
+.rejection-button:hover{
+    background-color: #d32f2f;
+}
+
+/* Table Adjustment */
+.table-container{
+    margin-top: 2rem;
+    overflow-x: auto;
+}
+
+.table-container table{
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table-container th, .table-container td{
+    text-align: left;
+    padding: 8px;
+}
+
+.table-container th{
+    background-color: #f2f2f2;
+    font-weight: 700;
+}
+
+.table-container tr:nth-child(even){
+    background-color: #f9f9f9;
+}
+
+.table-container tr:hover{
+    background-color: #f1f1f1;
+}
+
+.table-container td .edit-icon, .table-container td .delete-icon{
+    cursor: pointer;
+    color: #1976d2;
+    margin-right: 10px;
+}
+
+.table-container td .delete-icon{
+    color: #f44336;
+}
+
+/* Modal Styles */
+.modal-container{
+    background-color: rgba(0, 0, 0, 0.5);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content{
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    width: 400px;
+    text-align: center;
+}
+
+.modal-content h2{
+    font-size: 24px;
+    margin-bottom: 15px;
+}
+
+.modal-buttons{
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.modal-buttons .modal-approve, .modal-buttons .modal-reject{
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.modal-buttons .modal-approve{
+    background-color: #4CAF50;
+    color: white;
+}
+
+.modal-buttons .modal-reject{
+    background-color: #f44336;
+    color: white;
+}
+
+.modal-buttons .modal-close{
+    background-color: #cccccc;
+    color: black;
+    margin-right: 10px;
+}
