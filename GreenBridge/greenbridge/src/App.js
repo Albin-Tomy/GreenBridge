@@ -5,7 +5,6 @@ import RegLogin from './Pages/Authentication/RegLogin';
 import './Login.css';
 import Header from './components/Header';
 import Admin from './Pages/Dashboard/Admin/Admin';
-import './Pages/Dashboard/Shg/ShgRegitration.css';
 import Home from './Pages/Home/Home';
 import LandingPage from './Pages/Home/LandingPage';
 import 'bootstrap/dist/css/bootstrap.min.css';
