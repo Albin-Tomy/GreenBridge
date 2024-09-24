@@ -6,12 +6,11 @@ import axios from "axios";
 import { useNavigate } from 'react-router-dom';
 
 const Login = ({ setIslogin }) => {
-
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isEmailValid, setIsEmailValid] = useState(false);
-
+  
   const navigate = useNavigate(); // Initialize useNavigate here
 
   // Reset email and password fields when the component is loaded
@@ -44,12 +43,12 @@ const Login = ({ setIslogin }) => {
       console.log('User logged in:', response.data);
 
       // Check if the user is active
-      if (response.data.is_active) {
+      if (response.data.user.is_active) {
         // Check if the user is SHG or not, and navigate accordingly
-        if (response.data.is_shg) {
-          navigate('/admin');  // Redirect to admin page
+        if (response.data.user.is_shg) {
+          navigate('/admin/home');  // Redirect to SHG dashboard
         } else {
-          navigate('/home');   // Redirect to home page
+          navigate('/home');   // Redirect to regular user home page
         }
       } else {
         // Alert user if not activated

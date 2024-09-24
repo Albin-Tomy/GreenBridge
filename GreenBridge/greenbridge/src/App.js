@@ -5,7 +5,6 @@ import RegLogin from './Pages/Authentication/RegLogin';
 import './Login.css';
 import Header from './components/Header';
 import Admin from './Pages/Dashboard/Admin/Admin';
-// import ShgRegistration from './Pages/Dashboard/Shg/ShgRegistration';
 import './Pages/Dashboard/Shg/ShgRegitration.css';
 import Home from './Pages/Home/Home';
 import LandingPage from './Pages/Home/LandingPage';
@@ -37,6 +36,10 @@ function App() {
         <Route path="/admin/pending-requests" element={<PendingRequestsPage />} />
         <Route path="/admin/view-all-shgs" element={<AllSHGsPage />} />
         <Route path='/shgregister' element={<ShgRegistration />} />
+        <Route path="/login" element={<RegLogin />} />
+        <Route path="/signup" element={<RegLogin />} />
+        <Route path="/" element={<LandingPage />} />
+        <Route path='/home' element={<Home/>} />
       </Routes>
     </Router>
   );
