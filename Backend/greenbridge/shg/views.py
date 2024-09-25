@@ -2,11 +2,10 @@ from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
-from .models import SHGRegistration, SHGProfile, User
+from .models import SHGRegistration, SHGProfile
 from .serializers import SHGRegistrationSerializer
 from authentication.models import User
 from django.contrib.auth.hashers import make_password
-
 
 @api_view(['POST'])
 def register_shg(request):
@@ -35,7 +34,8 @@ def register_shg(request):
             name=data.get('name'),
             email=email,
             password=user.password,  # Store the hashed password
-            registration_number=data.get('registration_number')
+            registration_number=data.get('registration_number'),
+            status='Pending'  # Set the status as Pending
         )
 
         return Response({'message': 'Registration submitted successfully. Awaiting admin approval.'}, status=status.HTTP_201_CREATED)
@@ -50,13 +50,16 @@ def approve_shg(request):
     try:
         shg_id = request.data.get('shg_id')
         action = request.data.get('action')
-        
+
+        if not action or action not in ['approve', 'reject']:
+            return Response({'error': 'Invalid action. Use "approve" or "reject".'}, status=status.HTTP_400_BAD_REQUEST)
+
         shg_registration = SHGRegistration.objects.get(id=shg_id)
 
         if action == 'approve':
-            # Activate the corresponding user
+            # Activate the user and approve SHG registration
             user = User.objects.get(email=shg_registration.email)
-            user.is_active = True  # Activate user upon approval
+            user.is_active = True
             user.save()
 
             # Create SHG profile upon approval
@@ -72,9 +75,10 @@ def approve_shg(request):
             return Response({'message': 'SHG approved successfully!'}, status=status.HTTP_200_OK)
 
         elif action == 'reject':
-            # If rejected, mark SHG as rejected and keep user inactive
+            # Reject SHG
             shg_registration.status = 'Rejected'
             shg_registration.save()
+
             return Response({'message': 'SHG rejected successfully!'}, status=status.HTTP_200_OK)
 
     except SHGRegistration.DoesNotExist:
@@ -83,37 +87,23 @@ def approve_shg(request):
         return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
-# View to get all pending SHG requests
 @api_view(['GET'])
-@permission_classes([IsAdminUser])  # Ensure only admins can access this view
+@permission_classes([IsAdminUser])
 def get_pending_shg_requests(request):
     try:
-        # Fetch SHGs where status is 'Pending' or not approved yet
         pending_shgs = SHGRegistration.objects.filter(status='Pending')
-        
-        # Serialize the data
         serializer = SHGRegistrationSerializer(pending_shgs, many=True)
-        
-        # Return the serialized data
         return Response(serializer.data, status=status.HTTP_200_OK)
-
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
-# View to get all SHGs (both pending and approved)
 @api_view(['GET'])
-@permission_classes([IsAdminUser])  # Ensure only admins can access this view
+@permission_classes([IsAdminUser])
 def get_all_shgs(request):
     try:
-        # Fetch all SHGs regardless of their status
         all_shgs = SHGRegistration.objects.all()
-        
-        # Serialize the data
         serializer = SHGRegistrationSerializer(all_shgs, many=True)
-        
-        # Return the serialized data
         return Response(serializer.data, status=status.HTTP_200_OK)
-
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)

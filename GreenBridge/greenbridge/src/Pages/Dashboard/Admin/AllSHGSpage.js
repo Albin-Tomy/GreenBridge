@@ -8,7 +8,7 @@ const AllSHGsPage = () => {
     // Fetch all SHGs when the component mounts
     const fetchAllShgs = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/api/adminpanel/all/');
+        const response = await axios.get('http://localhost:8000/api/shg/all/');
         setAllShgs(response.data);
       } catch (error) {
         console.error('Error fetching SHGs:', error);
