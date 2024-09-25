@@ -19,7 +19,7 @@ const Dropdown = ({ isOpen, toggleDropdown }) => (
       <div className="dropdown-content">
         <Link to="/login">Login</Link>
         <Link to="/signup">Signup</Link>
-        <Link to="/shg-register">Join the Community</Link>
+        <Link to="/shgregister">Join the Community</Link>
       </div>
     )}
   </div>

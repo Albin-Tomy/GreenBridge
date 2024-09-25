@@ -1,27 +1,38 @@
 import React from 'react';
-import './shg.css'; // Assuming the CSS file remains unchanged
+import './shg.css'; 
 import { Link } from 'react-router-dom';
-import collection from '../../assets/wastwcollection.jpeg';
+import Header from '../../components/Header';
+
+// Image Imports
+import collection from '../../assets/organic.jpeg';
 import collection1 from '../../assets/community.jpeg';
 import collection2 from '../../assets/community1.jpeg';
 import recycle from '../../assets/recycle.jpeg';
 import organic from '../../assets/organic.jpeg';
-import ewaste from  '../../assets/ewaste.jpeg';
+import ewaste from '../../assets/ewaste.jpeg';
 import plastic from '../../assets/plastic.jpeg';
 import community from '../../assets/community1.jpeg';
+import promo2 from '../../assets/waste management.jpeg'; // Corrected path and filename
+import story1 from '../../assets/waste1.jpeg';
+import story2 from '../../assets/honey.jpg';
+import story3 from '../../assets/ewsate1.jpeg';
 
 const SHGHome = () => {
     return (
+        <div className='head'>
+
+        <Header/>
         <div>
+            {/* Hero Section */}
             <section className="hero-banner">
                 <div className="main-container">
-                    <div className="image-item image1">
+                    <div className="image-item">
                         <img src={collection} alt="Waste Collection Service" />
                     </div>
-                    <div className="image-item image2">
+                    <div className="image-item">
                         <img src={collection1} alt="Community Effort" />
                     </div>
-                    <div className="image-item image3">
+                    <div className="image-item">
                         <img src={collection2} alt="Sustainable Collection" />
                     </div>
                 </div>
@@ -95,7 +106,7 @@ const SHGHome = () => {
                         </Link>
                     </div>
                     <div className="image">
-                        <img src="promo2.jpg" alt="Waste Management Training" />
+                        <img src={promo2} alt="Waste Management Training" />
                     </div>
                 </div>
             </div>
@@ -105,19 +116,19 @@ const SHGHome = () => {
                 <h2>Success Stories</h2>
                 <div className="story-container">
                     <div className="story-card">
-                        <img src="story1.jpg" alt="SHG in Action" />
+                        <img src={story1} alt="SHG in Action" />
                         <h3>Village SHG's Recycling Initiative</h3>
                         <p>Our local SHG successfully collected and recycled 1 ton of plastic waste.</p>
                     </div>
 
                     <div className="story-card">
-                        <img src="story2.jpg" alt="Waste Collection Event" />
+                        <img src={story2} alt="Waste Collection Event" />
                         <h3>Community Cleanup Success</h3>
                         <p>500 kg of organic waste was composted in our latest cleanup drive.</p>
                     </div>
 
                     <div className="story-card">
-                        <img src="story3.jpg" alt="E-Waste Recycling Efforts" />
+                        <img src={story3} alt="E-Waste Recycling Efforts" />
                         <h3>E-Waste Recycling Achievements</h3>
                         <p>Our efforts have led to safe disposal and recycling of 300 e-waste items.</p>
                     </div>
@@ -128,6 +139,7 @@ const SHGHome = () => {
             <footer>
                 <p>© 2024 SHG Waste Collection Services | Designed by [Your Name]</p>
             </footer>
+        </div>
         </div>
     );
 };
