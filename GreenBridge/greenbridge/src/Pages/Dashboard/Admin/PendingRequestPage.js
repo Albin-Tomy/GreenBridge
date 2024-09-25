@@ -8,7 +8,7 @@ const PendingRequestsPage = () => {
     // Fetch pending SHG requests when the component mounts
     const fetchPendingRequests = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/api/shg/pending/');
+        const response = await axios.get('http://localhost:8000/api/adminpanel/pending/');
         setPendingRequests(response.data);
       } catch (error) {
         console.error('Error fetching pending requests:', error);
@@ -20,7 +20,7 @@ const PendingRequestsPage = () => {
 
   const handleApproval = async (id, action) => {
     try {
-      const response = await axios.post('http://localhost:8000/api/shg/approve/', { shg_id: id, action });
+      const response = await axios.post('http://localhost:8000/api/adminpanel/approve/', { shg_id: id, action });
       alert(response.data.message);
       setPendingRequests(pendingRequests.filter(request => request.id !== id)); // Remove from list
     } catch (error) {
