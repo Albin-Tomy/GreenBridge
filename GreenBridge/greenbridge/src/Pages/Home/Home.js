@@ -1,85 +1,135 @@
 import React from 'react';
-import './homepage-styles.css';
+import './shg.css'; // Assuming the CSS file remains unchanged
+import { Link } from 'react-router-dom';
+import collection from '../../assets/wastwcollection.jpeg';
+import collection1 from '../../assets/community.jpeg';
+import collection2 from '../../assets/community1.jpeg';
+import recycle from '../../assets/recycle.jpeg';
+import organic from '../../assets/organic.jpeg';
+import ewaste from  '../../assets/ewaste.jpeg';
+import plastic from '../../assets/plastic.jpeg';
+import community from '../../assets/community1.jpeg';
 
-const Home = () => {
+const SHGHome = () => {
     return (
         <div>
-
-            <main>
-                {/* Hero Section */}
-                <section className="hero">
-                    <div className="hero-text">
-                        <h2>Discover the Power of Nature</h2>
-                        <p>Handcrafted, organic products for a healthier, more balanced lifestyle.</p>
-                        <a href="#" className="cta-btn">Shop Now</a>
+            <section className="hero-banner">
+                <div className="main-container">
+                    <div className="image-item image1">
+                        <img src={collection} alt="Waste Collection Service" />
                     </div>
-                </section>
+                    <div className="image-item image2">
+                        <img src={collection1} alt="Community Effort" />
+                    </div>
+                    <div className="image-item image3">
+                        <img src={collection2} alt="Sustainable Collection" />
+                    </div>
+                </div>
+                <div className="text-container">
+                    <h1>Empowering Communities, Sustaining Tomorrow</h1>
+                    <p>Join our Self-Help Groups in making a cleaner, greener environment.</p>
+                </div>
+            </section>
 
-                {/* Featured Products Section */}
-                <section className="featured-products">
-                    <h2>Our Best Sellers</h2>
-                    <div className="product-grid">
-                        <div className="product-item">
-                            <img src="product1.jpg" alt="Product 1" />
-                            <h3>Organic Body Lotion</h3>
-                            <p>Moisturize naturally with this all-organic lotion.</p>
-                            <a href="#" className="product-btn">Buy Now</a>
-                        </div>
-                        <div className="product-item">
-                            <img src="product2.jpg" alt="Product 2" />
-                            <h3>Herbal Shampoo</h3>
-                            <p>Strengthen your hair with our herbal blend.</p>
-                            <a href="#" className="product-btn">Buy Now</a>
-                        </div>
-                        <div className="product-item">
-                            <img src="product3.jpg" alt="Product 3" />
-                            <h3>Essential Oils Set</h3>
-                            <p>Relax and rejuvenate with our essential oils.</p>
-                            <a href="#" className="product-btn">Buy Now</a>
+            {/* Services Section */}
+            <section className="services-section">
+                <h2>Our Waste Collection Services</h2>
+                <div className="service-item">
+                    <div className="outer-circle">
+                        <div className="inner-circle">
+                            <img src={recycle} alt="Recycling Services" />
                         </div>
                     </div>
-                </section>
+                    <p>Recycling</p>
+                </div>
 
-                {/* Customer Testimonials Section */}
-                <section className="testimonials">
-                    <h2>What Our Customers Are Saying</h2>
-                    <div className="testimonial-grid">
-                        <div className="testimonial-item">
-                            <p>"GreenBridge's products have completely changed my skincare routine!"</p>
-                            <h4>- Sarah W.</h4>
-                        </div>
-                        <div className="testimonial-item">
-                            <p>"The herbal shampoo is amazing! My hair feels so much healthier."</p>
-                            <h4>- John D.</h4>
-                        </div>
-                        <div className="testimonial-item">
-                            <p>"Their essential oils have become a daily part of my self-care."</p>
-                            <h4>- Emily R.</h4>
+                <div className="service-item">
+                    <div className="outer-circle">
+                        <div className="inner-circle">
+                            <img src={organic} alt="Organic Waste Collection" />
                         </div>
                     </div>
-                </section>
+                    <p>Organic Waste</p>
+                </div>
 
-                {/* Newsletter Section */}
-                <section className="newsletter">
-                    <h2>Subscribe to Our Newsletter</h2>
-                    <p>Get the latest updates on new products and upcoming sales.</p>
-                    <form className="newsletter-form">
-                        <input type="email" placeholder="Enter your email" required />
-                        <button type="submit" className="newsletter-btn">Subscribe</button>
-                    </form>
-                </section>
-            </main>
+                <div className="service-item">
+                    <div className="outer-circle">
+                        <div className="inner-circle">
+                            <img src={ewaste} alt="E-Waste Collection" />
+                        </div>
+                    </div>
+                    <p>E-Waste</p>
+                </div>
 
+                <div className="service-item">
+                    <div className="outer-circle">
+                        <div className="inner-circle">
+                            <img src={plastic} alt="Plastic Waste Collection" />
+                        </div>
+                    </div>
+                    <p>Plastic Waste</p>
+                </div>
+            </section>
+
+            {/* Promotions Section */}
+            <div className="promotion">
+                <div className="section">
+                    <div className="image">
+                        <img src={community} alt="Community Cleanup Drive" />
+                    </div>
+                    <div className="text-content">
+                        <h2>Join Our <span className="highlight">Community Cleanup Drive</span></h2>
+                        <p>Be a part of a collective effort to keep our environment clean and sustainable.</p>
+                        <Link to="/signup">
+                            <button className="order-btn">Get Started</button>
+                        </Link>
+                    </div>
+                </div>
+
+                <div className="section">
+                    <div className="text-content">
+                        <h2>Exclusive <span className="highlight">Waste Management Training</span></h2>
+                        <p>Get trained in effective waste management and help build a greener future.</p>
+                        <Link to="/signup">
+                            <button className="order-btn">Get Started</button>
+                        </Link>
+                    </div>
+                    <div className="image">
+                        <img src="promo2.jpg" alt="Waste Management Training" />
+                    </div>
+                </div>
+            </div>
+
+            {/* Success Stories Section */}
+            <section className="success-stories">
+                <h2>Success Stories</h2>
+                <div className="story-container">
+                    <div className="story-card">
+                        <img src="story1.jpg" alt="SHG in Action" />
+                        <h3>Village SHG's Recycling Initiative</h3>
+                        <p>Our local SHG successfully collected and recycled 1 ton of plastic waste.</p>
+                    </div>
+
+                    <div className="story-card">
+                        <img src="story2.jpg" alt="Waste Collection Event" />
+                        <h3>Community Cleanup Success</h3>
+                        <p>500 kg of organic waste was composted in our latest cleanup drive.</p>
+                    </div>
+
+                    <div className="story-card">
+                        <img src="story3.jpg" alt="E-Waste Recycling Efforts" />
+                        <h3>E-Waste Recycling Achievements</h3>
+                        <p>Our efforts have led to safe disposal and recycling of 300 e-waste items.</p>
+                    </div>
+                </div>
+            </section>
+
+            {/* Footer */}
             <footer>
-                <p>&copy; 2024 GreenBridge | All Rights Reserved</p>
-                <ul className="footer-links">
-                    <li><a href="#">Privacy Policy</a></li>
-                    <li><a href="#">Terms of Service</a></li>
-                    <li><a href="#">FAQ</a></li>
-                </ul>
+                <p>© 2024 SHG Waste Collection Services | Designed by [Your Name]</p>
             </footer>
         </div>
     );
-}
+};
 
-export default Home;
+export default SHGHome;

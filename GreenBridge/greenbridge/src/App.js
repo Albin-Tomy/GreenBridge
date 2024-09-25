@@ -12,7 +12,6 @@ import PendingRequestsPage from './Pages/Dashboard/Admin/PendingRequestPage';
 import AllSHGsPage from './Pages/Dashboard/Admin/AllSHGSpage';
 import ShgRegistration from './Pages/Dashboard/Shg/ShgRegistration';
 
-
 function App() {
   return (
     // <Router>
