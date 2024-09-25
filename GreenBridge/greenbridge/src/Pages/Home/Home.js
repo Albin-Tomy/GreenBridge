@@ -14,7 +14,7 @@ import plastic from '../../assets/plastic.jpeg';
 import community from '../../assets/community1.jpeg';
 import promo2 from '../../assets/waste management.jpeg'; // Corrected path and filename
 import story1 from '../../assets/waste1.jpeg';
-import story2 from '../../assets/honey.jpg';
+import story2 from '../../assets/wastwcollection.jpeg';
 import story3 from '../../assets/ewsate1.jpeg';
 
 const SHGHome = () => {

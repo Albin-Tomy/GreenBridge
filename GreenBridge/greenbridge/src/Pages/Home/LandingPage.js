@@ -7,7 +7,7 @@ import Header from '../../components/Header';
 const LandingPage = () => {
   return (
     <div>
-        <Header></Header>
+        <Header/>
         <div className="landing-page">
       {/* Hero Section */}
       <section className="hero">
