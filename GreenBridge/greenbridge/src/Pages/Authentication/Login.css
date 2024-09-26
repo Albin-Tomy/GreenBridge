@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap');
 
-body {
+.login-page {
     margin: 0;
     padding: 0;
     font-family: 'Roboto', sans-serif;
@@ -57,7 +57,7 @@ body {
     flex-direction: column;
     justify-content: center;
     color: #fff;
-    background-color: rgba(0, 0, 0, 0.5);
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #50a3a2 100%) !important;
 }
 
 .brand {
@@ -118,7 +118,7 @@ body {
     width: 100%;
     padding: 14px;
     border: none;
-    border-radius: 50px;
+    border-radius: 50px !important;
     background-color: rgba(255, 255, 255, 0.3);
     color: #fff;
     font-size: 16px;

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import google from '../../assets/Google.png'; 
 import logo from '../../assets/logo.png';
-import '../../Login.css'; // Ensure this CSS file is created based on your styles
+import './Login.css'; // Ensure this CSS file is created based on your styles
 import axios from 'axios';
 
 const Register = ({ setIslogin }) => {
