@@ -1,40 +1,46 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import './PendingRequest.css';
 
 const PendingRequestsPage = () => {
   const [pendingRequests, setPendingRequests] = useState([]);
 
   // Function to fetch token from localStorage (adjust if you're storing it elsewhere)
   const getToken = () => {
-    return localStorage.getItem('authToken');  // Assuming you're storing the token in localStorage
+    const token = localStorage.getItem('authToken');
+    console.log("Retrieved Token:", token);  // Debugging line
+    return token;
   };
-
-  useEffect(() => {
-    // Fetch pending SHG requests when the component mounts
-    const fetchPendingRequests = async () => {
-      try {
-        const token = getToken();  // Get the auth token
-
-        if (!token) {
-          console.error('No token found. Redirect to login.');
-          // Optionally redirect the user to the login page if no token exists
-          return;
-        }
-
-        const response = await axios.get('http://localhost:8000/api/shg/pending/', {
-          headers: {
-            Authorization: `Bearer ${token}`  // Include the token in the request headers
-          }
-        });
-
-        setPendingRequests(response.data);
-      } catch (error) {
-        console.error('Error fetching pending requests:', error);
+  
+  const fetchPendingRequests = async () => {
+    try {
+      const token = getToken();  // Get the auth token
+  
+      if (!token) {
+        console.error('No token found. Redirecting to login.');
+        window.location.href = '/login';  // Redirect to login if no token found
+        return;
       }
-    };
+  
+      const response = await axios.get('http://localhost:8000/api/shg/pending/', {
+        headers: {
+          Authorization: `Bearer ${token}`  // Include the token in the request headers
+        }
+      });
+  
+      if (response.data) {
+        setPendingRequests(response.data);  // Update state with pending requests
+      }
+    } catch (error) {
+      console.error('Error fetching pending requests:', error);
+    }
+  };
+  
 
-    fetchPendingRequests();
-  }, []);
+  // Use useEffect to fetch pending requests when the component mounts
+  useEffect(() => {
+    fetchPendingRequests();  // Call the function to fetch pending requests
+  }, []);  // Empty dependency array means this runs once when the component mounts
 
   const handleApproval = async (id, action) => {
     try {

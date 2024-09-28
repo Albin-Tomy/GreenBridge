@@ -10,10 +10,11 @@ const Login = ({ setIslogin }) => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isEmailValid, setIsEmailValid] = useState(false);
-  
+
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Clear inputs when component mounts
     setEmail('');
     setPassword('');
   }, []);
@@ -32,9 +33,11 @@ const Login = ({ setIslogin }) => {
         password,
       });
 
+      // Store token in localStorage
       localStorage.setItem('token', response.data.access);
       console.log('User logged in:', response.data);
 
+      // Redirect based on role
       if (response.data.user.is_active) {
         if (response.data.user.is_shg) {
           navigate('/admin/home');
