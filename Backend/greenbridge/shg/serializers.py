@@ -9,7 +9,7 @@ from .models import SHGRegistration, SHGProfile
 class SHGRegistrationSerializer(serializers.ModelSerializer):
     class Meta:
         model = SHGRegistration
-        fields = ['id', 'name', 'email', 'registration_number', 'status']  # Include all necessary fields
+        fields = [ 'name', 'email', 'registration_number', 'status']  # Include all necessary fields
 
 
 class SHGProfileSerializer(serializers.ModelSerializer):

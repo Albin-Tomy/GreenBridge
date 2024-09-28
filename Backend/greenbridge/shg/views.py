@@ -87,17 +87,6 @@ def approve_shg(request):
         return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
-# @api_view(['GET'])
-# @permission_classes([IsAdminUser])
-# def get_pending_shg_requests(request):
-#     try:
-#         pending_shgs = SHGRegistration.objects.filter(status='Pending')
-#         serializer = SHGRegistrationSerializer(pending_shgs, many=True)
-#         return Response(serializer.data, status=status.HTTP_200_OK)
-#     except Exception as e:
-#         return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-
-
 @api_view(['GET'])
 @permission_classes([IsAdminUser])  # Ensure admin has access
 def get_pending_shg_requests(request):

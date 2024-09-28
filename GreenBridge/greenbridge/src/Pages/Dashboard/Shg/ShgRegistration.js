@@ -9,7 +9,7 @@ const ShgRegistration = () => {
         password: '',
         registration_number: ''
     });
-
+    const [isSubmitting, setIsSubmitting] = useState(false);  // State for submit button
     const [message, setMessage] = useState(null);
     const [error, setError] = useState(null);
 
@@ -22,7 +22,15 @@ const ShgRegistration = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log(formData); // Log the form data
+
+        // Simple client-side validation
+        if (formData.password.length < 8) {
+            setError('Password must be at least 8 characters long');
+            return;
+        }
+
+        setIsSubmitting(true);  // Disable button while submitting
+
         try {
             const response = await axios.post('http://localhost:8000/api/shg/register/', formData);
             setMessage(response.data.message);
@@ -36,10 +44,12 @@ const ShgRegistration = () => {
                 setError('Error: ' + error.message);
             }
             setMessage(null);
+        } finally {
+            setIsSubmitting(false);  // Re-enable button after submission
         }
     };
 
-    // Inline CSS styles (same as before)
+    // Inline CSS styles
     const styles = {
         backgroundContainer: {
             backgroundImage: `url(${backgroundImage})`,
@@ -173,13 +183,14 @@ const ShgRegistration = () => {
                         />
                     </div>
 
-                    <button 
-                        type="submit" 
+                    <button
+                        type="submit"
                         style={styles.submitButton}
-                        onMouseOver={e => e.target.style.backgroundColor = styles.submitButtonHover.backgroundColor}
-                        onMouseOut={e => e.target.style.backgroundColor = styles.submitButton.backgroundColor}
+                        disabled={isSubmitting}
+                        onMouseOver={(e) => e.target.style.backgroundColor = styles.submitButtonHover.backgroundColor}
+                        onMouseOut={(e) => e.target.style.backgroundColor = styles.submitButton.backgroundColor}
                     >
-                        Submit
+                        {isSubmitting ? 'Submitting...' : 'Submit'}
                     </button>
                 </form>
             </div>

@@ -4,11 +4,11 @@ from authentication.models import User
 # SHG Registration: Only stores basic registration information
 class SHGRegistration(models.Model):
     name = models.CharField(max_length=255)
-    email = models.EmailField(unique=True)
+    email = models.EmailField(unique=True, db_index=True)
     password = models.CharField(max_length=128)
-    registration_number = models.CharField(max_length=255, unique=True)
+    registration_number = models.CharField(max_length=255, unique=True, db_index=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    
+
     # Add this field
     status = models.CharField(max_length=20, choices=[('Pending', 'Pending'), ('Approved', 'Approved'), ('Rejected', 'Rejected')], default='Pending')
 
