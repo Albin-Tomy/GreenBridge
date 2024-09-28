@@ -3,6 +3,7 @@ import google from '../../assets/Google.png';
 import logo from '../../assets/logo.png';
 import './Login.css'; // Ensure this CSS file is created based on your styles
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
 const Register = ({ setIslogin }) => {
 
@@ -12,6 +13,9 @@ const Register = ({ setIslogin }) => {
   const [error, setError] = useState('');
   const [isEmailValid, setIsEmailValid] = useState(false);
   const [isPasswordMatch, setIsPasswordMatch] = useState(false);
+
+  // Initialize useNavigate hook
+  const navigate = useNavigate();
 
   // Email validation function
   const handleEmailChange = (e) => {
@@ -53,6 +57,10 @@ const Register = ({ setIslogin }) => {
         password,
       });
       console.log('User registered:', response.data);
+
+      // Redirect to the home page after successful registration
+      navigate('/home');  // Redirect to the home page (or any other route you want)
+
     } catch (error) {
       if (error.response && error.response.data) {
         setError(error.response.data.error); // Display the specific error message

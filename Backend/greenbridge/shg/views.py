@@ -11,12 +11,17 @@ from django.contrib.auth.hashers import make_password
 def register_shg(request):
     try:
         data = request.data
+        print('Received Data:', data)  # Log received data
+
+        # Required fields
+        required_fields = ['name', 'email', 'password', 'registration_number']
+        for field in required_fields:
+            if field not in data:
+                return Response({ "error": f"{field.replace('_', ' ').capitalize()} is required." }, status=status.HTTP_400_BAD_REQUEST)
+
         email = data.get('email')
         password = data.get('password')
-
-        # Check if email and password are provided
-        if not email or not password:
-            return Response({"error": "Email and password are required."}, status=status.HTTP_400_BAD_REQUEST)
+        registration_number = data.get('registration_number')
 
         # Check if user with this email already exists
         if User.objects.filter(email=email).exists():
@@ -34,14 +39,16 @@ def register_shg(request):
             name=data.get('name'),
             email=email,
             password=user.password,  # Store the hashed password
-            registration_number=data.get('registration_number'),
+            registration_number=registration_number,
             status='Pending'  # Set the status as Pending
         )
 
         return Response({'message': 'Registration submitted successfully. Awaiting admin approval.'}, status=status.HTTP_201_CREATED)
     
     except Exception as e:
+        print("Error occurred:", e)  # Log any other errors
         return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 @api_view(['POST'])
