@@ -34,7 +34,7 @@ const Login = ({ setIslogin }) => {
       });
 
       // Store token in localStorage
-      localStorage.setItem('token', response.data.access);
+      localStorage.setItem('authToken', response.data.access); // Ensure the key matches
       console.log('User logged in:', response.data);
 
       // Redirect based on role

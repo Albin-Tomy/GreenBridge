@@ -22,17 +22,24 @@ const ShgRegistration = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        console.log(formData); // Log the form data
         try {
             const response = await axios.post('http://localhost:8000/api/shg/register/', formData);
             setMessage(response.data.message);
             setError(null);
         } catch (error) {
-            setError(error.response?.data?.error || 'Failed to submit registration. Please try again.');
+            if (error.response) {
+                setError(error.response.data.error || 'Failed to submit registration. Please try again.');
+            } else if (error.request) {
+                setError('Network error. Please check your connection and try again.');
+            } else {
+                setError('Error: ' + error.message);
+            }
             setMessage(null);
         }
     };
 
-    // Inline CSS styles
+    // Inline CSS styles (same as before)
     const styles = {
         backgroundContainer: {
             backgroundImage: `url(${backgroundImage})`,

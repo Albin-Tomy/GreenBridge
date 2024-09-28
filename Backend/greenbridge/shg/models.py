@@ -8,6 +8,9 @@ class SHGRegistration(models.Model):
     password = models.CharField(max_length=128)
     registration_number = models.CharField(max_length=255, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    
+    # Add this field
+    status = models.CharField(max_length=20, choices=[('Pending', 'Pending'), ('Approved', 'Approved'), ('Rejected', 'Rejected')], default='Pending')
 
     def __str__(self):
         return self.name
