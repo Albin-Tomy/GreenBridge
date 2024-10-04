@@ -1,34 +1,50 @@
 import React from 'react';
-import { Link } from 'react-router-dom'; // Assuming you are using React Router for navigation
-import './ShgDashboard.css'; // Importing the responsive CSS
+import './ShgDashboard.css'; // Import the CSS for styling
+import { FaHome, FaPlus, FaList, FaShoppingCart, FaUser } from 'react-icons/fa';
 
-const ShgDashboard = () => {
+const SHGDashboard = () => {
   return (
-    <div className="shg-dashboard">
-      <aside className="sidebar">
-        <div className="sidebar-header">
+    <div className="shg-dashboard-container">
+      {/* Sidebar */}
+      <nav className="shg-sidebar">
+        <div className="shg-sidebar-header">
           <h2>SHG Dashboard</h2>
         </div>
-        <ul className="sidebar-menu">
-          <li><Link to="/add-product">Add Product</Link></li>
-          <li><Link to="/update-product">Update Product</Link></li>
-          <li><Link to="/delete-product">Delete Product</Link></li>
-          <li><Link to="/update-stock">Update Stock</Link></li>
-          <li><Link to="/update-profile">Update Profile</Link></li>
+        <ul className="shg-sidebar-menu">
+          <li><a href="#"><FaHome className="shg-icon" /> Dashboard</a></li>
+          <li><a href="#"><FaPlus className="shg-icon" /> Add Product</a></li>
+          <li><a href="#"><FaList className="shg-icon" /> View Products</a></li>
+          <li><a href="#"><FaShoppingCart className="shg-icon" /> Orders</a></li>
+          <li><a href="#"><FaUser className="shg-icon" /> Profile</a></li>
         </ul>
-      </aside>
+      </nav>
 
-      <div className="main-content">
-        <header className="shg-header">
-          <h1>Welcome to Your Dashboard</h1>
+      {/* Main Content */}
+      <div className="shg-main-content">
+        <header className="shg-dashboard-header">
+          <h1>Welcome to the SHG Dashboard</h1>
         </header>
 
-        <section className="content-section">
-          <p>Select an option from the sidebar to manage your products or update your profile.</p>
+        <section className="shg-dashboard-section">
+          <div className="shg-dashboard-card">
+            <h3>Add New Product</h3>
+            <p>Manage your products and inventory.</p>
+            <button className="shg-btn">Add Product</button>
+          </div>
+          <div className="shg-dashboard-card">
+            <h3>Orders</h3>
+            <p>View and manage customer orders.</p>
+            <button className="shg-btn">View Orders</button>
+          </div>
+          <div className="shg-dashboard-card">
+            <h3>Profile</h3>
+            <p>Update your SHG profile and contact info.</p>
+            <button className="shg-btn">Edit Profile</button>
+          </div>
         </section>
       </div>
     </div>
   );
 };
 
-export default ShgDashboard;
+export default SHGDashboard;

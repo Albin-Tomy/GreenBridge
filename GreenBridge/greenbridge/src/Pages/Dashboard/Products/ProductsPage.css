@@ -1,0 +1,136 @@
+/* ProductsPage.css */
+
+/* Main Container for the Products Page */
+.products-page-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f9f9f9; /* Light background for better contrast */
+  }
+  
+  /* Page Title */
+  .products-page-title {
+    text-align: center;
+    font-size: 2.5rem;
+    color: #333; /* Dark text for better readability */
+    margin-bottom: 20px;
+  }
+  
+  /* Form Styling */
+  .products-form {
+    background-color: #fff; /* White background for the form */
+    padding: 20px;
+    border-radius: 8px; /* Rounded corners for a modern look */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    margin-bottom: 40px; /* Space below the form */
+  }
+  
+  /* Form Inputs */
+  .products-input,
+  .products-select {
+    width: 100%; /* Full width for inputs */
+    padding: 12px; /* Comfortable padding */
+    margin-bottom: 15px; /* Space between inputs */
+    border: 1px solid #ccc; /* Light border for inputs */
+    border-radius: 5px; /* Rounded corners */
+    font-size: 1rem; /* Standard font size */
+  }
+  
+  /* File Input */
+  .products-file-input {
+    border: none; /* No border for file input */
+    background-color: #f3f3f3; /* Light background */
+    padding: 12px; /* Comfortable padding */
+    cursor: pointer; /* Hand cursor for interactivity */
+    font-size: 1rem; /* Standard font size */
+    margin-bottom: 15px; /* Space below the input */
+  }
+  
+  /* Submit Button */
+  .products-submit-button {
+    background-color: #28a745; /* Green background */
+    color: #fff; /* White text */
+    padding: 12px 20px; /* Comfortable padding */
+    border: none; /* No border */
+    border-radius: 5px; /* Rounded corners */
+    font-size: 1rem; /* Standard font size */
+    cursor: pointer; /* Hand cursor */
+    transition: background-color 0.3s; /* Smooth background color change */
+  }
+  
+  .products-submit-button:hover {
+    background-color: #218838; /* Darker green on hover */
+  }
+  
+  /* Product List Section */
+  .products-list-title {
+    text-align: center;
+    font-size: 2rem; /* Slightly smaller than the main title */
+    margin-bottom: 20px; /* Space below the title */
+    color: #333; /* Dark text for better readability */
+  }
+  
+  /* Product List Styling */
+  .products-list {
+    list-style: none; /* Remove default list styling */
+    padding: 0; /* Remove default padding */
+  }
+  
+  /* Individual Product Item */
+  .products-list-item {
+    background-color: #fff; /* White background for each item */
+    padding: 15px; /* Comfortable padding */
+    margin-bottom: 15px; /* Space between items */
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  }
+  
+  /* Product Details */
+  .product-name {
+    font-size: 1.5rem; /* Larger font for product name */
+    font-weight: bold; /* Bold text for emphasis */
+    margin-bottom: 5px; /* Space below the name */
+  }
+  
+  .product-description,
+  .product-price,
+  .product-stock {
+    margin-bottom: 5px; /* Space below each detail */
+  }
+  
+  /* Action Buttons for Each Product */
+  .products-action-button {
+    background-color: #007bff; /* Blue background */
+    color: #fff; /* White text */
+    border: none; /* No border */
+    padding: 8px 12px; /* Comfortable padding */
+    border-radius: 5px; /* Rounded corners */
+    cursor: pointer; /* Hand cursor */
+    margin-right: 5px; /* Space between buttons */
+    transition: background-color 0.3s; /* Smooth background color change */
+  }
+  
+  .products-action-button:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+  }
+  
+  /* Responsive Styles */
+  @media (max-width: 768px) {
+    .products-page-title {
+      font-size: 2rem; /* Smaller title on mobile */
+    }
+  
+    .products-form,
+    .products-list-item {
+      padding: 15px; /* Less padding on mobile */
+    }
+  
+    .products-input,
+    .products-select,
+    .products-file-input,
+    .products-submit-button,
+    .products-action-button {
+      font-size: 0.9rem; /* Smaller font size on mobile */
+    }
+  }
+  

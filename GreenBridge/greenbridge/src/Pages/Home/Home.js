@@ -1,12 +1,12 @@
 import React from 'react';
-import './shg.css'; 
+import './Home.css'; 
 import { Link } from 'react-router-dom';
 import Header from '../../components/Header';
 
 // Image Imports
 import collection from '../../assets/organic.jpeg';
 import collection1 from '../../assets/community.jpeg';
-import collection2 from '../../assets/community1.jpeg';
+import collection2 from '../../assets/waste2.jpeg';
 import recycle from '../../assets/recycle.jpeg';
 import organic from '../../assets/organic.jpeg';
 import ewaste from '../../assets/ewaste.jpeg';

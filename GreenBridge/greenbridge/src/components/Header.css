@@ -11,7 +11,7 @@
 header {
     width: 100%;
     height: 100px;
-    background: #079602; /* Set the header background to white */
+    background: #448a42; /* Set the header background to white */
     display: flex;
     justify-content: center; /* Center contents horizontally */
     align-items: center;
@@ -52,7 +52,7 @@ header {
 .company-name {
     font-size: 1.8em;
     font-weight: bold;
-    color: #0F2027; /* Dark text color for company name */
+    color: #eceeef; /* Dark text color for company name */
 }
 
 /* Navigation Links */
@@ -77,7 +77,7 @@ header {
     text-decoration: none;
     padding: 0.5em 1.2em;
     border-radius: 10px 10px 0 0;
-    color: #0F2027; /* Dark color for links */
+    color: #e5e9ea; /* Dark color for links */
     transition: all 0.4s;
     position: relative;
     z-index: 1;
@@ -92,7 +92,7 @@ header {
     width: 100%;
     height: 5px;
     border-radius: 10px 10px 0 0;
-    background: #2C5364; /* Dark background for hover effect */
+    background: #f0f0f0; /* Dark background for hover effect */
     transform: scaleY(0.05);
     z-index: -1;
     transition: all 0.4s;
@@ -130,7 +130,7 @@ header {
     position: absolute;
     right: 15px;
     font-size: 1.2em;
-    color: #0F2027;
+    color: #eeeeee;
     cursor: pointer;
 }
 
@@ -151,7 +151,7 @@ header {
     display: flex;
     align-items: center;
     text-decoration: none;
-    color: #0F2027; /* Dark color for icons */
+    color: #f1f3f5; /* Dark color for icons */
     transition: color 0.3s;
 }
 
@@ -162,7 +162,7 @@ header {
 .icon-label {
     font-size: 0.9em;
     margin-left: 0.3em;
-    color: #000;
+    color: #f0ebeb;
 }
 
 /* Dropdown Styles */
@@ -174,26 +174,74 @@ header {
 .dropdown-content {
     display: none;
     position: absolute;
-    background-color: #f9f9f9;
-    min-width: 160px;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    top: 100%; /* Dropdown appears below the profile icon */
+    right: 0;
+    background-color: #fff;
+    border-radius: 10px; /* Smooth corners */
+    min-width: 200px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); /* Soft shadow */
     z-index: 1;
+    transition: all 0.3s ease-in-out;
+    opacity: 0;
+    transform: translateY(10px);
 }
 
-.dropdown-container .dropdown-content a {
-    color: black;
-    padding: 12px 16px;
+.dropdown-content.show {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.dropdown-content a,
+.dropdown-content button {
+    display: block;
+    padding: 12px 20px;
+    font-size: 0.9em;
+    color: #333;
     text-decoration: none;
-    display: block;
+    background-color: #fff;
+    transition: background-color 0.3s ease;
+    border: none;
+    text-align: left;
+    width: 100%;
 }
 
-.dropdown-container .dropdown-content a:hover {
+.dropdown-content a:hover,
+.dropdown-content button:hover {
     background-color: #f1f1f1;
+    color: #079602;
 }
 
-/* Show the dropdown content when dropdown is open */
-.dropdown-container .dropdown-content {
+.dropdown-content a:active,
+.dropdown-content button:active {
+    background-color: #ececec;
+}
+
+.logout-btn {
+    cursor: pointer;
+    background: none;
+    color: #ff4d4d; /* Red color for logout */
+}
+
+.logout-btn:hover {
+    color: #ff0000; /* Darker red on hover */
+}
+
+.dropdown-username {
+    font-weight: bold;
+    padding: 12px 20px;
+    font-size: 1em;
+    border-bottom: 1px solid #eee;
+    background-color: #fafafa; /* Light gray background */
+    color: #079602; /* Green color for username */
+}
+
+.dropdown-container:hover .dropdown-content,
+.dropdown-container .dropdown-content.show {
     display: block;
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
 /* Mobile Responsive */

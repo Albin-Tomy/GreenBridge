@@ -9,6 +9,12 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import PendingRequestsPage from './Pages/Dashboard/Admin/PendingRequestPage';
 import AllSHGsPage from './Pages/Dashboard/Admin/AllSHGSpage';
 import ShgRegistration from './Pages/Dashboard/Shg/ShgRegistration';
+import SHGDashboard from './Pages/Dashboard/Shg/ShgDashboard';
+import ProductsPage from './Pages/Dashboard/Products/ProductsPage';
+import Profile from './Pages/Dashboard/User/Profile';
+import ForgotPassword from './Pages/Authentication/ForgotPassword'; 
+import ResetPassword from './Pages/Authentication/ResetPassword';
+
 
 function App() {
   return (
@@ -23,6 +29,11 @@ function App() {
         <Route path="/signup" element={<RegLogin />} />
         <Route path="/home" element={<LandingPage />} />
         <Route path='/' element={<Home/>} />
+        <Route path='/shg' element={<SHGDashboard/>}/>
+        <Route path='/products' element={<ProductsPage/>}/>
+        <Route path='/profile' element={<Profile/>}/>
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/password-reset-confirm/:uidb64/:token" element={<ResetPassword />} />
       </Routes>
     </Router>
   );

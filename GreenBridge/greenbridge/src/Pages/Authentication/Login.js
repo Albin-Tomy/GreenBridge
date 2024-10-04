@@ -10,8 +10,9 @@ const Login = ({ setIslogin }) => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isEmailValid, setIsEmailValid] = useState(false);
+  const [isForgetPassword, setIsForgetPassword] = useState(false); // State for reset password flow
 
-  const navigate = useNavigate();
+  const navigate = useNavigate();  // Initialize the useNavigate hook
 
   useEffect(() => {
     // Clear inputs when component mounts
@@ -32,19 +33,21 @@ const Login = ({ setIslogin }) => {
         email,
         password,
       });
-
+  
       // Store token in localStorage
-      localStorage.setItem('authToken', response.data.access); // Ensure the key matches
+      localStorage.setItem('authToken', response.data.access); // Access token
+      localStorage.setItem('user', JSON.stringify(response.data.user)); // User details
+  
       console.log('User logged in:', response.data);
-
+  
       // Redirect based on role
       if (response.data.user.is_active) {
-        if (response.data.user.is_shg) {
-          navigate('/admin/home');
-        } else if (response.data.user.is_superuser) {
-          navigate('/home');
+        if (response.data.user.is_superuser) {
+          navigate('/admin/home'); // Redirect to admin dashboard
+        } else if (response.data.user.is_shg) {
+          navigate('/shg'); // Redirect to SHG dashboard
         } else {
-          navigate('/home');
+          navigate('/home'); // Redirect to general user dashboard
         }
       } else {
         alert('User is not activated/approved. Please try again later.');
@@ -54,7 +57,7 @@ const Login = ({ setIslogin }) => {
       setError('Login failed. Please check your credentials.');
     }
   };
-
+  
   const formSubmit = async (e) => {
     e.preventDefault();
 
@@ -68,6 +71,28 @@ const Login = ({ setIslogin }) => {
     await handleLogin();
   };
 
+  // Function to handle Forgot Password click
+  const handleForgotPassword = () => {
+    setIsForgetPassword(true);  // Show the reset password form
+  };
+
+  // Function to handle reset password request
+  const requestResetPassword = () => {
+    const formData = new FormData();
+    formData.append("email", email);
+
+    axios.post('http://localhost:8000/api/v1/auth/password-reset/', formData)
+      .then((response) => {
+        if (response.status === 200) {
+          alert('Reset password link sent to your email');
+        }
+      })
+      .catch((error) => {
+        console.error('Error sending reset password link:', error);
+        setError(error.response?.data?.error || 'Failed to send reset password link.');
+      });
+  };
+
   return (
     <div className="login-page">
       <div className="login-right">
@@ -78,60 +103,90 @@ const Login = ({ setIslogin }) => {
           <h2 className="brand-name">GREENBRIDGE</h2>
         </div>
 
-        <h2>Login</h2>
-        <form onSubmit={formSubmit}>
-          <div className="input-group">
-            <label htmlFor="email">E-mail</label>
-            <input
-              type="text"
-              id="email"
-              name="email"
-              placeholder="E-mail"
-              value={email}
-              onChange={handleEmailChange}
-              autoComplete="off"
-            />
-          </div>
+        <h2>{isForgetPassword ? "Reset Your Password" : "Login"}</h2>
 
-          <div className="input-group">
-            <label htmlFor="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+        {!isForgetPassword ? (
+          <form onSubmit={formSubmit}>
+            <div className="input-group">
+              <label htmlFor="email">E-mail</label>
+              <input
+                type="text"
+                id="email"
+                name="email"
+                placeholder="E-mail"
+                value={email}
+                onChange={handleEmailChange}
+                autoComplete="off"
+              />
+            </div>
+
+            <div className="input-group">
+              <label htmlFor="password">Password</label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                disabled={!isEmailValid}
+                autoComplete="new-password"
+              />
+              <span onClick={handleForgotPassword} className="forgot-password" style={{cursor: "pointer"}}>
+                Forgot Password? <strong>Click Here</strong>
+              </span>
+            </div>
+
+            {error && <p className="form-error">{error}</p>}
+
+            <button
+              type="submit"
+              className="login-btn"
+              disabled={!isEmailValid || password === ''}
+            >
+              Sign In
+            </button>
+
+            <div className="or-divider">or</div>
+
+            <button type="button" className="google-btn">
+              <img src={google} alt="Google Logo" />
+            </button>
+          </form>
+        ) : (
+          <form>
+            <div className="input-group">
+              <label htmlFor="email">Enter Your Registered Email</label>
+              <input
+                type="text"
+                id="email"
+                name="email"
+                placeholder="E-mail"
+                value={email}
+                onChange={handleEmailChange}
+                autoComplete="off"
+              />
+            </div>
+
+            {error && <p className="form-error">{error}</p>}
+
+            <button
+              onClick={requestResetPassword}
+              className="login-btn"
               disabled={!isEmailValid}
-              autoComplete="new-password"
-            />
-            <a href="#" className="forgot-password">
-              Forgot Password? <strong>Click Here</strong>
-            </a>
+            >
+              Reset Password
+            </button>
+          </form>
+        )}
+
+        {!isForgetPassword && (
+          <div className="sign-up-link">
+            <p>
+              <a href="#" onClick={() => setIslogin(false)}>New User? Create Account</a>
+            </p>
           </div>
-
-          {error && <p className="form-error">{error}</p>}
-
-          <button
-            type="submit"
-            className="login-btn"
-            disabled={!isEmailValid || password === ''}
-          >
-            Sign In
-          </button>
-
-          <div className="or-divider">or</div>
-
-          <button type="button" className="google-btn">
-            <img src={google} alt="Google Logo" />
-          </button>
-        </form>
-
-        <div className="sign-up-link">
-          <p>
-            <a href="#" onClick={() => setIslogin(false)}>New User? Create Account</a>
-          </p>
-        </div>
+        )}
       </div>
     </div>
   );

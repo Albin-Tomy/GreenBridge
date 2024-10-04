@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import './PendingRequest.css';
+import './PendingRequest.css'; // Updated file name
 
 const PendingRequestsPage = () => {
   const [pendingRequests, setPendingRequests] = useState([]);
@@ -8,7 +8,7 @@ const PendingRequestsPage = () => {
 
   // Function to fetch token from localStorage
   const getToken = () => {
-    const token = localStorage.getItem('authToken'); // Ensure this matches the login component
+    const token = localStorage.getItem('authToken'); 
     console.log("Retrieved Token:", token);  // Debugging line
     return token;
   };
@@ -23,11 +23,7 @@ const PendingRequestsPage = () => {
           return;
         }
 
-        const response = await axios.get('http://localhost:8000/api/shg/pending/', {
-          headers: {
-            Authorization: `Bearer ${token}`  // Include the token in the request headers
-          }
-        });
+        const response = await axios.get('http://localhost:8000/api/shg/pending/');
 
         if (response.data) {
           console.log("Fetched Pending Requests:", response.data);  // Debugging line
@@ -42,7 +38,7 @@ const PendingRequestsPage = () => {
     fetchPendingRequests();
   }, []);
 
-  const handleApproval = async (id, action) => {
+  const handleApproval = async (email, action) => {
     try {
       const token = getToken();  // Get the auth token
 
@@ -52,31 +48,26 @@ const PendingRequestsPage = () => {
       }
 
       const response = await axios.post('http://localhost:8000/api/shg/approve/', 
-        { shg_id: id, action },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`  // Include the token in the request headers
-          }
-        }
+        { shg_email: email, action }
       );
 
       alert(response.data.message);
-      setPendingRequests(pendingRequests.filter(request => request.id !== id)); // Remove from list
+      setPendingRequests(pendingRequests.filter(request => request.email !== email)); // Remove from list
     } catch (error) {
       console.error('Error approving/rejecting SHG:', error);
     }
   };
 
   return (
-    <div>
-      <h1>Pending SHG Requests</h1>
-      {errorMessage && <p>{errorMessage}</p>}  {/* Display error message if exists */}
+    <div className="pending-requests-page">
+      <h1 className="pending-requests-title">Pending SHG Requests</h1>
+      {errorMessage && <p className="error-message">{errorMessage}</p>}  
       {pendingRequests.length === 0 ? (
-        <p>No pending requests.</p>
+        <p className="no-requests-message">No pending requests.</p>
       ) : (
-        <table>
+        <table className="pending-requests-table">
           <thead>
-            <tr>
+            <tr className="table-header">
               <th>Name</th>
               <th>Email</th>
               <th>Registration Number</th>
@@ -85,13 +76,21 @@ const PendingRequestsPage = () => {
           </thead>
           <tbody>
             {pendingRequests.map(request => (
-              <tr key={request.id}>
+              <tr key={request.id} className="table-row">
                 <td>{request.name}</td>
                 <td>{request.email}</td>
                 <td>{request.registration_number}</td>
                 <td>
-                  <button onClick={() => handleApproval(request.id, 'approve')}>Approve</button>
-                  <button onClick={() => handleApproval(request.id, 'reject')}>Reject</button>
+                  <button 
+                    className="action-button approve-button"
+                    onClick={() => handleApproval(request.email, 'approve')}>
+                    Approve
+                  </button>
+                  <button 
+                    className="action-button reject-button"
+                    onClick={() => handleApproval(request.email, 'reject')}>
+                    Reject
+                  </button>
                 </td>
               </tr>
             ))}

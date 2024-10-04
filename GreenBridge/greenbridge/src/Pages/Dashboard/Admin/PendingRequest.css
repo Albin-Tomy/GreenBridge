@@ -1,0 +1,96 @@
+/* Styles for the entire page */
+.pending-requests-page {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 20px;
+  }
+  
+  .pending-requests-title {
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
+  }
+  
+  /* Table styles */
+  .pending-requests-table {
+    width: 80%;
+    margin: 0 auto;
+    border-collapse: collapse;
+    box-shadow: 0px 0px 12px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+  }
+  
+  .table-header {
+    background-color: #007BFF;
+    color: white;
+  }
+  
+  .pending-requests-table th,
+  .pending-requests-table td {
+    padding: 12px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .pending-requests-table tr:nth-child(even) {
+    background-color: #f2f2f2;
+  }
+  
+  /* Hover effect for table rows */
+  .table-row:hover {
+    background-color: #f1f1f1;
+  }
+  
+  /* Styles for buttons */
+  .action-button {
+    padding: 8px 12px;
+    margin: 0 5px;
+    border: none;
+    color: white;
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .action-button:hover {
+    opacity: 0.9;
+  }
+  
+  .action-button:focus {
+    outline: none;
+  }
+  
+  /* Approve button */
+  .approve-button {
+    background-color: #28a745; /* Green */
+  }
+  
+  .approve-button:hover {
+    background-color: #218838; /* Darker green */
+  }
+  
+  /* Reject button */
+  .reject-button {
+    background-color: #dc3545; /* Red */
+  }
+  
+  .reject-button:hover {
+    background-color: #c82333; /* Darker red */
+  }
+  
+  /* Error message */
+  .error-message {
+    color: #dc3545;
+    text-align: center;
+  }
+  
+  /* No pending requests message */
+  .no-requests-message {
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    color: #555;
+  }
+  

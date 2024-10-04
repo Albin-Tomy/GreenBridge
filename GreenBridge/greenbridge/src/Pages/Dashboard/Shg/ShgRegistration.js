@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import backgroundImage from '../../../../src/assets/honey.jpg'; // Provide correct path
+import backgroundImage from '../../../assets/nature.jpg'; // Provide correct path
 
 const ShgRegistration = () => {
     const [formData, setFormData] = useState({
@@ -9,9 +9,19 @@ const ShgRegistration = () => {
         password: '',
         registration_number: ''
     });
-    const [isSubmitting, setIsSubmitting] = useState(false);  // State for submit button
+
     const [message, setMessage] = useState(null);
     const [error, setError] = useState(null);
+
+    // Ensure form fields reset every time the component mounts
+    useEffect(() => {
+        setFormData({
+            name: '',
+            email: '',
+            password: '',
+            registration_number: ''
+        });
+    }, []);
 
     const handleChange = (e) => {
         setFormData({
@@ -20,32 +30,52 @@ const ShgRegistration = () => {
         });
     };
 
+    const validateEmail = (email) => {
+        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return re.test(String(email).toLowerCase());
+    };
+
+    const validatePassword = (password) => {
+        return password.length >= 6; // Password must be at least 6 characters
+    };
+
+    const validateRegistrationNumber = (registration_number) => {
+        const re = /^[A-Z0-9-]+$/; // Assuming registration number can contain uppercase letters, digits, and hyphens
+        return re.test(registration_number);
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setError(null); // Reset error state
 
-        // Simple client-side validation
-        if (formData.password.length < 8) {
-            setError('Password must be at least 8 characters long');
+        // Validate form inputs
+        if (!validateEmail(formData.email)) {
+            setError('Invalid email format.');
             return;
         }
-
-        setIsSubmitting(true);  // Disable button while submitting
+        if (!validatePassword(formData.password)) {
+            setError('Password must be at least 6 characters long.');
+            return;
+        }
+        if (!validateRegistrationNumber(formData.registration_number)) {
+            setError('Registration number can only contain uppercase letters, digits, and hyphens.');
+            return;
+        }
 
         try {
             const response = await axios.post('http://localhost:8000/api/shg/register/', formData);
             setMessage(response.data.message);
             setError(null);
+            // Clear form fields after successful registration
+            setFormData({
+                name: '',
+                email: '',
+                password: '',
+                registration_number: ''
+            });
         } catch (error) {
-            if (error.response) {
-                setError(error.response.data.error || 'Failed to submit registration. Please try again.');
-            } else if (error.request) {
-                setError('Network error. Please check your connection and try again.');
-            } else {
-                setError('Error: ' + error.message);
-            }
+            setError(error.response?.data?.error || 'Failed to submit registration. Please try again.');
             setMessage(null);
-        } finally {
-            setIsSubmitting(false);  // Re-enable button after submission
         }
     };
 
@@ -132,7 +162,7 @@ const ShgRegistration = () => {
                 {message && <p style={styles.successMessage}>{message}</p>}
                 {error && <p style={styles.errorMessage}>{error}</p>}
 
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={handleSubmit} autoComplete="off">
                     <h2 style={styles.formHeading}>Register Below</h2>
 
                     <div style={styles.formGroup}>
@@ -144,6 +174,7 @@ const ShgRegistration = () => {
                             onChange={handleChange}
                             required
                             style={styles.formInput}
+                            autoComplete="off"
                         />
                     </div>
 
@@ -156,6 +187,7 @@ const ShgRegistration = () => {
                             onChange={handleChange}
                             required
                             style={styles.formInput}
+                            autoComplete="off"
                         />
                     </div>
 
@@ -168,6 +200,7 @@ const ShgRegistration = () => {
                             onChange={handleChange}
                             required
                             style={styles.formInput}
+                            autoComplete="off"
                         />
                     </div>
 
@@ -180,17 +213,17 @@ const ShgRegistration = () => {
                             onChange={handleChange}
                             required
                             style={styles.formInput}
+                            autoComplete="off"
                         />
                     </div>
 
-                    <button
-                        type="submit"
+                    <button 
+                        type="submit" 
                         style={styles.submitButton}
-                        disabled={isSubmitting}
-                        onMouseOver={(e) => e.target.style.backgroundColor = styles.submitButtonHover.backgroundColor}
-                        onMouseOut={(e) => e.target.style.backgroundColor = styles.submitButton.backgroundColor}
+                        onMouseOver={e => e.target.style.backgroundColor = styles.submitButtonHover.backgroundColor}
+                        onMouseOut={e => e.target.style.backgroundColor = styles.submitButton.backgroundColor}
                     >
-                        {isSubmitting ? 'Submitting...' : 'Submit'}
+                        Submit
                     </button>
                 </form>
             </div>

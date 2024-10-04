@@ -5,8 +5,8 @@ import { GoHeart } from 'react-icons/go';
 import { IoBagHandleOutline } from 'react-icons/io5';
 import { AiOutlineSearch } from 'react-icons/ai';
 import { FaBars } from 'react-icons/fa';
-import './Header.css'; // Import your CSS file
-import logo from '../assets/logo.png'; // Import your logo
+import './Header.css'; // Ensure you have this file in your project
+import logo from '../assets/logo.png'; // Ensure you have the logo image in this path
 
 
 // Dropdown component for profile menu
@@ -14,15 +14,15 @@ const Dropdown = ({ isOpen, toggleDropdown, handleLogout, username }) => (
   <div className="dropdown-container">
     <div className="dropbtn" onClick={toggleDropdown}>
       <CgProfile size={24} />
-      {/* Show username if logged in, else show 'Profile' */}
-      <span className="icon-label">{username ? username : 'Profile'}</span>
+      {/* Always show 'Profile' beside the icon, username will be inside the dropdown */}
+      <span className="icon-label"></span>
     </div>
     {isOpen && (
       <div className="dropdown-content">
         {username ? (
           <>
-            <Link to="/profile">My Profile</Link>
-            <Link to="/settings">Settings</Link>
+            <p className="dropdown-username">{username}</p> {/* Username inside dropdown */}
+            <Link to="/profile">Edit Profile</Link>
             <button onClick={handleLogout} className="logout-btn">
               Logout
             </button>
@@ -39,20 +39,17 @@ const Dropdown = ({ isOpen, toggleDropdown, handleLogout, username }) => (
   </div>
 );
 
-
 // Main Header component
 const Header = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [username, setUsername] = useState(null); // State to store the user's name
-
   const navigate = useNavigate();
 
   // Fetch the logged-in user's name from localStorage
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('user')); // Assuming user info is stored as JSON
-    if (user && user.name) {
-      setUsername(user.name); // Set username
+    if (user && user.email) {
+      setUsername(user.email); // Set username
     }
   }, []);
 
@@ -60,16 +57,11 @@ const Header = () => {
     setIsDropdownOpen(!isDropdownOpen);
   };
 
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
-  };
-
-  // Logout function to clear localStorage and navigate to login page
   const handleLogout = () => {
-    localStorage.removeItem('token');
+    localStorage.removeItem('authToken'); // Remove JWT token
     localStorage.removeItem('user'); // Clear user data
     setUsername(null); // Clear the username state
-    navigate('/login');
+    navigate('/');
   };
 
   return (
@@ -78,12 +70,12 @@ const Header = () => {
       <div className="navbar-brand">
         <Link to="/" className="logo-containers">
           <img src={logo} alt="Logo" className="logo" />
-          <h2 className="company-name">GreenBridge</h2>
         </Link>
+        <h2 className="company-name">GreenBridge</h2>
       </div>
 
       {/* Navigation Menu */}
-      <nav className={`nav ${isMobileMenuOpen ? 'active' : ''}`}>
+      <nav className={`nav`}>
         <ol>
           <li><Link to="/">Home</Link></li>
           <li><Link to="/about">About</Link></li>
@@ -114,10 +106,6 @@ const Header = () => {
             handleLogout={handleLogout}
             username={username} // Pass the username to the dropdown
           />
-          <Link to="/wishlist" className="icon-link">
-            <GoHeart />
-            <span className="icon-label">Wishlist</span>
-          </Link>
           <Link to="/cart" className="icon-link">
             <IoBagHandleOutline />
             <span className="icon-label">Bag</span>
@@ -126,7 +114,7 @@ const Header = () => {
       </div>
 
       {/* Mobile Menu Icon */}
-      <label htmlFor="nav-toggle" className="menu-icon" onClick={toggleMobileMenu}>
+      <label htmlFor="nav-toggle" className="menu-icon">
         <FaBars />
       </label>
     </header>

@@ -1,120 +1,117 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import Header from '../../components/Header'; // Import Header component
+import './LandingPage.css';
+import shg from '../../assets/shg.png';
+import shgproduct from '../../assets/aaranmula.jpeg';
+import shgtraining from '../../assets/shgtraining.jpeg';
+import wastecollection from '../../assets/waste1.jpeg';
+import waste from '../../assets/wastwcollection.jpeg';
+import sweet from '../../assets/honey.jpg';
+import hanticraft from '../../assets/hanticraft.jpeg';
+import furniture from '../../assets/furniture.jpg';
+import utensils from '../../assets/utensils.jpeg'
 
 const LandingPage = () => {
-  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-
-  useEffect(() => {
-    const handleResize = () => {
-      setWindowWidth(window.innerWidth);
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      {/* Header Section */}
-      <Header /> {/* Header should always stay at the top */}
+    <div className="landing-page-body">
+      {/* Header */}
+      <Header />
 
-      {/* Landing Page Content */}
-      <div
-        style={{
-          flex: 1, // Ensure the content takes up remaining space
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          padding: '20px',
-          color: '#ffffff',
-          textAlign: 'center',
-        }}
-      >
-        {/* Hero Section */}
-        <section style={{ maxWidth: windowWidth > 768 ? '800px' : '90%', margin: '0 auto', padding: '40px 0' }}>
-          <h1 style={{
-            fontSize: windowWidth > 576 ? '48px' : '36px',
-            marginBottom: '20px',
-          }}>Welcome to GreenBridge</h1>
-          <p style={{
-            fontSize: windowWidth > 576 ? '18px' : '16px',
-            marginBottom: '40px',
-          }}>Your one-stop solution for sustainable materials exchange.</p>
-          <Link to="/learn-more">
-            <button
-              style={{
-                padding: '12px 20px',
-                fontSize: '18px',
-                color: '#fff',
-                backgroundColor: '#0abd49',
-                border: 'none',
-                borderRadius: '5px',
-                cursor: 'pointer',
-                transition: 'background-color 0.3s ease',
-              }}
-              onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#098a36'}
-              onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#0abd49'}
-            >
-              Learn More
-            </button>
-          </Link>
-        </section>
+      {/* Hero Section */}
+      <section className="hero-section">
+        <div className="hero-content">
+          <h2>Empowering Self Help Groups for a Better Future</h2>
+          <p>Together, we enable communities to thrive by providing tools, resources, and opportunities to SHGs. Explore our services and join the movement.</p>
+          <Link to="/services" className="cta-btn">Explore Services</Link>
+        </div>
+        <div className="hero-image">
+          <img src={shg} alt="Empowering Communities" />
+        </div>
+      </section>
 
-        {/* Features Section */}
-        <section style={{ padding: '50px 20px', backgroundColor: '#f4f4f4', width: '100%' }}>
-          <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>Our Features</h2>
-          <div style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            justifyContent: 'space-around',
-            margin: '0 -10px',
-          }}>
-            {['Eco-Friendly Products', 'Community Driven', 'Innovative Solutions'].map((feature, index) => (
-              <div key={index} style={{
-                flexBasis: windowWidth > 768 ? '30%' : '100%',
-                margin: '20px 10px',
-                backgroundColor: 'white',
-                padding: '20px',
-                borderRadius: '8px',
-                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-                textAlign: 'left', // Left align text in features
-              }}>
-                <h3 style={{ fontSize: '24px', marginBottom: '15px' }}>{feature}</h3>
-                <p style={{ fontSize: '16px', color: '#555' }}>
-                  {index === 0 && 'Discover a wide range of environmentally friendly products.'}
-                  {index === 1 && 'Join a network of businesses committed to sustainability.'}
-                  {index === 2 && 'Explore innovative ideas to reduce waste and improve recycling.'}
-                </p>
-              </div>
-            ))}
+      {/* Services Section */}
+      <section id="services" className="services-section">
+        <h2>Our Key Services</h2>
+        <div className="service-cards-container">
+          <div className="service-card">
+            <img src={shgproduct} alt="SHG Products" />
+            <h3>Product Manufacturing</h3>
+            <p>We offer SHGs the platform to manufacture and sell their products, supporting economic growth in communities.</p>
           </div>
-        </section>
+          <div className="service-card">
+            <img src={shgtraining} alt="Training Programs" />
+            <h3>Training & Development</h3>
+            <p>Extensive training programs for SHGs to enhance skills, from product development to marketing and sales strategies.</p>
+          </div>
+          <div className="service-card">
+            <img src={wastecollection} alt="Waste Collection Services" />
+            <h3>Waste Collection Services</h3>
+            <p>We contribute to environmental sustainability through our community-driven waste collection services.</p>
+            <Link to="/waste-collection" className="waste-btn">Request Waste Collection</Link>
+          </div>
+        </div>
+      </section>
 
-        {/* Call to Action Section */}
-        <section style={{ padding: '60px 20px', backgroundColor: '#0abd49', color: 'white', textAlign: 'center' }}>
-          <h2 style={{ fontSize: '36px', marginBottom: '20px' }}>Ready to Make a Difference?</h2>
-          <p style={{ fontSize: '18px', marginBottom: '30px' }}>Sign up today and start contributing to a greener future.</p>
-          <Link to="/signup">
-            <button
-              style={{
-                padding: '12px 20px',
-                fontSize: '18px',
-                color: '#fff',
-                backgroundColor: '#0abd49',
-                border: 'none',
-                borderRadius: '5px',
-                cursor: 'pointer',
-                transition: 'background-color 0.3s ease',
-              }}
-              onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#098a36'}
-              onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#0abd49'}
-            >
-              Get Started
-            </button>
-          </Link>
-        </section>
-      </div>
+      {/* Waste Collection Section */}
+      <section id="waste-collection" className="waste-collection-section">
+        <h2>Request Waste Collection Services</h2>
+        <p>Our waste collection services are designed to help communities manage waste responsibly. Partner with us for a cleaner environment.</p>
+        <Link to="/waste-collection-form" className="waste-service-btn">Proceed to Waste Collection Form</Link>
+        <div className="waste-image-container">
+          <img src={waste} alt="Waste Collection Truck" />
+        </div>
+      </section>
+
+      {/* Product Categories Section */}
+      <section id="products" className="products-section">
+        <h2>Product Categories</h2>
+        <div className="product-grid">
+          <div className="product-card">
+            <img src={sweet} alt="Sweets" />
+            <h3>Sweets</h3>
+            <p>Explore a range of traditional and modern sweets crafted by SHGs.</p>
+            <Link to="/products/sweets" className="view-category-btn">View Sweets</Link>
+          </div>
+          <div className="product-card">
+            <img src={hanticraft} alt="Handicrafts" />
+            <h3>Handicrafts</h3>
+            <p>Beautiful handmade items from local artisans, perfect for gifting and decor.</p>
+            <Link to="/products/handicrafts" className="view-category-btn">View Handicrafts</Link>
+          </div>
+          <div className="product-card">
+            <img src={furniture} alt="Furniture" />
+            <h3>Furniture</h3>
+            <p>Explore our range of sustainable and handcrafted furniture pieces.</p>
+            <Link to="/products/furniture" className="view-category-btn">View Furniture</Link>
+          </div>
+          <div className="product-card">
+            <img src={utensils} alt="Utensils" />
+            <h3>Utensils</h3>
+            <p>Browse a collection of eco-friendly and durable kitchen utensils.</p>
+            <Link to="/products/utensils" className="view-category-btn">View Utensils</Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Contact Section */}
+      <section id="contact" className="contact-section">
+        <h2>Get in Touch</h2>
+        <p>We’d love to hear from you! Whether you're interested in partnering with us or have any questions, feel free to reach out.</p>
+        <Link to="/contact" className="contact-btn">Contact Us</Link>
+      </section>
+
+      {/* Footer */}
+      <footer className="footer-container">
+        <div className="footer-content">
+          <p>&copy; 2024 SHG Platform. All Rights Reserved.</p>
+          <ul className="footer-nav">
+            <li><Link to="/about">About Us</Link></li>
+            <li><Link to="/services">Our Services</Link></li>
+            <li><Link to="/contact">Contact</Link></li>
+          </ul>
+        </div>
+      </footer>
     </div>
   );
 };

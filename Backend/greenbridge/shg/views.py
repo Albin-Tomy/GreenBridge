@@ -14,35 +14,34 @@ def register_shg(request):
         print('Received Data:', data)  # Log received data
 
         # Required fields
-        required_fields = ['name', 'email', 'password', 'registration_number']
-        for field in required_fields:
-            if field not in data:
-                return Response({ "error": f"{field.replace('_', ' ').capitalize()} is required." }, status=status.HTTP_400_BAD_REQUEST)
+        # required_fields = ['name', 'email', 'password', 'registration_number']
+        # for field in required_fields:
+        #     if field not in data:
+        #         return Response({ "error": f"{field.replace('_', ' ').capitalize()} is required." }, status=status.HTTP_400_BAD_REQUEST)
 
         email = data.get('email')
         password = data.get('password')
         registration_number = data.get('registration_number')
 
         # Check if user with this email already exists
-        if User.objects.filter(email=email).exists():
-            return Response({"error": "User with this email already exists."}, status=status.HTTP_400_BAD_REQUEST)
+        # if User.objects.filter(email=email).exists():
+        #     return Response({"error": "User with this email already exists."}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Create a user but set is_active=False until admin approves
-        user = User.objects.create(
-            email=email,
-            password=make_password(password),  # Hash the password
-            is_active=False  # Initially inactive, awaiting admin approval
-        )
-
+        user = User(
+        email=email,
+        password=make_password(password),  # Hash the password
+        is_active=False  # Initially inactive, awaiting admin approval
+    )
+        user.save()
         # Create the SHG registration with basic information
-        shg_registration = SHGRegistration.objects.create(
+        shg_registration = SHGRegistration(
             name=data.get('name'),
             email=email,
             password=user.password,  # Store the hashed password
             registration_number=registration_number,
             status='Pending'  # Set the status as Pending
         )
-
+        shg_registration.save()
         return Response({'message': 'Registration submitted successfully. Awaiting admin approval.'}, status=status.HTTP_201_CREATED)
     
     except Exception as e:
@@ -52,32 +51,37 @@ def register_shg(request):
 
 
 @api_view(['POST'])
-@permission_classes([IsAdminUser])
+# @permission_classes([IsAdminUser])
 def approve_shg(request):
+    print("approved")
     try:
-        shg_id = request.data.get('shg_id')
+        shg_id = request.data.get('shg_email')
         action = request.data.get('action')
+        print(shg_id)
+        print(action)
+        # if not action or action not in ['approve', 'reject']:
+        #     return Response({'error': 'Invalid action. Use "approve" or "reject".'}, status=status.HTTP_400_BAD_REQUEST)
 
-        if not action or action not in ['approve', 'reject']:
-            return Response({'error': 'Invalid action. Use "approve" or "reject".'}, status=status.HTTP_400_BAD_REQUEST)
-
-        shg_registration = SHGRegistration.objects.get(id=shg_id)
+        shg_registration = SHGRegistration.objects.get(email=shg_id)
 
         if action == 'approve':
             # Activate the user and approve SHG registration
-            user = User.objects.get(email=shg_registration.email)
+            user = User.objects.get(email=shg_id)
             user.is_active = True
+            user.is_shg=True
+            shg_registration.status='approved'
+            shg_registration.save()
             user.save()
 
-            # Create SHG profile upon approval
-            shg_profile = SHGProfile.objects.create(
-                registration=shg_registration,
-                contact_person=request.data.get('contact_person', ''),
-                contact_phone=request.data.get('contact_phone', ''),
-                description=request.data.get('description', ''),
-                status='Approved',
-                approved_by=request.user  # Admin who approved
-            )
+            # # Create SHG profile upon approval
+            # shg_profile = SHGProfile.objects.create(
+            #     registration=shg_registration,
+            #     contact_person=request.data.get('contact_person', ''),
+            #     contact_phone=request.data.get('contact_phone', ''),
+            #     description=request.data.get('description', ''),
+            #     status='Approved',
+            #     approved_by=request.user  # Admin who approved
+            # )
 
             return Response({'message': 'SHG approved successfully!'}, status=status.HTTP_200_OK)
 
@@ -95,8 +99,9 @@ def approve_shg(request):
 
 
 @api_view(['GET'])
-@permission_classes([IsAdminUser])  # Ensure admin has access
+# @permission_classes([IsAdminUser])  # Ensure admin has access
 def get_pending_shg_requests(request):
+    print("entered")
     try:
         pending_shgs = SHGRegistration.objects.filter(status='Pending')  # Ensure this query fetches results
         serializer = SHGRegistrationSerializer(pending_shgs, many=True)
@@ -107,7 +112,7 @@ def get_pending_shg_requests(request):
 
 
 @api_view(['GET'])
-@permission_classes([IsAdminUser])
+# @permission_classes([IsAdminUser])
 def get_all_shgs(request):
     try:
         all_shgs = SHGRegistration.objects.all()
