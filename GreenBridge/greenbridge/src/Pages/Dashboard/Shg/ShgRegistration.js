@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import backgroundImage from '../../../assets/nature.jpg'; // Provide correct path
+import '../../../components/Header';
+import Header from '../../../components/Header';
+
 
 const ShgRegistration = () => {
     const [formData, setFormData] = useState({
@@ -154,6 +157,9 @@ const ShgRegistration = () => {
     };
 
     return (
+        <div>
+            <Header/>
+
         <div style={styles.backgroundContainer}>
             <div style={styles.registrationContainer}>
                 <h1 style={styles.mainHeading}>Welcome to SHG Registration</h1>
@@ -227,6 +233,7 @@ const ShgRegistration = () => {
                     </button>
                 </form>
             </div>
+        </div>
         </div>
     );
 };
