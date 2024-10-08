@@ -19,13 +19,24 @@ const Profile = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    const token = localStorage.getItem('authToken');  // Get the token from localStorage
+    console.log("Token:", token); // Log the token
+  
+    if (!token) {
+      setError('No token found. Please log in again.');
+      setLoading(false);
+      return;
+    }
+  
     axios
-      .get("http://localhost:8000/api/v1/auth/profile/complete/")
+      .get("http://localhost:8000/api/v1/auth/profile/update/?tok=${token}")
       .then((response) => {
+        console.log('Profile data:', response.data);  // Log profile data
         setProfile(response.data.profile);
         setLoading(false);
       })
       .catch((error) => {
+        console.error('Error fetching profile:', error);
         setError("Failed to load profile.");
         setLoading(false);
       });
@@ -40,13 +51,24 @@ const Profile = () => {
     setError("");
     setSuccess(false);
 
+    const token = localStorage.getItem('authToken');  // Retrieve token again for POST request
+    if (!token) {
+      setError('User not authenticated');
+      return;
+    }
+
     axios
-      .post("http://localhost:8000/api/v1/auth/profile/complete/", profile)
+      .post("http://localhost:8000/api/v1/auth/profile/update/", profile, {
+        headers: {
+          Authorization: `Bearer ${token}`,  // Include the token in headers for POST request
+        },
+      })
       .then((response) => {
         setSuccess(true);
         navigate("/dashboard");
       })
       .catch((error) => {
+        console.error('Error updating profile:', error);  // Log the error for debugging
         setError("Failed to update profile.");
       });
   };

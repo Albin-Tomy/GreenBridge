@@ -1,0 +1,137 @@
+
+
+.form-container {
+    width: 700px;
+    /* margin: 50px auto; */
+    background-color: #fff;
+    padding: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+.formhead {
+    background-color: #2980B9; /* Blue-gray background */
+    color: white;
+    padding: 10px 15px;
+    font-size: 16px;
+    font-weight: bold;
+    border: 1px solid #ccc;
+    border-radius: 4px 4px 0 0; /* Rounded top corners */
+    text-align: left;
+    display: flex;
+    align-items: center;
+   margin-bottom: 30px;
+}
+
+.head span {
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2); /* Slight text shadow */
+}
+
+h3 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+fieldset {
+    border: 1px solid #ccc;
+    padding: 20px;
+}
+
+legend {
+    font-weight: bold;
+}
+
+label {
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+/* input[type="text"],
+input[type="number"],
+select {
+    width: calc(100% - 20px);
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+} */
+
+.form-input {
+    width: calc(100% - 20px);
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.select{
+    width: 100%;
+}
+
+.dimensions {
+    display: flex;
+    align-items: center;
+}
+
+.dimensions input {
+    width: 30%;
+    margin-right: 5px;
+}
+
+.dimensions span {
+    font-size: 14px;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.save-btn,
+.cancel-btn {
+    padding: 10px 20px;
+    font-size: 14px;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.save-btn {
+    background-color: #007bff;
+    color: white;
+}
+
+.cancel-btn {
+    background-color: #6c757d;
+    color: white;
+}
+
+
+.radio-group {
+    margin-bottom: 15px;
+}
+
+/* Style for the label text */
+.radio-group label {
+    font-size: 16px;
+    margin-right: 10px;
+    font-family: Arial, sans-serif;
+}
+
+/* Style for the radio buttons */
+.radio-group input[type="radio"] {
+    margin-right: 5px;
+}
+
+/* Optional: style for making labels inline */
+.radio-group .options {
+    display: inline-block;
+    margin-left: 10px;
+}

@@ -14,7 +14,7 @@ import ProductsPage from './Pages/Dashboard/Products/ProductsPage';
 import Profile from './Pages/Dashboard/User/Profile';
 import ForgotPassword from './Pages/Authentication/ForgotPassword'; 
 import ResetPassword from './Pages/Authentication/ResetPassword';
-
+import Staff from './Pages/Dashboard/Shg/Staff';
 
 function App() {
   return (
@@ -34,6 +34,7 @@ function App() {
         <Route path='/profile' element={<Profile/>}/>
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/password-reset-confirm/:uidb64/:token" element={<ResetPassword />} />
+        <Route path='/staff' element={<Staff/>}/>
       </Routes>
     </Router>
   );

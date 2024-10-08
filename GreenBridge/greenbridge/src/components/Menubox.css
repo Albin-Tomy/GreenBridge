@@ -1,0 +1,22 @@
+.menubox-container{
+    /* height: 55px; */
+    border: 1px solid rgb(255, 255, 255);
+    border-radius: 0px;
+    padding: 8px;
+    background-color: rgb(132, 177, 122);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+}
+.menubox-container:hover{
+    box-shadow: 0px 0px 10px 10px rgba(244, 97, 97, 0.2);
+    cursor: pointer;
+}
+.menubox-text{
+    font-size: 18px;
+    font-family: inter;
+    font-weight: 800;
+    color:rgb(255, 245, 245);
+
+}

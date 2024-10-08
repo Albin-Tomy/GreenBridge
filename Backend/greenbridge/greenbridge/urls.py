@@ -22,6 +22,8 @@ urlpatterns = [
     path('api/v1/auth/',include('authentication.urls'),name='api/v1/auth'),
     path('api/shg/', include('shg.urls')),
     path('api/adminpanel/', include('adminpanel.urls')),
+    path('api/v1/products/',include('products.urls'),name='api/v1/products'),
+    
     
 
 ]

@@ -1,6 +1,6 @@
 from django.shortcuts import render
 import requests
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view,permission_classes
 from rest_framework.response import Response
 from .models import User,User_profile
 from .serializers import UserSerializer,UserProfileSerializer
@@ -16,7 +16,6 @@ from django.utils.http import urlsafe_base64_encode,urlsafe_base64_decode
 from django.utils.encoding import force_bytes
 from django.template.loader import render_to_string
 from .serializers import PasswordResetRequestSerializer,PasswordResetConfirmSerializer
-
 
 
 @api_view(['POST'])
@@ -72,29 +71,46 @@ def user_login(request):
             return Response({"error": "Invalid credentials."}, status=status.HTTP_401_UNAUTHORIZED)
         
 
-class UserProfileView(APIView):
+@api_view(['GET'])
+# @permission_classes([IsAuthenticated])  # Still ensure the user is authenticated
+def profile_update(request):
+    # Extract the token from the query parameters
+    token = request.GET.get('tok')
+    print(token)
 
-    def get(self, request):
+    # Here, you would need to verify the token and authenticate the user
+    user = None
+    if token:
         try:
-            profile = User_profile.objects.get(user=request.user)
-            serializer = UserProfileSerializer(profile)
-            return Response({"profile": serializer.data}, status=status.HTTP_200_OK)
+            # Your logic to authenticate the user using the token
+            user = User.objects.get(auth_token=token)  # This line assumes you are using token-based authentication
+            request.user = user  # Set the user on the request
+        except User.DoesNotExist:
+            return Response({"error": "Invalid token."}, status=status.HTTP_401_UNAUTHORIZED)
+
+    if request.method == 'GET' and user:
+        try:
+            # Fetch the latest user profile
+            profile = user.user_profile_set.latest('created_at')
+            profile_data = {
+                "first_name": profile.first_name,
+                "last_name": profile.last_name,
+                "phone": profile.phone,
+                "default_address": profile.default_address,
+                "default_city": profile.default_city,
+                "default_state": profile.default_state,
+                "default_pincode": profile.default_pincode,
+            }
+            return Response({"profile": profile_data}, status=status.HTTP_200_OK)
         except User_profile.DoesNotExist:
             return Response({"error": "Profile not found."}, status=status.HTTP_404_NOT_FOUND)
+        except User_profile.MultipleObjectsReturned:
+            return Response({"error": "Multiple profiles found."}, status=status.HTTP_400_BAD_REQUEST)
 
-    def post(self, request):
-        try:
-            profile = User_profile.objects.get(user=request.user)
-            serializer = UserProfileSerializer(profile, data=request.data, partial=True)
-        except User_profile.DoesNotExist:
-            serializer = UserProfileSerializer(data={**request.data, "user": request.user.id})
+    return Response({"error": "User not authenticated."}, status=status.HTTP_401_UNAUTHORIZED)
 
-        if serializer.is_valid():
-            serializer.save(user=request.user)  # Ensure the logged-in user is assigned
-            return Response({"profile": serializer.data}, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
+    
+    
 # function for senting password reset link
 @api_view(['POST'])
 def password_reset_request(request):
@@ -119,7 +135,7 @@ def password_reset_request(request):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
- 
+
 
 @api_view(['GET', 'POST'])
 def password_reset_confirm(request, uidb64, token):
