@@ -10,15 +10,28 @@ const Login = ({ setIslogin }) => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isEmailValid, setIsEmailValid] = useState(false);
-  const [isForgetPassword, setIsForgetPassword] = useState(false); // State for reset password flow
+  const [isForgetPassword, setIsForgetPassword] = useState(false);
 
-  const navigate = useNavigate();  // Initialize the useNavigate hook
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Clear inputs when component mounts
     setEmail('');
     setPassword('');
-  }, []);
+
+    // Check if the user is already logged in
+    const token = localStorage.getItem('authToken');
+    if (token) {
+      const user = JSON.parse(localStorage.getItem('user'));
+      if (user.is_superuser) {
+        navigate('/admin/home');
+      } else if (user.is_shg) {
+        navigate('/shg');
+      } else {
+        navigate('/home');
+      }
+    }
+  }, [navigate]);
 
   const handleEmailChange = (e) => {
     const inputEmail = e.target.value;
@@ -33,13 +46,16 @@ const Login = ({ setIslogin }) => {
         email,
         password,
       });
+
+      const { access, refresh, user_id } = response.data;
   
-      // Store token in localStorage
-      localStorage.setItem('authToken', response.data.access); // Access token
-      localStorage.setItem('user', JSON.stringify(response.data.user)); // User details
-  
+      // Store token and user data in localStorage
+      localStorage.setItem('authToken', access);  // Store access token
+      localStorage.setItem('user', JSON.stringify(response.data.user));  // Store user object
+      localStorage.setItem('userId', user_id);  // Store user ID
+
       console.log('User logged in:', response.data);
-  
+
       // Redirect based on role
       if (response.data.user.is_active) {
         if (response.data.user.is_superuser) {
@@ -60,23 +76,19 @@ const Login = ({ setIslogin }) => {
   
   const formSubmit = async (e) => {
     e.preventDefault();
-
     if (!email || !password) {
       setError('All fields are required!');
       return;
     } else {
       setError('');
     }
-
     await handleLogin();
   };
 
-  // Function to handle Forgot Password click
   const handleForgotPassword = () => {
-    setIsForgetPassword(true);  // Show the reset password form
+    setIsForgetPassword(true);
   };
 
-  // Function to handle reset password request
   const requestResetPassword = () => {
     const formData = new FormData();
     formData.append("email", email);

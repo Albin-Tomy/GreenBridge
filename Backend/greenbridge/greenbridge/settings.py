@@ -159,12 +159,24 @@ WSGI_APPLICATION = 'greenbridge.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
+# DATABASES = {
+#        'default': {
+#            'ENGINE': 'djongo',
+#            'NAME': 'greenbridge',
+#        }
+#    }
+
 DATABASES = {
-       'default': {
-           'ENGINE': 'djongo',
-           'NAME': 'greenbridge',
-       }
-   }
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'greenbridge',
+        'USER': 'postgres',
+        'PASSWORD': 'password',
+        'HOST': 'localhost',  # Or your database host
+        'PORT': '5432',       # Default PostgreSQL port
+    }
+}
+
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.sqlite3',
@@ -235,3 +247,11 @@ EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
+from datetime import timedelta
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),  # 1 hour token lifetime
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),  # 7 days refresh token lifetime
+    'ROTATE_REFRESH_TOKENS': True,               # Option to rotate refresh tokens
+    'BLACKLIST_AFTER_ROTATION': True,            # Invalidate the refresh token after rotation
+}

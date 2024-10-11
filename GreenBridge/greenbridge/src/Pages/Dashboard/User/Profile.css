@@ -1,76 +1,55 @@
-/* Container styling */
 .profile-container {
-    max-width: 600px;
-    margin: 0 auto;
-    padding: 20px;
-    background-color: #f9f9f9;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    border-radius: 10px;
-    text-align: center;
-  }
-  
-  .profile-header {
-    font-size: 24px;
-    margin-bottom: 20px;
-  }
-  
-  /* Input fields styling */
-  .profile-input {
-    width: 100%;
-    padding: 10px;
-    margin: 10px 0;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    box-sizing: border-box;
-  }
-  
-  .profile-input:focus {
-    outline: none;
-    border-color: #007bff;
-  }
-  
-  /* Button styling */
-  .profile-submit {
-    background-color: #007bff;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    width: 100%;
-  }
-  
-  .profile-submit:hover {
-    background-color: #0056b3;
-  }
-  
-  /* Error and success messages */
-  .profile-error {
-    color: red;
-    margin-bottom: 15px;
-  }
-  
-  .profile-success {
-    color: green;
-    margin-bottom: 15px;
-  }
-  
-  /* Loading text */
-  .profile-loading {
-    font-size: 18px;
-    color: #333;
-  }
-  
-  /* Responsive Design */
-  @media (max-width: 768px) {
-    .profile-container {
-      padding: 15px;
-    }
-    .profile-input {
-      padding: 8px;
-    }
-    .profile-submit {
-      padding: 8px;
-    }
-  }
-  
+  width: 80%;
+  margin: 0 auto;
+}
+
+.profile-details {
+  background-color: #f9f9f9;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.profile-details p {
+  font-size: 16px;
+  margin: 10px 0;
+}
+
+.edit-btn {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.edit-btn:hover {
+  background-color: #0056b3;
+}
+
+.form-container {
+  margin-top: 20px;
+}
+
+.form-actions {
+  margin-top: 20px;
+}
+
+.save-btn, .cancel-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.save-btn {
+  background-color: #28a745;
+  color: white;
+}
+
+.cancel-btn {
+  background-color: #dc3545;
+  color: white;
+  margin-left: 10px;
+}

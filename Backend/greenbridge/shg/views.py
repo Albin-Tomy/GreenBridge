@@ -57,10 +57,6 @@ def approve_shg(request):
     try:
         shg_id = request.data.get('shg_email')
         action = request.data.get('action')
-        print(shg_id)
-        print(action)
-        # if not action or action not in ['approve', 'reject']:
-        #     return Response({'error': 'Invalid action. Use "approve" or "reject".'}, status=status.HTTP_400_BAD_REQUEST)
 
         shg_registration = SHGRegistration.objects.get(email=shg_id)
 
@@ -73,15 +69,6 @@ def approve_shg(request):
             shg_registration.save()
             user.save()
 
-            # # Create SHG profile upon approval
-            # shg_profile = SHGProfile.objects.create(
-            #     registration=shg_registration,
-            #     contact_person=request.data.get('contact_person', ''),
-            #     contact_phone=request.data.get('contact_phone', ''),
-            #     description=request.data.get('description', ''),
-            #     status='Approved',
-            #     approved_by=request.user  # Admin who approved
-            # )
 
             return Response({'message': 'SHG approved successfully!'}, status=status.HTTP_200_OK)
 
@@ -99,7 +86,6 @@ def approve_shg(request):
 
 
 @api_view(['GET'])
-# @permission_classes([IsAdminUser])  # Ensure admin has access
 def get_pending_shg_requests(request):
     print("entered")
     try:
@@ -112,7 +98,6 @@ def get_pending_shg_requests(request):
 
 
 @api_view(['GET'])
-# @permission_classes([IsAdminUser])
 def get_all_shgs(request):
     try:
         all_shgs = SHGRegistration.objects.all()

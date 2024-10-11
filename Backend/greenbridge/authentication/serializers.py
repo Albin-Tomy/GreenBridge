@@ -8,21 +8,12 @@ class UserSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+
 class UserProfileSerializer(serializers.ModelSerializer):
+    user_id = serializers.IntegerField(source='User.id', read_only=True)
     class Meta:
         model = User_profile
-        fields = [
-            'first_name', 
-            'last_name', 
-            'phone', 
-            'default_address', 
-            'default_city', 
-            'default_state', 
-            'default_pincode',
-            'updated_at',  # Optional to show these fields if needed in response
-            'created_at'   # Optional
-        ]
-        read_only_fields = ['updated_at', 'created_at']
+        fields = '__all__'
 
 
 class PasswordResetRequestSerializer(serializers.Serializer):

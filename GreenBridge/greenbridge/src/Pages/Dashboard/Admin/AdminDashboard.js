@@ -1,6 +1,7 @@
 import React from 'react';
 import './AdminDashboard.css'; // Importing the responsive CSS
 import { useNavigate } from 'react-router-dom';
+import Header from '../../../components/Header';
 
 const AdminDashboard = () => {
 
@@ -15,6 +16,8 @@ const AdminDashboard = () => {
   };
 
   return (
+    <div>
+      <Header/>
     <div className="admin-dashboard">
       <aside className="sidebar">
         <div className="sidebar-header">
@@ -69,6 +72,7 @@ const AdminDashboard = () => {
           </div>
         </section>
       </div>
+    </div>
     </div>
   );
 };

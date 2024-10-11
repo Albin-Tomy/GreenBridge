@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import './PendingRequest.css'; // Updated file name
+import Header from '../../../components/Header';
 
 const PendingRequestsPage = () => {
   const [pendingRequests, setPendingRequests] = useState([]);
@@ -59,6 +60,8 @@ const PendingRequestsPage = () => {
   };
 
   return (
+    <div>
+      < Header/>
     <div className="pending-requests-page">
       <h1 className="pending-requests-title">Pending SHG Requests</h1>
       {errorMessage && <p className="error-message">{errorMessage}</p>}  
@@ -97,6 +100,7 @@ const PendingRequestsPage = () => {
           </tbody>
         </table>
       )}
+    </div>
     </div>
   );
 };

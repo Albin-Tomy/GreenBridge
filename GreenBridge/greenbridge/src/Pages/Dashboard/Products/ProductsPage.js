@@ -1,229 +1,117 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import './ProductsPage.css'; // Import the corresponding CSS
+import './ProductsPage.css';
+import { FaHeart, FaShoppingCart, FaStar } from 'react-icons/fa';
+import { Link } from 'react-router-dom'; // Import Link for navigation
 
-const ProductsPage = () => {
+const ProductPage = () => {
   const [products, setProducts] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [subcategories, setSubcategories] = useState([]);
-  const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-    price: '',
-    stock_quantity: '',
-    category_id: '',
-    subcategory_id: '',
-    image: null,
-  });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [sortOrder, setSortOrder] = useState('default'); // State for sorting
+  const [filter, setFilter] = useState('all'); // State for filtering
 
-  // Fetch all products
-  const fetchProducts = async () => {
-    try {
-      const response = await axios.get('/api/products/');
-      setProducts(response.data);
-    } catch (error) {
-      console.error("Error fetching products", error);
-    }
-  };
-
-  // Fetch all categories
-  const fetchCategories = async () => {
-    try {
-      const response = await axios.get('/api/categories/');
-      setCategories(response.data);
-    } catch (error) {
-      console.error("Error fetching categories", error);
-    }
-  };
-
-  // Fetch all subcategories
-  const fetchSubcategories = async () => {
-    try {
-      const response = await axios.get('/api/subcategories/');
-      setSubcategories(response.data);
-    } catch (error) {
-      console.error("Error fetching subcategories", error);
-    }
-  };
-
-  // Handle form input changes
-  const handleInputChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-  };
-
-  // Handle file upload (image)
-  const handleFileChange = (e) => {
-    setFormData({
-      ...formData,
-      image: e.target.files[0]
-    });
-  };
-
-  // Create a new product
-  const createProduct = async () => {
-    const productData = new FormData();
-    productData.append('name', formData.name);
-    productData.append('description', formData.description);
-    productData.append('price', formData.price);
-    productData.append('stock_quantity', formData.stock_quantity);
-    productData.append('subcategory_id', formData.subcategory_id);
-    productData.append('image', formData.image);
-
-    try {
-      const response = await axios.post('/api/products/create/', productData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-      alert("Product created successfully");
-      fetchProducts();
-    } catch (error) {
-      console.error("Error creating product", error);
-    }
-  };
-
-  // Update a product
-  const updateProduct = async (productId) => {
-    const productData = new FormData();
-    productData.append('name', formData.name);
-    productData.append('description', formData.description);
-    productData.append('price', formData.price);
-    productData.append('stock_quantity', formData.stock_quantity);
-    productData.append('subcategory_id', formData.subcategory_id);
-    productData.append('image', formData.image);
-
-    try {
-      const response = await axios.put(`/api/products/update/${productId}/`, productData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-      alert("Product updated successfully");
-      fetchProducts();
-    } catch (error) {
-      console.error("Error updating product", error);
-    }
-  };
-
-  // Delete a product
-  const deleteProduct = async (productId) => {
-    try {
-      await axios.delete(`/api/products/delete/${productId}/`);
-      alert("Product deleted successfully");
-      fetchProducts();
-    } catch (error) {
-      console.error("Error deleting product", error);
-    }
-  };
-
-  // Fetch all data on component mount
   useEffect(() => {
     fetchProducts();
-    fetchCategories();
-    fetchSubcategories();
   }, []);
 
+  const fetchProducts = async () => {
+    try {
+      const response = await fetch('http://127.0.0.1:8000/api/v1/products/list/'); // Adjust the port and endpoint if necessary
+      if (!response.ok) throw new Error('Network response was not ok');
+      const data = await response.json();
+      console.log('Fetched products:', data); // Debug: Check fetched data
+      setProducts(data);
+    } catch (error) {
+      setError('Error fetching products: ' + error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Sort and filter products
+  const sortedProducts = () => {
+    let filteredProducts = products;
+
+    // Filter logic
+    if (filter !== 'all') {
+      filteredProducts = filteredProducts.filter(product => product.category === filter);
+    }
+
+    // Sort logic
+    switch (sortOrder) {
+      case 'price-asc':
+        filteredProducts.sort((a, b) => a.price - b.price);
+        break;
+      case 'price-desc':
+        filteredProducts.sort((a, b) => b.price - a.price);
+        break;
+      case 'rating':
+        filteredProducts.sort((a, b) => b.rating - a.rating);
+        break;
+      default:
+        break;
+    }
+
+    return filteredProducts;
+  };
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>{error}</p>;
+
   return (
-    <div className="products-page-container">
-      <h1 className="products-page-title">Products Page</h1>
+    <div className="product-page">
+      <h1 className="page-title">Discover Our Luxury Collection</h1>
 
-      {/* Form for creating or updating a product */}
-      <form className="products-form">
-        <input
-          className="products-input"
-          type="text"
-          name="name"
-          placeholder="Product Name"
-          value={formData.name}
-          onChange={handleInputChange}
-        />
-        <input
-          className="products-input"
-          type="text"
-          name="description"
-          placeholder="Product Description"
-          value={formData.description}
-          onChange={handleInputChange}
-        />
-        <input
-          className="products-input"
-          type="number"
-          name="price"
-          placeholder="Product Price"
-          value={formData.price}
-          onChange={handleInputChange}
-        />
-        <input
-          className="products-input"
-          type="number"
-          name="stock_quantity"
-          placeholder="Stock Quantity"
-          value={formData.stock_quantity}
-          onChange={handleInputChange}
-        />
-
-        {/* Dropdown for selecting Category */}
-        <select className="products-select" name="category_id" onChange={handleInputChange}>
-          <option>Select Category</option>
-          {categories.map((category) => (
-            <option key={category.id} value={category.id}>
-              {category.name}
-            </option>
-          ))}
+      {/* Sort and Filter Bar */}
+      <div className="sort-filter-bar">
+        <select onChange={(e) => setSortOrder(e.target.value)} value={sortOrder}>
+          <option value="default">Sort by</option>
+          <option value="price-asc">Price: Low to High</option>
+          <option value="price-desc">Price: High to Low</option>
+          <option value="rating">Rating</option>
         </select>
 
-        {/* Dropdown for selecting Subcategory */}
-        <select className="products-select" name="subcategory_id" onChange={handleInputChange}>
-          <option>Select Subcategory</option>
-          {subcategories.map((subcategory) => (
-            <option key={subcategory.id} value={subcategory.id}>
-              {subcategory.name}
-            </option>
-          ))}
+        <select onChange={(e) => setFilter(e.target.value)} value={filter}>
+          <option value="all">All Categories</option>
+          <option value="furniture">Furniture</option>
+          <option value="decor">Decor</option>
+          <option value="lighting">Lighting</option>
+          <option value="bedroom">Bedroom</option>
         </select>
+      </div>
 
-        {/* File input for product image */}
-        <input
-          className="products-file-input"
-          type="file"
-          name="image"
-          onChange={handleFileChange}
-        />
-
-        <button className="products-submit-button" type="button" onClick={createProduct}>
-          Create Product
-        </button>
-      </form>
-
-      {/* List of products */}
-      <h2 className="products-list-title">Product List</h2>
-      <ul className="products-list">
-        {products.map((product) => (
-          <li key={product.id} className="products-list-item">
-            <p className="product-name">{product.name}</p>
-            <p className="product-description">{product.description}</p>
-            <p className="product-price">Price: ${product.price}</p>
-            <p className="product-stock">Stock: {product.stock_quantity}</p>
-            <button
-              className="products-action-button"
-              onClick={() => updateProduct(product.id)}
-            >
-              Update
-            </button>
-            <button
-              className="products-action-button"
-              onClick={() => deleteProduct(product.id)}
-            >
-              Delete
-            </button>
-          </li>
+      <div className="products-grid">
+        {sortedProducts().map((product) => (
+          <div key={product.id} className="product-card"> {/* Use product.id instead of product._id */}
+            <Link to={`/products/${product.id}`} className="product-link"> {/* Corrected Link */}
+              <img
+                src={product.imageUrl || 'https://via.placeholder.com/150'}
+                alt={product.name}
+                className="product-image"
+              />
+              <div className="product-info">
+                <h4>{product.name}</h4>
+                <p className="price">₹ {product.price}</p>
+                <p className="description">{product.description}</p>
+                <div className="rating">
+                  <span>{product.rating || 0}</span>
+                  <FaStar className="star-icon" />
+                </div>
+              </div>
+            </Link>
+            <div className="product-actions">
+              <button className="wishlist-btn">
+                <FaHeart /> Wishlist
+              </button>
+              <button className="cart-btn">
+                <FaShoppingCart /> Add to Cart
+              </button>
+            </div>
+          </div>
         ))}
-      </ul>
+      </div>
     </div>
   );
 };
 
-export default ProductsPage;
+export default ProductPage;

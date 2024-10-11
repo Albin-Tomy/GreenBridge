@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import './AllSHGsPage.css';
+import Header from '../../../components/Header';
 
 const AllSHGsPage = () => {
   const [allShgs, setAllShgs] = useState([]);
@@ -20,6 +21,8 @@ const AllSHGsPage = () => {
   }, []);
 
   return (
+    <div>
+      <Header/>
     <div className="shg-container">
       <h1 className="shg-title">All SHGs</h1>
       {allShgs.length === 0 ? (
@@ -46,6 +49,7 @@ const AllSHGsPage = () => {
           </tbody>
         </table>
       )}
+    </div>
     </div>
   );
 };

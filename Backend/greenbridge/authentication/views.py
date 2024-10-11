@@ -16,7 +16,13 @@ from django.utils.http import urlsafe_base64_encode,urlsafe_base64_decode
 from django.utils.encoding import force_bytes
 from django.template.loader import render_to_string
 from .serializers import PasswordResetRequestSerializer,PasswordResetConfirmSerializer
-
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
+from .models import User_profile
+from .serializers import UserProfileSerializer
+# from bson import id
+from bson import ObjectId 
 
 @api_view(['POST'])
 def user_registration(request):
@@ -61,8 +67,12 @@ def user_login(request):
             if user.is_active:
                 refresh = RefreshToken.for_user(user)
                 return Response({
+                    # 'refresh': str(refresh),
+                    # 'access': str(refresh.access_token),
+                    # 'user': UserSerializer(user).data
                     'refresh': str(refresh),
                     'access': str(refresh.access_token),
+                    'user_id': user.id,    # Send user ID in the login response
                     'user': UserSerializer(user).data
                 }, status=status.HTTP_200_OK)
             else:
@@ -71,43 +81,66 @@ def user_login(request):
             return Response({"error": "Invalid credentials."}, status=status.HTTP_401_UNAUTHORIZED)
         
 
+
+# User_profile function-based views
+
 @api_view(['GET'])
-# @permission_classes([IsAuthenticated])  # Still ensure the user is authenticated
-def profile_update(request):
-    # Extract the token from the query parameters
-    token = request.GET.get('tok')
-    print(token)
+def user_profile_list(request):
+    user_profiles = User_profile.objects.all()
+    serializer = UserProfileSerializer(user_profiles, many=True)
+    return Response(serializer.data)
 
-    # Here, you would need to verify the token and authenticate the user
-    user = None
-    if token:
-        try:
-            # Your logic to authenticate the user using the token
-            user = User.objects.get(auth_token=token)  # This line assumes you are using token-based authentication
-            request.user = user  # Set the user on the request
-        except User.DoesNotExist:
-            return Response({"error": "Invalid token."}, status=status.HTTP_401_UNAUTHORIZED)
+@api_view(['POST'])
+def user_profile_create(request):
+    serializer = UserProfileSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    if request.method == 'GET' and user:
-        try:
-            # Fetch the latest user profile
-            profile = user.user_profile_set.latest('created_at')
-            profile_data = {
-                "first_name": profile.first_name,
-                "last_name": profile.last_name,
-                "phone": profile.phone,
-                "default_address": profile.default_address,
-                "default_city": profile.default_city,
-                "default_state": profile.default_state,
-                "default_pincode": profile.default_pincode,
-            }
-            return Response({"profile": profile_data}, status=status.HTTP_200_OK)
-        except User_profile.DoesNotExist:
-            return Response({"error": "Profile not found."}, status=status.HTTP_404_NOT_FOUND)
-        except User_profile.MultipleObjectsReturned:
-            return Response({"error": "Multiple profiles found."}, status=status.HTTP_400_BAD_REQUEST)
 
-    return Response({"error": "User not authenticated."}, status=status.HTTP_401_UNAUTHORIZED)
+@api_view(['GET'])
+def user_profile_detail(request, id):
+    try:
+        # Fetch user profile by custom id
+        user_profile = User_profile.objects.get(id=id)
+    except User_profile.DoesNotExist:
+        return Response({'error': 'User profile not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    # Serialize the user profile data and return it
+    serializer = UserProfileSerializer(user_profile)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+@api_view(['PUT', 'PATCH'])
+def user_profile_update(request, id):
+    try:
+        # Fetch user profile by _id (MongoDB ObjectId)
+        user_profile = User_profile.objects.get(id=ObjectId(id))
+        
+        # Use partial=True if using PATCH to allow partial updates
+        serializer = UserProfileSerializer(user_profile, data=request.data, partial=True)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    except User_profile.DoesNotExist:
+        return Response({'error': 'User profile not found'}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+
+@api_view(['DELETE'])
+def user_profile_delete(request, pk):
+    try:
+        user_profile = User_profile.objects.get(pk=pk)
+        user_profile.delete()
+        return Response({'message': 'User profile deleted'}, status=status.HTTP_200_OK)
+    except User_profile.DoesNotExist:
+        return Response({'error': 'User profile not found'}, status=status.HTTP_404_NOT_FOUND)
 
     
     
