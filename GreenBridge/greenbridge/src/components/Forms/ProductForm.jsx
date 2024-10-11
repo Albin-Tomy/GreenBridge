@@ -53,31 +53,6 @@ const ProductForm = ({ onCancel,initialProductData,isEdit}) => {
     setProductData({ ...productData, image: e.target.files[0] });
   };
 
-  // const handleSubmit = (e) => {
-  //   e.preventDefault();
-
-  //   const formData = new FormData();
-  //   Object.keys(productData).forEach((key) => {
-  //     formData.append(key, productData[key]);
-  //   });
-
-
-  
-  //   axios
-  //     .post("http://127.0.0.1:8000/api/v1/products/create/", formData, {
-  //       headers: {
-  //         "Content-Type": "multipart/form-data",
-  //       },
-  //     })
-  //     .then((response) => {
-  //       alert("Product created successfully!")
-  //       console.log("Product created successfully:", response.data);
-  //       window.location.reload();
-  //     })
-  //     .catch((error) => {
-  //       console.error("Error creating product:", error.response.data);
-  //     });
-  // };
 
   const handleSubmit = (e) => {
     e.preventDefault();

@@ -1,27 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { CgProfile } from 'react-icons/cg';
-import { GoHeart } from 'react-icons/go';
-import { IoBagHandleOutline } from 'react-icons/io5';
-import { AiOutlineSearch } from 'react-icons/ai';
-import { FaBars } from 'react-icons/fa';
-import './Header.css'; // Ensure you have this file in your project
-import logo from '../assets/logo.png'; // Ensure you have the logo image in this path
-
+// import { CgProfile } from 'react-icons/cg';
+import { AiOutlineSearch, AiFillHome, AiOutlineShoppingCart } from 'react-icons/ai';
+import { FaBars, FaArrowLeft, FaArrowRight, FaHeart } from 'react-icons/fa'; // Added FaHeart for Wishlist
+import './Header.css';
+import logo from '../assets/logo.png';
+import axios from 'axios';
+import { MdAccountCircle } from 'react-icons/md';
 
 // Dropdown component for profile menu
 const Dropdown = ({ isOpen, toggleDropdown, handleLogout, username }) => (
   <div className="dropdown-container">
     <div className="dropbtn" onClick={toggleDropdown}>
-      <CgProfile size={24} />
-      {/* Always show 'Profile' beside the icon, username will be inside the dropdown */}
-      <span className="icon-label"></span>
+      <MdAccountCircle size={30} />
+      {username ? <span className="icon-label">{username}</span> : <span className="icon-label">Login</span>}
     </div>
     {isOpen && (
       <div className="dropdown-content">
         {username ? (
           <>
-            <p className="dropdown-username">{username}</p> {/* Username inside dropdown */}
+            <p className="dropdown-username">{username}</p>
             <Link to="/profile">Edit Profile</Link>
             <button onClick={handleLogout} className="logout-btn">
               Logout
@@ -42,82 +40,116 @@ const Dropdown = ({ isOpen, toggleDropdown, handleLogout, username }) => (
 // Main Header component
 const Header = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [username, setUsername] = useState(null); // State to store the user's name
+  const [username, setUsername] = useState(null);
   const navigate = useNavigate();
+  const userId = localStorage.getItem('userId');
+  const token = localStorage.getItem('authToken');
 
-  // Fetch the logged-in user's name from localStorage
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem('user')); // Assuming user info is stored as JSON
-    if (user && user.email) {
-      setUsername(user.email); // Set username
+    const fetchUserProfile = async () => {
+      try {
+        const response = await axios.get(`http://localhost:8000/api/v1/auth/user_profiles/${userId}/`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+        setUsername(response.data.first_name);
+      } catch (error) {
+        console.error('Error fetching user profile:', error);
+      }
+    };
+
+    if (userId && token) {
+      fetchUserProfile();
     }
-  }, []);
+  }, [userId, token]);
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('authToken'); // Remove JWT token
-    localStorage.removeItem('user'); // Clear user data
-    setUsername(null); // Clear the username state
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('user');
+    setUsername(null);
     navigate('/');
   };
 
+  const goBack = () => {
+    navigate(-1);
+  };
+
+  const goForward = () => {
+    navigate(1);
+  };
+
   return (
-    <header className="navbar">
-      {/* Brand and Logo */}
-      <div className="navbar-brand">
-        <Link to="/" className="logo-containers">
-          <img src={logo} alt="Logo" className="logo" />
-        </Link>
-        <h2 className="company-name">GreenBridge</h2>
-      </div>
-
-      {/* Navigation Menu */}
-      <nav className={`nav`}>
-        <ol>
-          <li><Link to="/">Home</Link></li>
-          <li><Link to="/about">About</Link></li>
-          <li><Link to="/services">Services</Link></li>
-          <li><Link to="/contact">Contact</Link></li>
-        </ol>
-      </nav>
-
-      {/* Right Section: Search, Profile, Wishlist, Cart */}
-      <div className="right-section">
-        {/* Search bar */}
-        <form className="search-bar">
-          <input
-            type="text"
-            className="search-input"
-            placeholder="Search products, brands"
-          />
-          <button type="submit" className="search-icon">
-            <AiOutlineSearch />
-          </button>
-        </form>
-
-        {/* Icons: Profile, Wishlist, Bag */}
-        <div className="icon-links">
-          <Dropdown
-            isOpen={isDropdownOpen}
-            toggleDropdown={toggleDropdown}
-            handleLogout={handleLogout}
-            username={username} // Pass the username to the dropdown
-          />
-          <Link to="/cart" className="icon-link">
-            <IoBagHandleOutline />
-            <span className="icon-label">Bag</span>
+    <>
+      <header className="navbar">
+        {/* Brand and Logo */}
+        <div className="navbar-brands">
+          <Link to="/" className="logo-containers">
+            <img src={logo} alt="Logo" className="logos" />
           </Link>
+          <h2 className="company-names">GreenBridge</h2>
         </div>
-      </div>
 
-      {/* Mobile Menu Icon */}
-      <label htmlFor="nav-toggle" className="menu-icon">
-        <FaBars />
-      </label>
-    </header>
+        {/* Right Section: Search, Profile, Wishlist, Cart */}
+        <div className="right-section">
+          {/* Search bar */}
+          <form className="search-bar">
+            <button type="submit" className="search-icon">
+              <AiOutlineSearch />
+            </button>
+            <input
+              type="text"
+              className="search-input"
+              placeholder="Search products, brands"
+              aria-label="Search products, brands"
+            />
+          </form>
+
+          {/* Home Icon */}
+          <Link to="/" className="home-icon">
+            <AiFillHome size={24} />
+          </Link>
+
+          {/* Icons: Profile, Wishlist, Cart */}
+          <div className="icon-links">
+            <Dropdown
+              isOpen={isDropdownOpen}
+              toggleDropdown={toggleDropdown}
+              handleLogout={handleLogout}
+              username={username}
+            />
+            {username && (
+              <Link to="/wishlist" className="icon-link">
+                <FaHeart /> {/* Wishlist Icon */}
+                <span className="icon-label">Wishlist</span>
+              </Link>
+            )}
+            <Link to="/cart" className="icon-link">
+              <AiOutlineShoppingCart size={24} /> {/* Cart icon with standard size */}
+            </Link>
+          </div>
+        </div>
+
+        {/* Mobile Menu Icon */}
+        <label htmlFor="nav-toggle" className="menu-icon">
+          <FaBars />
+        </label>
+      </header>
+
+      {/* Navigation buttons below the header in the right corner */}
+      <div className="navigation-buttons">
+        <button onClick={goBack} className="nav-button">
+          <FaArrowLeft size={12} />
+        </button>
+        <button onClick={goForward} className="nav-button">
+          <FaArrowRight size={12} />
+        </button>
+      </div>
+    </>
   );
 };
 

@@ -47,12 +47,14 @@ const Login = ({ setIslogin }) => {
         password,
       });
 
-      const { access, refresh, user_id } = response.data;
+      const { access, user_id } = response.data;
   
       // Store token and user data in localStorage
       localStorage.setItem('authToken', access);  // Store access token
       localStorage.setItem('user', JSON.stringify(response.data.user));  // Store user object
       localStorage.setItem('userId', user_id);  // Store user ID
+
+      console.log(localStorage.getItem('userId'));
 
       console.log('User logged in:', response.data);
 

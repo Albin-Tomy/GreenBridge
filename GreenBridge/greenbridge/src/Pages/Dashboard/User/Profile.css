@@ -1,55 +1,127 @@
-.profile-container {
-  width: 80%;
-  margin: 0 auto;
+/* General Styles for the Profile Page */
+.profile-page {
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 30px;
+  border: 1px solid #e0e0e0;
+  border-radius: 15px;
+  background-color: #ffffff;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+  font-family: 'Roboto', sans-serif;
+}
+
+.profile-heading {
+  text-align: center;
+  font-size: 32px;
+  margin-bottom: 25px;
+  color: #007bff; /* Brand Color */
+  font-weight: 600; /* Bold heading */
 }
 
 .profile-details {
-  background-color: #f9f9f9;
-  padding: 20px;
+  margin-bottom: 25px;
+}
+
+.profile-item {
+  margin-bottom: 20px;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  transition: background-color 0.3s; /* Smooth background transition */
+}
+
+.profile-item:hover {
+  background-color: #f7f7f7; /* Light hover effect */
+}
+
+.profile-item strong {
+  color: #333;
+  min-width: 120px; /* Fixed width for labels */
+}
+
+.profile-input {
+  padding: 12px;
+  border: 1px solid #ccc;
   border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-.profile-details p {
+  width: calc(100% - 140px); /* Adjust width to account for label */
   font-size: 16px;
-  margin: 10px 0;
+  transition: border-color 0.3s, box-shadow 0.3s; /* Add box shadow transition */
 }
 
-.edit-btn {
-  padding: 10px 20px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
+.profile-input:focus {
+  border-color: #007bff; /* Change border color on focus */
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Add box shadow on focus */
+  outline: none; /* Remove default outline */
 }
 
-.edit-btn:hover {
-  background-color: #0056b3;
-}
-
-.form-container {
-  margin-top: 20px;
-}
-
-.form-actions {
-  margin-top: 20px;
-}
-
-.save-btn, .cancel-btn {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.save-btn {
-  background-color: #28a745;
-  color: white;
-}
-
-.cancel-btn {
-  background-color: #dc3545;
-  color: white;
+.profile-value {
   margin-left: 10px;
+  color: #555;
+  font-weight: normal;
+}
+
+.edit-btn,
+.save-btn {
+  background-color: #007bff;
+  color: #ffffff;
+  border: none;
+  padding: 14px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s, transform 0.2s, box-shadow 0.2s; /* Additional transition */
+  margin-right: 10px; /* Space between buttons */
+  box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2); /* Button shadow */
+}
+
+.edit-btn:hover,
+.save-btn:hover {
+  background-color: #0056b3;
+  transform: translateY(-2px); /* Slight lift effect on hover */
+  box-shadow: 0 6px 20px rgba(0, 123, 255, 0.3); /* Increased shadow on hover */
+}
+
+.edit-btn:disabled,
+.save-btn:disabled {
+  background-color: #cccccc; /* Disable color */
+  cursor: not-allowed; /* Change cursor on disabled */
+}
+
+.form-error {
+  color: red;
+  font-size: 14px;
+  margin: 10px 0;
+  font-weight: 500; /* Make error message slightly bolder */
+}
+
+.form-success {
+  color: green;
+  font-size: 14px;
+  margin: 10px 0;
+  font-weight: 500; /* Make success message slightly bolder */
+}
+
+/* Responsive Styles */
+@media (max-width: 600px) {
+  .profile-page {
+      padding: 20px;
+  }
+
+  .profile-heading {
+      font-size: 28px; /* Reduce heading size on smaller screens */
+  }
+
+  .profile-item {
+      font-size: 16px;
+  }
+
+  .profile-input {
+      font-size: 14px;
+  }
+
+  .edit-btn,
+  .save-btn {
+      padding: 12px 15px; /* Reduce button padding */
+      font-size: 14px;
+  }
 }

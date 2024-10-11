@@ -22,7 +22,8 @@ from rest_framework import status
 from .models import User_profile
 from .serializers import UserProfileSerializer
 # from bson import id
-from bson import ObjectId 
+# from bson import ObjectId 
+from django.shortcuts import get_object_or_404
 
 @api_view(['POST'])
 def user_registration(request):
@@ -84,63 +85,108 @@ def user_login(request):
 
 # User_profile function-based views
 
-@api_view(['GET'])
-def user_profile_list(request):
-    user_profiles = User_profile.objects.all()
-    serializer = UserProfileSerializer(user_profiles, many=True)
-    return Response(serializer.data)
-
 @api_view(['POST'])
-def user_profile_create(request):
-    serializer = UserProfileSerializer(data=request.data)
+@permission_classes([IsAuthenticated])
+def create_user_profile(request):
+    # Use the current user's ID from the request
+    user_id = request.user.id
+    data = request.data
+    data['user_id'] = user_id  # Set user_id in the request data
+
+    serializer = UserProfileSerializer(data=data)
     if serializer.is_valid():
-        serializer.save()
+        serializer.save()  # Save the profile with the user_id
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
 @api_view(['GET'])
+# @permission_classes([IsAuthenticated])
 def user_profile_detail(request, id):
     try:
-        # Fetch user profile by custom id
-        user_profile = User_profile.objects.get(id=id)
-    except User_profile.DoesNotExist:
-        return Response({'error': 'User profile not found'}, status=status.HTTP_404_NOT_FOUND)
+        user_profile = get_object_or_404(User_profile, user_id=id)
+        serializer = UserProfileSerializer(user_profile)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_404_NOT_FOUND)
 
-    # Serialize the user profile data and return it
-    serializer = UserProfileSerializer(user_profile)
-    return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-@api_view(['PUT', 'PATCH'])
+# Update user profile
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
 def user_profile_update(request, id):
     try:
-        # Fetch user profile by _id (MongoDB ObjectId)
-        user_profile = User_profile.objects.get(id=ObjectId(id))
+        user_profile = get_object_or_404(User_profile, user__id=id)
         
-        # Use partial=True if using PATCH to allow partial updates
+        # Prevent email modification
+        if 'email' in request.data:
+            request.data.pop('email')
+        
         serializer = UserProfileSerializer(user_profile, data=request.data, partial=True)
-
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    except User_profile.DoesNotExist:
-        return Response({'error': 'User profile not found'}, status=status.HTTP_404_NOT_FOUND)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
-        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response({"error": str(e)}, status=status.HTTP_404_NOT_FOUND)
+    
+# @api_view(['GET'])
+# def user_profile_list(request):
+#     user_profiles = User_profile.objects.all()
+#     serializer = UserProfileSerializer(user_profiles, many=True)
+#     return Response(serializer.data)
+
+# @api_view(['POST'])
+# def user_profile_create(request):
+#     serializer = UserProfileSerializer(data=request.data)
+#     if serializer.is_valid():
+#         serializer.save()
+#         return Response(serializer.data, status=status.HTTP_201_CREATED)
+#     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+# @api_view(['GET'])
+# def user_profile_detail(request, id):
+#     try:
+#         # Fetch user profile by custom id
+#         user_profile = User_profile.objects.get(id=id)
+#     except User_profile.DoesNotExist:
+#         return Response({'error': 'User profile not found'}, status=status.HTTP_404_NOT_FOUND)
+
+#     # Serialize the user profile data and return it
+#     serializer = UserProfileSerializer(user_profile)
+#     return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+# @api_view(['PUT', 'PATCH'])
+# def user_profile_update(request, id):
+#     try:
+#         # Fetch user profile by _id (MongoDB ObjectId)
+#         user_profile = User_profile.objects.get(id=ObjectId(id))
+        
+#         # Use partial=True if using PATCH to allow partial updates
+#         serializer = UserProfileSerializer(user_profile, data=request.data, partial=True)
+
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data, status=status.HTTP_200_OK)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+#     except User_profile.DoesNotExist:
+#         return Response({'error': 'User profile not found'}, status=status.HTTP_404_NOT_FOUND)
+#     except Exception as e:
+#         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 
-@api_view(['DELETE'])
-def user_profile_delete(request, pk):
-    try:
-        user_profile = User_profile.objects.get(pk=pk)
-        user_profile.delete()
-        return Response({'message': 'User profile deleted'}, status=status.HTTP_200_OK)
-    except User_profile.DoesNotExist:
-        return Response({'error': 'User profile not found'}, status=status.HTTP_404_NOT_FOUND)
+# @api_view(['DELETE'])
+# def user_profile_delete(request, pk):
+#     try:
+#         user_profile = User_profile.objects.get(pk=pk)
+#         user_profile.delete()
+#         return Response({'message': 'User profile deleted'}, status=status.HTTP_200_OK)
+#     except User_profile.DoesNotExist:
+#         return Response({'error': 'User profile not found'}, status=status.HTTP_404_NOT_FOUND)
 
     
     

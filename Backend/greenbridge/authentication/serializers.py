@@ -10,10 +10,12 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
-    user_id = serializers.IntegerField(source='User.id', read_only=True)
+    # user_id = serializers.IntegerField(source='User.id', read_only=True)
+    email = serializers.EmailField(source='user.email', read_only=True)  # Email is read-only
     class Meta:
         model = User_profile
         fields = '__all__'
+
 
 
 class PasswordResetRequestSerializer(serializers.Serializer):

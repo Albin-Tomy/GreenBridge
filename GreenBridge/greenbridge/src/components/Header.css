@@ -11,7 +11,7 @@
 header {
     width: 100%;
     height: 100px;
-    background: #448a42; /* Set the header background to white */
+    background: #448a42; /* Set the header background */
     display: flex;
     justify-content: center; /* Center contents horizontally */
     align-items: center;
@@ -22,38 +22,44 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    width: 95%; /* Width of the box */
-    max-width: 1200px; /* Limit the maximum width */
+    width: 95%;
+    max-width: 1200px;
     padding: 0 2em;
-    background-color: rgb(22, 200, 25); /* Make the background of the box white */
-    border-radius: 20px; /* Rounded corners for the box */
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2); /* Subtle shadow */
-    height: 70px; /* Set a height for the box */
-    overflow: hidden; /* Prevent overflow */
+    background-color: rgb(22, 200, 25); /* Background of the box */
+    border-radius: 20px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    height: 70px;
+    overflow: hidden;
 }
 
 /* Logo and Company Name */
-.navbar-brand {
+.navbar-brands {
     display: flex;
-    align-items: center; /* Align items vertically in the center */
+    align-items: center;
+    margin-left: 40px; /* Move the logo and brand name slightly to the right */
 }
 
 .logo-containers {
     display: flex;
-    align-items: center; /* Align logo and name in the center */
+    align-items: center;
+    margin-left: 10px; /* Additional space if needed */
 }
 
-.logo {
-    width: 50px; /* Adjust size as necessary */
+.logos {
+    width: 70px;
     height: auto;
-    margin-right: 10px; /* Space between logo and name */
+    margin-right: 10px;
 }
 
-.company-name {
-    font-size: 1.8em;
-    font-weight: bold;
-    color: #eceeef; /* Dark text color for company name */
+.company-names {
+    font-size: 3em; /* Adjust the size to match the image */
+    font-family: 'Brush Script MT', cursive; /* Use a cursive font similar to the one in the image */
+    color: #f0f0f0; /* Bright green color */
+    font-weight: bold; /* Make sure the text is not bold */
+    letter-spacing: 3px; /* Add some spacing between the letters */
+    text-shadow: 1px 1px 2px #000000; /* Add a slight shadow for depth */
 }
+
 
 /* Navigation Links */
 .nav {
@@ -77,7 +83,7 @@ header {
     text-decoration: none;
     padding: 0.5em 1.2em;
     border-radius: 10px 10px 0 0;
-    color: #e5e9ea; /* Dark color for links */
+    color: #e5e9ea;
     transition: all 0.4s;
     position: relative;
     z-index: 1;
@@ -92,31 +98,32 @@ header {
     width: 100%;
     height: 5px;
     border-radius: 10px 10px 0 0;
-    background: #f0f0f0; /* Dark background for hover effect */
+    background: #f0f0f0;
     transform: scaleY(0.05);
     z-index: -1;
     transition: all 0.4s;
 }
 
 .nav ol li a:hover::before {
-    transform: scaleY(1); /* Hover effect */
+    transform: scaleY(1);
 }
 
 .nav ol li a:hover {
-    color: #2C5364; /* Change text color on hover */
+    color: #2C5364;
 }
 
 /* Search Bar */
 .search-bar {
     display: flex;
     align-items: center;
+    position: relative;
     max-width: 300px;
     flex-grow: 0.5;
-    position: relative; /* Needed for search icon positioning */
+    margin-left: 0; /* Move search bar to the left */
 }
 
 .search-input {
-    padding: 0.5em 2.5em 0.5em 1.2em;
+    padding: 0.5em 1.2em 0.5em 2.5em; /* Ensure padding is sufficient inside the input */
     border: 1px solid #ccc;
     border-radius: 20px;
     outline: none;
@@ -128,41 +135,69 @@ header {
     background: none;
     border: none;
     position: absolute;
-    right: 15px;
-    font-size: 1.2em;
+    left: -35px; /* Move the icon outside of the search box */
+    font-size: 1.5em;
     color: #eeeeee;
     cursor: pointer;
 }
+/* Home Icon */
+.home-icon {
+    margin-left: 10px;
+    color: #f1f3f5;
+    display: flex;
+    align-items: center;
+    font-size: 1.5em;
+    cursor: pointer;
+}
+
+.home-icon:hover {
+    color: #45a049;
+}
 
 /* Right Section (Icons) */
+
 .right-section {
     display: flex;
     align-items: center;
     justify-content: flex-end;
     gap: 2em;
+    margin-right: 3em; /* Move the entire icon section to the left */
 }
 
 .icon-links {
     display: flex;
     gap: 1.5em;
+    margin-right: -10px; /* Adjust this value to move the icons slightly to the left */
 }
 
 .icon-link {
     display: flex;
     align-items: center;
     text-decoration: none;
-    color: #f1f3f5; /* Dark color for icons */
+    color: #f1f3f5;
     transition: color 0.3s;
 }
 
 .icon-link:hover {
-    color: #2C5364; /* Dark hover color */
+    color: #2C5364;
 }
 
 .icon-label {
-    font-size: 0.9em;
+    font-size: 1em;
     margin-left: 0.3em;
     color: #f0ebeb;
+}
+.dropbtn {
+    display: flex;
+    align-items: center; /* Align items vertically */
+    cursor: pointer; /* Show pointer on hover */
+    color: #f1f3f5; /* Change color if needed */
+    padding: 10px; /* Add some padding for spacing */
+    transition: color 0.3s; /* Smooth color transition */
+  }
+  
+.dropbtn:hover {
+    color: #2C5364; /* Change color on hover */
 }
 
 /* Dropdown Styles */
@@ -174,16 +209,18 @@ header {
 .dropdown-content {
     display: none;
     position: absolute;
-    top: 100%; /* Dropdown appears below the profile icon */
+    top: 100%;
     right: 0;
     background-color: #fff;
-    border-radius: 10px; /* Smooth corners */
-    min-width: 200px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); /* Soft shadow */
+    border-radius: 12px; /* Rounded corners */
+    min-width: 220px; /* Increased width */
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2); /* Softer, larger shadow for depth */
     z-index: 1;
     transition: all 0.3s ease-in-out;
     opacity: 0;
     transform: translateY(10px);
+    padding: 10px 0; /* Space between content */
+    overflow: hidden;
 }
 
 .dropdown-content.show {
@@ -196,20 +233,21 @@ header {
 .dropdown-content button {
     display: block;
     padding: 12px 20px;
-    font-size: 0.9em;
+    font-size: 0.95em;
     color: #333;
     text-decoration: none;
     background-color: #fff;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s ease, color 0.3s ease;
     border: none;
     text-align: left;
     width: 100%;
+    cursor: pointer;
 }
 
 .dropdown-content a:hover,
 .dropdown-content button:hover {
-    background-color: #f1f1f1;
-    color: #079602;
+    background-color: #e9f7ef; /* Light green on hover */
+    color: #079602; /* Green hover text color */
 }
 
 .dropdown-content a:active,
@@ -220,28 +258,71 @@ header {
 .logout-btn {
     cursor: pointer;
     background: none;
-    color: #ff4d4d; /* Red color for logout */
+    color: #ff4d4d;
+    font-weight: bold;
 }
 
 .logout-btn:hover {
-    color: #ff0000; /* Darker red on hover */
+    color: #ff0000;
 }
 
 .dropdown-username {
     font-weight: bold;
-    padding: 12px 20px;
+    padding: 15px 20px;
     font-size: 1em;
     border-bottom: 1px solid #eee;
-    background-color: #fafafa; /* Light gray background */
-    color: #079602; /* Green color for username */
+    background-color: #fafafa;
+    color: #079602;
 }
 
+/* Dropdown animation */
 .dropdown-container:hover .dropdown-content,
 .dropdown-container .dropdown-content.show {
     display: block;
     opacity: 1;
     transform: translateY(0);
     transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+
+/* Cart Icon */
+.cart-icon {
+    font-size: 1.5em; /* Standard size for the cart icon */
+}
+
+/* Navigation Buttons Below Header */
+.navigation-buttons {
+    position: absolute;
+    top: 110px; /* Position below the header */
+    left: 20px; /* Right corner of the screen */
+    display: flex;
+    gap: 15px; /* Space between buttons */
+    z-index: 10; /* Ensure buttons appear above other elements */
+}
+
+.nav-button {
+    background-color: #fff; /* White background for contrast */
+    color: #4CAF50; /* Green color for the arrow icons */
+    border: 2px solid #4CAF50; /* Green border */
+    padding: 8px 20px; /* Adjusted padding to make the button rectangular */
+    cursor: pointer;
+    border-radius: 5px; /* Make the corners slightly rounded (or set to 0 for sharp corners) */
+    font-size: 16px; /* Font size for icons */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Light shadow for depth */
+}
+
+.nav-button:hover {
+    background-color: #4CAF50; /* Green background on hover */
+    color: #fff; /* White icon color on hover */
+}
+
+
+.nav-button i {
+    font-size: 18px; /* Adjust the icon size */
 }
 
 /* Mobile Responsive */
