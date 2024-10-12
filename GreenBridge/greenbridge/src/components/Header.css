@@ -170,7 +170,7 @@ header {
     margin-right: -10px; /* Adjust this value to move the icons slightly to the left */
 }
 
-.icon-link {
+.icon-linkss {
     display: flex;
     align-items: center;
     text-decoration: none;
@@ -178,7 +178,7 @@ header {
     transition: color 0.3s;
 }
 
-.icon-link:hover {
+.icon-linkss:hover {
     color: #2C5364;
 }
 

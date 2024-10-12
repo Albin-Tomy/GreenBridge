@@ -123,14 +123,14 @@ const Header = () => {
               username={username}
             />
             {username && (
-              <Link to="/wishlist" className="icon-link">
+              <button onClick={() => navigate('/wishlist')} className="icon-linkss">
                 <FaHeart /> {/* Wishlist Icon */}
                 <span className="icon-label">Wishlist</span>
-              </Link>
+              </button>
             )}
-            <Link to="/cart" className="icon-link">
+            <button onClick={() => navigate('/cart')} className="icon-linkss">
               <AiOutlineShoppingCart size={24} /> {/* Cart icon with standard size */}
-            </Link>
+            </button>
           </div>
         </div>
 

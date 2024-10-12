@@ -21,6 +21,28 @@ const ProductDetail = () => {
       });
   }, [id]);
 
+  // Add to Cart function
+  const addToCart = () => {
+    axios.post('http://127.0.0.1:8000/api/v1/orders/cart-items-create/', { product_id: id })
+      .then(response => {
+        alert('Product added to cart');
+      })
+      .catch(error => {
+        console.error('There was an error adding the product to the cart!', error);
+      });
+  };
+
+  // Add to Wishlist function
+  const addToWishlist = () => {
+    axios.post('http://127.0.0.1:8000/api/v1/orders/wishlist-items-list/', { product_id: id })
+      .then(response => {
+        alert('Product added to wishlist');
+      })
+      .catch(error => {
+        console.error('There was an error adding the product to the wishlist!', error);
+      });
+  };
+
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -70,12 +92,12 @@ const ProductDetail = () => {
                 </ul>
               </div>
 
-              {/* Add to Cart Section */}
+              {/* Add to Cart and Wishlist Buttons */}
               <div className="product-actions">
-                <button className="wishlist-btn">
+                <button className="wishlist-btn" onClick={addToWishlist}>
                   <i className="fas fa-heart"></i> Add to Wishlist
                 </button>
-                <button className="cart-btn">
+                <button className="cart-btn" onClick={addToCart}>
                   <i className="fas fa-shopping-cart"></i> Add to Cart
                 </button>
               </div>

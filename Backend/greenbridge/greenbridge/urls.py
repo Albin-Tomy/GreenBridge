@@ -23,6 +23,7 @@ urlpatterns = [
     path('api/shg/', include('shg.urls')),
     path('api/adminpanel/', include('adminpanel.urls')),
     path('api/v1/products/',include('products.urls'),name='api/v1/products'),
+    path('api/v1/orders/',include('orders.urls'),name='api/v1/orders'),
     
     
 

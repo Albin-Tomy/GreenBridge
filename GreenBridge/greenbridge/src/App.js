@@ -18,6 +18,8 @@ import Staff from './Pages/Dashboard/Shg/Staff';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import ProductDetail from './Pages/Dashboard/Products/ProductDetail';
 import Admin from './Pages/Dashboard/Admin/Admin';
+import CartPage from './Pages/Dashboard/Products/CartPage';
+import Wishlist from './Pages/Dashboard/Products/WishList';
 
 
 function App() {
@@ -41,6 +43,8 @@ function App() {
         <Route path="/password-reset-confirm/:uidb64/:token" element={<ResetPassword />} />
         <Route path='/staff' element={<Staff/>}/>
         <Route path="/products/:id" element={<ProductDetail/>} />
+        <Route path="/cart" element={<CartPage />} />
+        <Route path="/wishlist" element={<Wishlist />} />
         
       </Routes>
     </Router>
