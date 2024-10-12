@@ -1,7 +1,7 @@
 import React from 'react';
 import './AdminDashboard.css'; // Importing the responsive CSS
 import { useNavigate } from 'react-router-dom';
-import Header from '../../../components/Header';
+import Header from '../../../components/Navbar';
 
 const AdminDashboard = () => {
 
@@ -13,6 +13,9 @@ const AdminDashboard = () => {
 
   const goToAllSHGs = () => {
     navigate('/admin/view-all-shgs');  // Navigate to the page showing all SHGs
+  };
+  const goToProducts = () => {
+    navigate('/admin/admin');  // Navigate to the pending requests page
   };
 
   return (
@@ -61,9 +64,9 @@ const AdminDashboard = () => {
           </div>
 
           <div className="functionality">
-            <h3>Reports</h3>
-            <button>View Sales Reports</button>
-            <button>View Performance Reports</button>
+            <h3>Products</h3>
+
+            <button  onClick={goToProducts}>View Performance Reports</button>
           </div>
 
           <div className="functionality">

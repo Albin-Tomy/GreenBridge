@@ -130,63 +130,6 @@ def user_profile_update(request, id):
     except Exception as e:
         return Response({"error": str(e)}, status=status.HTTP_404_NOT_FOUND)
     
-# @api_view(['GET'])
-# def user_profile_list(request):
-#     user_profiles = User_profile.objects.all()
-#     serializer = UserProfileSerializer(user_profiles, many=True)
-#     return Response(serializer.data)
-
-# @api_view(['POST'])
-# def user_profile_create(request):
-#     serializer = UserProfileSerializer(data=request.data)
-#     if serializer.is_valid():
-#         serializer.save()
-#         return Response(serializer.data, status=status.HTTP_201_CREATED)
-#     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-# @api_view(['GET'])
-# def user_profile_detail(request, id):
-#     try:
-#         # Fetch user profile by custom id
-#         user_profile = User_profile.objects.get(id=id)
-#     except User_profile.DoesNotExist:
-#         return Response({'error': 'User profile not found'}, status=status.HTTP_404_NOT_FOUND)
-
-#     # Serialize the user profile data and return it
-#     serializer = UserProfileSerializer(user_profile)
-#     return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-# @api_view(['PUT', 'PATCH'])
-# def user_profile_update(request, id):
-#     try:
-#         # Fetch user profile by _id (MongoDB ObjectId)
-#         user_profile = User_profile.objects.get(id=ObjectId(id))
-        
-#         # Use partial=True if using PATCH to allow partial updates
-#         serializer = UserProfileSerializer(user_profile, data=request.data, partial=True)
-
-#         if serializer.is_valid():
-#             serializer.save()
-#             return Response(serializer.data, status=status.HTTP_200_OK)
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-#     except User_profile.DoesNotExist:
-#         return Response({'error': 'User profile not found'}, status=status.HTTP_404_NOT_FOUND)
-#     except Exception as e:
-#         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-
-
-# @api_view(['DELETE'])
-# def user_profile_delete(request, pk):
-#     try:
-#         user_profile = User_profile.objects.get(pk=pk)
-#         user_profile.delete()
-#         return Response({'message': 'User profile deleted'}, status=status.HTTP_200_OK)
-#     except User_profile.DoesNotExist:
-#         return Response({'error': 'User profile not found'}, status=status.HTTP_404_NOT_FOUND)
 
     
     
@@ -241,3 +184,48 @@ def password_reset_confirm(request, uidb64, token):
         return Response({"message": "Password has been reset successfully."}, status=status.HTTP_200_OK)
  
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def google_sign_in(request):
+    access_token = request.data.get('token')
+    print("Received access_token:", access_token)
+    if not access_token:
+        return Response({'error': 'Token is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Verify the access token with Google
+    google_response = requests.get(
+        f"https://www.googleapis.com/oauth2/v1/userinfo?access_token={access_token}"
+    )
+
+    if google_response.status_code != 200:
+        return Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
+
+    google_data = google_response.json()
+    email = google_data.get('email')
+
+    # Use the google_user_id to identify the user
+    try:
+        user = User.objects.get(email=email)
+    except User.DoesNotExist:
+        user = User.objects.create(
+            email=email,
+        )
+        user.save()
+
+    # Generate JWT tokens
+    refresh = RefreshToken.for_user(user)
+    access_token = str(refresh.access_token)
+
+    return Response({
+        'access_token': access_token,
+        'refresh_token': str(refresh),
+        'user': {
+            'id': user.id,
+            'email': user.email,
+        }
+    }, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+def get_all_users(request):
+    users = User.objects.all().values('id', 'email')  # Select only 'id' and 'email' fields
+    return Response(users, status=status.HTTP_200_OK)

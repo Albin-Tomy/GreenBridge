@@ -2,8 +2,8 @@ from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Product,Category,MadeOf,Country,Brand
-from .serializers import ProductSerializer,CategorySerializer,MadeOfSerializer,CountrySerializer,BrandSerializer
+from .models import Product,Category,MadeOf,Country,Brand,SubCategory
+from .serializers import ProductSerializer,CategorySerializer,MadeOfSerializer,CountrySerializer,BrandSerializer,SubCategorySerializer
 
 
 # product function based views
@@ -106,8 +106,55 @@ def category_delete(request, pk):
         return Response({'error':"Item with this id does not exist"},status=status.HTTP_204_NO_CONTENT)
 
     
-   
-    
+# SubCategory function-based views
+
+@api_view(['GET'])
+def subcategory_list(request):
+    subcategories = SubCategory.objects.all()
+    serializer = SubCategorySerializer(subcategories, many=True)
+    return Response(serializer.data)
+
+@api_view(['POST'])
+def subcategory_create(request):
+    serializer = SubCategorySerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def subcategory_detail(request, pk):
+    try:
+        subcategory = SubCategory.objects.get(pk=pk)
+    except SubCategory.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    serializer = SubCategorySerializer(subcategory)
+    return Response(serializer.data)
+
+@api_view(['PUT'])
+def subcategory_update(request, pk):
+    try:
+        subcategory = SubCategory.objects.get(pk=pk)
+    except SubCategory.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    serializer = SubCategorySerializer(subcategory, data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['DELETE'])
+def subcategory_delete(request, pk):
+    try:
+        subcategory = SubCategory.objects.get(pk=pk)
+    except SubCategory.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    subcategory.delete()
+    return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 # madeOf function based views
 
@@ -329,3 +376,4 @@ def brand_delete(request, pk):
         return Response({'message':"Brand deleted"},status=status.HTTP_200_OK)
     except Brand.DoesNotExist:
         return Response({'error':"Item with this id does not exist"},status=status.HTTP_204_NO_CONTENT)
+    

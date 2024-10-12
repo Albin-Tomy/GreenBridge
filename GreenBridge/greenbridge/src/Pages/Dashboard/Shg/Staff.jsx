@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "./Staff.css";
-import Navbar from "../../../components/Header";
+import Navbar from "../../../components/Navbar";
 import Menubox from "../../../components/Menubox";
 import DataTable from "../../../components/BasicTable";
 import { IconButton } from "@mui/material";
@@ -274,7 +274,7 @@ function Staff() {
   }, [menu,open,countries]);
 
   const productColumns = [
-    { field: "id", headerName: "ID", flex: 1 },
+    // { field: "id", headerName: "ID", flex: 1 },
     { field: "name", headerName: "Name", flex: 1 },
     { field: "category", headerName: "Category", flex: 1 },
     { field: "price", headerName: "Price", type: "number", flex: 1 },
@@ -298,7 +298,7 @@ function Staff() {
 
   const orderRows = [];
   const orderColumns = [
-    { field: "id", headerName: "ID", flex: 1 },
+    // { field: "id", headerName: "ID", flex: 1 },
     { field: "user_id", headerName: "User", flex: 1 },
     { field: "order_date", headerName: "Ordered On", flex: 1 },
     { field: "order_status", headerName: "Order Status", flex: 1 },
@@ -323,7 +323,7 @@ function Staff() {
   ];
 
   const categoryColumns = [
-    { field: "id", headerName: "Id", flex: 1 },
+    // { field: "id", headerName: "Id", flex: 1 },
     { field: "name", headerName: "Name", flex: 1 },
     { field: "description", headerName: "Descrption", flex: 1 },
     { field: "added", headerName: "Added On", flex: 1 },
@@ -346,7 +346,7 @@ function Staff() {
   ];
 
   const countryColumns = [
-    { field: "id", headerName: "Id", flex: 1 },
+    // { field: "id", headerName: "Id", flex: 1 },
     { field: "name", headerName: "Name", flex: 1 },
     { field: "added", headerName: "Added On", flex: 1 },
     { field: "updated", headerName: "Updated On", flex: 1 },
@@ -523,8 +523,9 @@ function Staff() {
   };
 
     return (
+    <div>
+      <Navbar></Navbar>
     <div className="container">
-    <Navbar></Navbar>
     <div className="menu-container">
       <div className="menus">
         <Menubox
@@ -581,6 +582,7 @@ function Staff() {
       customStyle={{height:'87vh',overflowY:'scroll', marginTop:'0px'}}
       />
     }
+  </div>
   </div>
 
 );

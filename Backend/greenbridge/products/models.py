@@ -1,5 +1,5 @@
 from django.db import models
-
+from django.utils import timezone
 
 class Category(models.Model):
     id = models.AutoField(primary_key=True)
@@ -56,4 +56,15 @@ class Product(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def _str_(self):
+        return self.name
+
+class SubCategory(models.Model):
+    subcategory_id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=255)
+    description = models.TextField()
+    category = models.ForeignKey('Category', on_delete=models.CASCADE)
+    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
         return self.name

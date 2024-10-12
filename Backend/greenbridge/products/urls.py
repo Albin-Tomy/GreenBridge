@@ -27,4 +27,10 @@ urlpatterns = [
     path('brand-details/<int:pk>/', views.brand_detail, name='brand-detail'),
     path('brand-update/<int:pk>/', views.brand_update, name='brand-update'),
     path('brand-delete/<int:pk>/', views.brand_delete, name='brand-delete'),
+    # SubCategory URLs
+    path('subcategory-list/', views.subcategory_list, name='subcategory-list'),  # List all subcategories
+    path('subcategory-create/', views.subcategory_create, name='subcategory-create'),  # Create a new subcategory
+    path('subcategory-details/<int:pk>/', views.subcategory_detail, name='subcategory-detail'),  # Retrieve subcategory details
+    path('subcategory-update/<int:pk>/', views.subcategory_update, name='subcategory-update'),  # Update a subcategory
+    path('subcategory-delete/<int:pk>/', views.subcategory_delete, name='subcategory-delete'),  # Delete a subcategory
 ]

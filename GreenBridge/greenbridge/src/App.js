@@ -2,7 +2,7 @@ import React from 'react';
 // import './App.css';
 import { BrowserRouter as Router,Routes,Route } from 'react-router-dom';
 import RegLogin from './Pages/Authentication/RegLogin';
-import Admin from './Pages/Dashboard/Admin/AdminDashboard';
+import Dashboard from './Pages/Dashboard/Admin/AdminDashboard';
 import Home from './Pages/Home/Home';
 import LandingPage from './Pages/Home/LandingPage';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -15,6 +15,9 @@ import Profile from './Pages/Dashboard/User/Profile';
 import ForgotPassword from './Pages/Authentication/ForgotPassword'; 
 import ResetPassword from './Pages/Authentication/ResetPassword';
 import Staff from './Pages/Dashboard/Shg/Staff';
+import { GoogleOAuthProvider } from '@react-oauth/google';
+import ProductDetail from './Pages/Dashboard/Products/ProductDetail';
+import Admin from './Pages/Dashboard/Admin/Admin';
 
 
 function App() {
@@ -22,7 +25,8 @@ function App() {
     
     <Router>
       <Routes>
-        <Route path="/admin/home" element={<Admin />} />
+        <Route path="/admin/home" element={<Dashboard />} />
+        <Route path="/admin/admin" element={<Admin />} />
         <Route path="/admin/pending-requests" element={<PendingRequestsPage />} />
         <Route path="/admin/view-all-shgs" element={<AllSHGsPage />} />
         <Route path='/shgregister' element={<ShgRegistration />} />
@@ -36,6 +40,7 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/password-reset-confirm/:uidb64/:token" element={<ResetPassword />} />
         <Route path='/staff' element={<Staff/>}/>
+        <Route path="/products/:id" element={<ProductDetail/>} />
         
       </Routes>
     </Router>
