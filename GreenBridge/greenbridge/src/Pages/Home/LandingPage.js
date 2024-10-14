@@ -11,8 +11,15 @@ import sweet from '../../assets/honey.jpg';
 import hanticraft from '../../assets/hanticraft.jpeg';
 import furniture from '../../assets/furniture.jpg';
 import utensils from '../../assets/utensils.jpeg'
+import { useNavigate } from 'react-router-dom';
 
 const LandingPage = () => {
+  const navigate = useNavigate();
+
+
+  const goToProducts = () => {
+    navigate('/products');
+  };
   return (
     <div className="landing-page-body">
       {/* Header */}
@@ -23,7 +30,9 @@ const LandingPage = () => {
         <div className="hero-content">
           <h2>Empowering Self Help Groups for a Better Future</h2>
           <p>Together, we enable communities to thrive by providing tools, resources, and opportunities to SHGs. Explore our services and join the movement.</p>
-          <Link to="/services" className="cta-btn">Explore Services</Link>
+          <button onClick={goToProducts} >
+                <span className="contact-btn">Explore Now</span>
+              </button>
         </div>
         <div className="hero-image">
           <img src={shg} alt="Empowering Communities" />

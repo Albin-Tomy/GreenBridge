@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import './AllSHGsPage.css';
-import Header from '../../../components/Header';
+import Header from '../../../components/Navbar';
 
 const AllSHGsPage = () => {
   const [allShgs, setAllShgs] = useState([]);

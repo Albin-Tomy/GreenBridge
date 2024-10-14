@@ -225,7 +225,23 @@ def google_sign_in(request):
         }
     }, status=status.HTTP_200_OK)
 
+# @api_view(['GET'])
+# def get_all_users(request):
+#     users = User.objects.all().values('id', 'email')  # Select only 'id' and 'email' fields
+#     return Response(users, status=status.HTTP_200_OK)
+
 @api_view(['GET'])
 def get_all_users(request):
-    users = User.objects.all().values('id', 'email')  # Select only 'id' and 'email' fields
-    return Response(users, status=status.HTTP_200_OK)
+    users = User.objects.all()
+    serializer = UserSerializer(users,many=True)
+    if serializer.is_valid:
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    else:
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+@api_view(['DELETE'])
+def delete_user(request, user_id):
+    user = get_object_or_404(User, id=user_id)
+    user.delete()
+    return Response({"message": "User deleted successfully."}, status=status.HTTP_204_NO_CONTENT)

@@ -13,8 +13,8 @@
   padding: 0 15px;
 }
 
-/* Hero Section */
-.hero {
+
+.heroin {
   background-image: url('https://via.placeholder.com/1200x600');
   background-size: cover;
   background-position: center;
@@ -23,17 +23,18 @@
   text-align: center;
 }
 
-.hero h1 {
+.heroin h1 {
   font-size: 48px;
+  font-weight: bold;
   margin-bottom: 20px;
 }
 
-.hero p {
+.heroin p {
   font-size: 20px;
   margin-bottom: 40px;
 }
 
-.cta-btn {
+.shop-now-btn {
   padding: 15px 30px;
   background-color: #e60023;
   color: white;
@@ -44,7 +45,7 @@
   transition: background-color 0.3s;
 }
 
-.cta-btn:hover {
+.shop-now-btn:hover {
   background-color: #c7001d;
 }
 
@@ -94,12 +95,12 @@
   color: #666;
 }
 
-/* Products Section */
-.products {
+.featured-products {
   padding: 60px 0;
+  background-color: #fff;
 }
 
-.products h2 {
+.featured-products h2 {
   text-align: center;
   font-size: 36px;
   margin-bottom: 40px;
@@ -117,6 +118,11 @@
   text-align: center;
   border-radius: 10px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
 }
 
 .product-card h3 {
@@ -130,70 +136,40 @@
   margin-top: 10px;
 }
 
-/* Testimonials Section */
-.testimonials {
+.about-us {
   padding: 60px 0;
   background-color: #333;
   color: white;
   text-align: center;
 }
 
-.testimonials h2 {
+.about-us h2 {
   font-size: 36px;
+  margin-bottom: 20px;
+}
+
+.about-us p {
+  font-size: 18px;
   margin-bottom: 40px;
 }
 
-.testimonials-grid {
-  display: flex;
-  justify-content: space-around;
-  gap: 20px;
-}
-
-.testimonial-card {
-  background-color: #444;
-  padding: 30px;
-  border-radius: 10px;
-  width: 300px;
-}
-
-.testimonial-card p {
-  font-size: 16px;
-  margin-bottom: 20px;
-}
-
-/* Contact Section */
-.contact {
-  padding: 60px 0;
-  text-align: center;
-}
-
-.contact h2 {
-  font-size: 36px;
-  margin-bottom: 20px;
-}
-
-.contact p {
-  font-size: 16px;
-  margin-bottom: 30px;
-}
-
-.contact-btn {
+.learn-more-btn {
   padding: 15px 30px;
-  background-color: #e60023;
-  color: white;
+  background-color: #fff;
+  color: #333;
   border: none;
   border-radius: 5px;
   font-size: 16px;
   cursor: pointer;
+  transition: background-color 0.3s;
 }
 
-.contact-btn:hover {
-  background-color: #c7001d;
+.learn-more-btn:hover {
+  background-color: #f0f0f0;
 }
 
-/* Footer */
 footer {
-  background-color: #222;
+  background-color: #333;
   color: white;
   padding: 20px 0;
   text-align: center;

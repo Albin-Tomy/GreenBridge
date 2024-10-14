@@ -21,11 +21,12 @@ const AdminDashboard = () => {
   return (
     <div>
       <Header/>
-    <div className="admin-dashboard">
-      <aside className="sidebar">
-        <div className="sidebar-header">
+      <div className="sidebar-header">
           <h2>Admin Dashboard</h2>
         </div>
+    <div className="admin-dashboard">
+      <aside className="sidebar">
+        
         <table className="sidebar-menu">
           <tbody>
             <tr>
@@ -48,13 +49,11 @@ const AdminDashboard = () => {
       </aside>
 
       <div className="main-content">
-        <header className="admin-header">
-          <h1>Welcome, Admin</h1>
-        </header>
+
 
         <section className="content-section">
           <div className="functionality">
-            <h3>Approve SHG Registrations</h3>
+            <h3>SHG Registrations</h3>
             <button  onClick={goToAllSHGs}>View All SHGs</button>
           </div>
 
@@ -66,7 +65,7 @@ const AdminDashboard = () => {
           <div className="functionality">
             <h3>Products</h3>
 
-            <button  onClick={goToProducts}>View Performance Reports</button>
+            <button  onClick={goToProducts}>View ProductsPage</button>
           </div>
 
           <div className="functionality">

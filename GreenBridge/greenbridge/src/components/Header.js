@@ -1,12 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-// import { CgProfile } from 'react-icons/cg';
 import { AiOutlineSearch, AiFillHome, AiOutlineShoppingCart } from 'react-icons/ai';
-import { FaBars, FaArrowLeft, FaArrowRight, FaHeart } from 'react-icons/fa'; // Added FaHeart for Wishlist
+import { FaBars, FaArrowLeft, FaArrowRight, FaHeart } from 'react-icons/fa';
 import './Header.css';
 import logo from '../assets/logo.png';
 import axios from 'axios';
 import { MdAccountCircle } from 'react-icons/md';
+
+// Configure Axios interceptor for automatic logout on token expiration
+axios.interceptors.response.use(
+  response => response,
+  error => {
+    if (error.response && error.response.status === 401) {
+      // Token is expired or invalid
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('userId');
+      window.location.href = '/login'; // Redirect to login page
+    }
+    return Promise.reject(error);
+  }
+);
 
 // Dropdown component for profile menu
 const Dropdown = ({ isOpen, toggleDropdown, handleLogout, username }) => (
@@ -70,9 +83,18 @@ const Header = () => {
 
   const handleLogout = () => {
     localStorage.removeItem('authToken');
-    localStorage.removeItem('user');
+    localStorage.removeItem('userId');
     setUsername(null);
-    navigate('/');
+    navigate('/login');
+  };
+
+  const goToWishlist = () => {
+    navigate('/wishlist');
+  };
+
+  // Navigate to the cart page
+  const goToCart = () => {
+    navigate('/cart');
   };
 
   const goBack = () => {
@@ -97,17 +119,28 @@ const Header = () => {
         {/* Right Section: Search, Profile, Wishlist, Cart */}
         <div className="right-section">
           {/* Search bar */}
-          <form className="search-bar">
+          {/* <form className="search-bar">
             <button type="submit" className="search-icon">
               <AiOutlineSearch />
             </button>
             <input
               type="text"
-              className="search-input"
+              className="search-inputs"
               placeholder="Search products, brands"
               aria-label="Search products, brands"
             />
-          </form>
+          </form> */}
+          <form className="custom-search-bar">
+  <button type="submit" className="custom-search-icon">
+    <AiOutlineSearch />
+  </button>
+  <input
+    type="text"
+    className="custom-search-input"
+    placeholder="Search products, brands"
+    aria-label="Search products, brands"
+  />
+</form>
 
           {/* Home Icon */}
           <Link to="/" className="home-icon">
@@ -123,13 +156,13 @@ const Header = () => {
               username={username}
             />
             {username && (
-              <button onClick={() => navigate('/wishlist')} className="icon-linkss">
-                <FaHeart /> {/* Wishlist Icon */}
+              <button onClick={goToWishlist} className="icon-linkss">
+                <FaHeart />
                 <span className="icon-label">Wishlist</span>
               </button>
             )}
-            <button onClick={() => navigate('/cart')} className="icon-linkss">
-              <AiOutlineShoppingCart size={24} /> {/* Cart icon with standard size */}
+            <button onClick={goToCart} className="icon-linkss">
+              <AiOutlineShoppingCart size={24} />
             </button>
           </div>
         </div>

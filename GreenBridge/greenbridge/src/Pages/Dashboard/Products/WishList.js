@@ -11,7 +11,7 @@ const Wishlist = () => {
   useEffect(() => {
     const fetchWishlist = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/api/v1/orders/wishlist-list/', {
+        const response = await axios.get(`http://localhost:8000/api/v1/orders/wishlist-list/?user_id=${userId}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -25,7 +25,7 @@ const Wishlist = () => {
     };
 
     fetchWishlist();
-  }, [token]);
+  }, [userId, token]);
 
   const removeFromWishlist = async (itemId) => {
     try {
@@ -36,12 +36,45 @@ const Wishlist = () => {
       });
       setWishlist(wishlist.filter(item => item.id !== itemId));
     } catch (error) {
-      console.error('Error removing item:', error);
+      console.error('Error removing item from wishlist:', error);
     }
   };
 
   const addToCart = async (productId) => {
-    // Implement logic to add the product to the cart (similar to wishlist add).
+    try {
+      let cartResponse = await axios.get(`http://localhost:8000/api/v1/orders/cart-list/?user_id=${userId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      let cartId;
+      if (cartResponse.data.length > 0) {
+        cartId = cartResponse.data[0].cart_id;
+      } else {
+        const newCartResponse = await axios.post('http://localhost:8000/api/v1/orders/cart-list/', {
+          user_id: userId
+        }, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        cartId = newCartResponse.data.cart_id;
+      }
+
+      await axios.post('http://localhost:8000/api/v1/orders/cart-items-create/', {
+        cart_id: cartId,
+        product_id: productId
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      alert('Product added to cart');
+    } catch (error) {
+      console.error('Error adding product to cart:', error);
+    }
   };
 
   if (loading) {
@@ -57,13 +90,13 @@ const Wishlist = () => {
           wishlist.map((wishlistItem) => (
             <div key={wishlistItem.id} className="wishlist-item">
               <img
-                src={wishlistItem.product.image || "https://via.placeholder.com/100"}
-                alt={wishlistItem.product.name}
+                src={wishlistItem.product?.image || "https://via.placeholder.com/100"}
+                alt={wishlistItem.product?.name || "Product"}
                 className="wishlist-item-image"
               />
               <div className="wishlist-item-details">
-                <h4 className="wishlist-item-name">{wishlistItem.product.name}</h4>
-                <p className="wishlist-item-price">₹ {wishlistItem.product.price}</p>
+                <h4 className="wishlist-item-name">{wishlistItem.product?.name || "Unnamed Product"}</h4>
+                <p className="wishlist-item-price">₹ {wishlistItem.product?.price || "N/A"}</p>
               </div>
               <div className="wishlist-item-actions">
                 <button
@@ -74,7 +107,8 @@ const Wishlist = () => {
                 </button>
                 <button
                   className="wishlist-add-to-cart-btn"
-                  onClick={() => addToCart(wishlistItem.product.id)}
+                  onClick={() => wishlistItem.product ? addToCart(wishlistItem.product.id) : alert("Product not available")}
+                  disabled={!wishlistItem.product}
                 >
                   <i className="fas fa-shopping-cart"></i> Add to Cart
                 </button>

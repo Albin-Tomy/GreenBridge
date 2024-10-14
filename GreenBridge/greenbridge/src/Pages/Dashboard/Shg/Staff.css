@@ -1,56 +1,115 @@
-.container{
+.container {
     width: 100vw;
-    display: flex;
-    flex-direction: column;
-}
-.menus{
-    width: 100%;
-    height: 75px;
-    margin-top: 2.5rem;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 15px;
-    padding: 0 2rem;
-    margin-bottom: 2rem;
+    /* display: flex; */
+    flex-direction: row; /* Change to row for sidebar layout */
 }
 
-
-
-.menu-container{
-    width: 100%;
+/* Sidebar styling */
+.menu-container {
+    width: 250px; /* Fixed width for sidebar */
+    min-height: 100vh; /* Full viewport height */
+    background-color: #f8f9fa; /* Light background color for the sidebar */
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1); /* Add a subtle shadow for depth */
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    padding: 0 8.5%;
-
+    padding: 1rem 0;
+    position: fixed; /* Fix the position for the sidebar */
+    left: 0;
 }
 
-.submenu{
+/* Style for the content area */
+.content {
+    flex-grow: 1; /* Let the content take up the remaining space */
+    margin-left: 250px; /* Offset the width of the sidebar */
+    padding: 2rem;
+    width: calc(100% - 250px); /* Adjust the width for full content */
+}
+
+/* Menu items styling */
+.menus {
     width: 100%;
-    height: 45px;
-    margin-top: 0.2rem;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 15px;
-    padding: 0 2rem;
-    margin-bottom: 2rem;
+    padding: 1rem;
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
+
+.menus a {
+    width: 100%;
+    text-align: center;
+    padding: 10px 15px;
+    color: #333;
+    background-color: #e9ecef;
+    border-radius: 5px;
+    font-weight: bold;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.menus a:hover {
+    background-color: #ced4da;
+}
+
+/* Styling the submenu if needed */
+.submenu {
+    width: 100%;
+    margin-top: 0.5rem;
+    padding: 0 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.submenu a {
+    text-align: left;
+    padding: 8px 15px;
+    color: #555;
+    border-radius: 4px;
+    font-size: 14px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.submenu a:hover {
+    background-color: #d4d4d4;
+}
+
+
 
 .table-container{
     width: 100%;
-    padding: 0 11%;
+    margin-left: 6rem;
+    margin-top: 3rem;
 
 }
+.table-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; 
+    /* padding: 0 11%;  */
+    position: relative;
+    
+}
 
-.add-button-container{
+.add-button-container {
+    position: absolute; 
+    top: 0; 
+    right: 0; 
+    margin: 2rem; 
+    
+}
+
+/* .add-button-container{
     margin: 0 11%;
     margin-right: 12.5%;
     height: 50px;
     display: flex;
     align-items: center;
-    justify-content: end;
-}
+    justify-content:baseline;
+    
+} */
 
 .add-button{
     height: 80%;
@@ -59,6 +118,7 @@
     font-weight: 700;
     background: #abe2bd;
     border-radius: 8px;
-    border: 1px solid #59c87c;
+    border: 1px solid #06c141;
     padding: 0 15px;
 }
+

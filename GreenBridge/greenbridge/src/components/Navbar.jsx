@@ -65,38 +65,18 @@ const Header = () => {
   };
 
   return (
-    <header className="headers">
-      {/* Brand and Logo */}
-      <div className="navbar-brand">
-        <Link to="/" className="logo-containers">
-          <img src={logo} alt="Logo" className="logo" />
-        </Link>
-        <h2 className="company-name">GreenBridge</h2>
-      </div>
+    <header className="navbar">
+        {/* Brand and Logo */}
+        <div className="navbar-brands">
+          <Link to="/" className="logo-containers">
+            <img src={logo} alt="Logo" className="logos" />
+          </Link>
+          <h2 className="company-names">GreenBridge</h2>
+        </div>
 
-      {/* Navigation Menu */}
-      <nav className={`nav`}>
-        <ol>
-          <li><Link to="/">Home</Link></li>
-          <li><Link to="/about">About</Link></li>
-          <li><Link to="/services">Services</Link></li>
-          <li><Link to="/contact">Contact</Link></li>
-        </ol>
-      </nav>
-
-      {/* Right Section: Search, Profile, Wishlist, Cart */}
-      <div className="right-section">
+        {/* Right Section: Search, Profile, Wishlist, Cart */}
+        <div className="right-section">
         {/* Search bar */}
-        <form className="search-bar">
-          <input
-            type="text"
-            className="search-input"
-            placeholder="Search products, brands"
-          />
-          <button type="submit" className="search-icon">
-            <AiOutlineSearch />
-          </button>
-        </form>
 
         {/* Icons: Profile, Wishlist, Bag */}
         <div className="icon-links">
@@ -106,10 +86,6 @@ const Header = () => {
             handleLogout={handleLogout}
             username={username} // Pass the username to the dropdown
           />
-          <Link to="/cart" className="icon-link">
-            <IoBagHandleOutline />
-            <span className="icon-label">Bag</span>
-          </Link>
         </div>
       </div>
 

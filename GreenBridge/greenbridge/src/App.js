@@ -20,7 +20,8 @@ import ProductDetail from './Pages/Dashboard/Products/ProductDetail';
 import Admin from './Pages/Dashboard/Admin/Admin';
 import CartPage from './Pages/Dashboard/Products/CartPage';
 import Wishlist from './Pages/Dashboard/Products/WishList';
-
+import HomePage from './Pages/Home/HomePage';
+import LandingPages from './Pages/Home/LandingPages';
 
 function App() {
   return (
@@ -36,7 +37,7 @@ function App() {
         <Route path="/signup" element={<RegLogin />} />
         <Route path="/home" element={<LandingPage />} />
         <Route path='/' element={<Home/>} />
-        <Route path='/shg' element={<SHGDashboard/>}/>
+        <Route path='/shg' element={<Staff/>}/>
         <Route path='/products' element={<ProductsPage/>}/>
         <Route path='/profile' element={<Profile/>}/>
         <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -45,6 +46,8 @@ function App() {
         <Route path="/products/:id" element={<ProductDetail/>} />
         <Route path="/cart" element={<CartPage />} />
         <Route path="/wishlist" element={<Wishlist />} />
+        <Route path="/landing" element={<LandingPages />} />
+        <Route path="/homepage" element={<HomePage />} />
         
       </Routes>
     </Router>

@@ -9,7 +9,8 @@ const CartPage = () => {
 
   // Fetch cart items from the Django backend
   useEffect(() => {
-    axios.get('http://127.0.0.1:8000/api/v1/orders/cart-list/')
+    const userId = localStorage.getItem('userId');
+    axios.get(`http://127.0.0.1:8000/api/v1/orders/cart-list/?user_id=${userId}`)
       .then(response => {
         setCartItems(response.data);
         calculateTotal(response.data);
@@ -54,7 +55,7 @@ const CartPage = () => {
 
       <div className="cart-container">
         <div className="cart-items">
-          {cartItems.length > 0 ? (
+          {/* {cartItems.length > 0 ? (
             cartItems.map(item => (
               <div className="cart-item" key={item.id}>
                 <img src={item.image} alt={item.name} className="cart-item-image" />
@@ -74,7 +75,35 @@ const CartPage = () => {
             ))
           ) : (
             <p>Your cart is empty</p>
-          )}
+          )} */}
+          {cartItems.length > 0 ? (
+  cartItems.map(item => (
+    <div className="cart-item" key={item.id}>
+      {item.product ? (  // Check if product exists
+        <>
+          <img src={item.product.image} alt={item.product.name} className="cart-item-image" />
+          <div className="item-details">
+            <h4 className="item-name">{item.product.name}</h4>
+            <p className="item-price">Price: <span className="price-amount">₹ {item.product.price}</span></p>
+            <div className="quantity-control">
+              <button className="qty-btn" onClick={() => updateQuantity(item.id, item.quantity - 1)} disabled={item.quantity <= 1}>-</button>
+              <span className="quantity">{item.quantity}</span>
+              <button className="qty-btn" onClick={() => updateQuantity(item.id, item.quantity + 1)}>+</button>
+            </div>
+          </div>
+          <button className="remove-btn" onClick={() => removeItem(item.id)}>
+            <FaTrash />
+          </button>
+        </>
+      ) : (
+        <p>Product details not available</p>  // Handle missing product case
+      )}
+    </div>
+  ))
+) : (
+  <p>Your cart is empty</p>
+)}
+
         </div>
 
         <div className="cart-summary">

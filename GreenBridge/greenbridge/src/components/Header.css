@@ -13,7 +13,7 @@ header {
     height: 100px;
     background: #448a42; /* Set the header background */
     display: flex;
-    justify-content: center; /* Center contents horizontally */
+    justify-content: center;
     align-items: center;
     padding: 0;
 }
@@ -59,7 +59,6 @@ header {
     letter-spacing: 3px; /* Add some spacing between the letters */
     text-shadow: 1px 1px 2px #000000; /* Add a slight shadow for depth */
 }
-
 
 /* Navigation Links */
 .nav {
@@ -113,7 +112,7 @@ header {
 }
 
 /* Search Bar */
-.search-bar {
+.custom-search-bar {
     display: flex;
     align-items: center;
     position: relative;
@@ -122,7 +121,7 @@ header {
     margin-left: 0; /* Move search bar to the left */
 }
 
-.search-input {
+.custom-search-inputs {
     padding: 0.5em 1.2em 0.5em 2.5em; /* Ensure padding is sufficient inside the input */
     border: 1px solid #ccc;
     border-radius: 20px;
@@ -131,15 +130,16 @@ header {
     width: 100%;
 }
 
-.search-icon {
+.custom-search-icon {
     background: none;
     border: none;
     position: absolute;
-    left: -35px; /* Move the icon outside of the search box */
+    left: -65px; /* Move the icon outside of the search box */
     font-size: 1.5em;
     color: #eeeeee;
     cursor: pointer;
 }
+
 /* Home Icon */
 .home-icon {
     margin-left: 10px;
@@ -155,7 +155,6 @@ header {
 }
 
 /* Right Section (Icons) */
-
 .right-section {
     display: flex;
     align-items: center;
@@ -175,6 +174,9 @@ header {
     align-items: center;
     text-decoration: none;
     color: #f1f3f5;
+    background: none; /* Remove background */
+    padding: 0; /* Remove padding */
+    border: none; /* Remove border */
     transition: color 0.3s;
 }
 
@@ -182,22 +184,25 @@ header {
     color: #2C5364;
 }
 
+/* Icon Label */
 .icon-label {
     font-size: 1em;
     margin-left: 0.3em;
     color: #f0ebeb;
 }
+
+/* Dropdown Button */
 .dropbtn {
     display: flex;
-    align-items: center; /* Align items vertically */
-    cursor: pointer; /* Show pointer on hover */
-    color: #f1f3f5; /* Change color if needed */
-    padding: 10px; /* Add some padding for spacing */
-    transition: color 0.3s; /* Smooth color transition */
-  }
-  
+    align-items: center;
+    cursor: pointer;
+    color: #f1f3f5;
+    padding: 10px;
+    transition: color 0.3s;
+}
+
 .dropbtn:hover {
-    color: #2C5364; /* Change color on hover */
+    color: #2C5364;
 }
 
 /* Dropdown Styles */
@@ -284,7 +289,6 @@ header {
     transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
-
 /* Cart Icon */
 .cart-icon {
     font-size: 1.5em; /* Standard size for the cart icon */
@@ -301,10 +305,10 @@ header {
 }
 
 .nav-button {
-    background-color: #fff; /* White background for contrast */
+    background: none; /* Remove background */
     color: #4CAF50; /* Green color for the arrow icons */
-    border: 2px solid #4CAF50; /* Green border */
-    padding: 8px 20px; /* Adjusted padding to make the button rectangular */
+    border: none; /* Remove border */
+    padding: 0; /* Adjust padding */
     cursor: pointer;
     border-radius: 5px; /* Make the corners slightly rounded (or set to 0 for sharp corners) */
     font-size: 16px; /* Font size for icons */
@@ -312,7 +316,6 @@ header {
     align-items: center;
     justify-content: center;
     transition: background-color 0.3s ease, color 0.3s ease;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Light shadow for depth */
 }
 
 .nav-button:hover {
@@ -320,14 +323,8 @@ header {
     color: #fff; /* White icon color on hover */
 }
 
-
 .nav-button i {
-    font-size: 18px; /* Adjust the icon size */
-}
-
-/* Mobile Responsive */
-.menu-icon {
-    display: none;
+    font-size: 20px; /* Font size for icons */
 }
 
 @media (max-width: 1200px) {

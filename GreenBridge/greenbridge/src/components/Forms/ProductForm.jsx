@@ -256,7 +256,7 @@ const ProductForm = ({ onCancel,initialProductData,isEdit}) => {
             ))}
           </select>
 
-          <label>Stock Quantity</label>
+          {/* <label>Stock Quantity</label>
           <input
             type="number"
             id="stock_quantity"
@@ -265,7 +265,7 @@ const ProductForm = ({ onCancel,initialProductData,isEdit}) => {
             value={productData.stock_quantity}
             onChange={handleInputChange}
             required
-          />
+          /> */}
 
           <label>Product Image</label>
           <input

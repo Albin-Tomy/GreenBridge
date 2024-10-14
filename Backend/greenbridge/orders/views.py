@@ -8,6 +8,8 @@ from .serializers import CartSerializer, CartItemsSerializer,PaymentSerializer,A
 
 # order && order_item function based view
 
+# order && order_item function based view
+
 @api_view(['GET', 'POST'])
 def order_list(request):
     if request.method == 'GET':
@@ -60,7 +62,7 @@ def delete_order(request, pk):
         order.delete()
         if order_item:
             order_item.delete()
-        return Response({'message': 'Order deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
+        return Response({'message': 'Order deleted successfully'}, status=status.HTTP_200_OK)
 
 
 @api_view(['PUT'])
@@ -126,65 +128,46 @@ def order_item_detail(request, pk):
         order_item.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-
 # Wishlist && wishlist_item function based view
-    
 
 @api_view(['GET', 'POST'])
-def wishlist_list(request):
+def wishlist_list_create(request):
     if request.method == 'GET':
-        wishlists = Wishlist.objects.all()
+        user_id = request.GET.get('user_id')  # Get user_id from query parameters
+        if user_id:
+            wishlists = Wishlist.objects.filter(user_id=user_id)  # Filter wishlist by user_id
+        else:
+            wishlists = Wishlist.objects.all()
         serializer = WishlistSerializer(wishlists, many=True)
         return Response(serializer.data)
-    
+
     elif request.method == 'POST':
         serializer = WishlistSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-
-@api_view(['GET', 'PUT', 'DELETE'])
-def wishlist_detail(request, pk):
-    try:
-        wishlist = Wishlist.objects.get(pk=pk)
-    except Wishlist.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-
-    if request.method == 'GET':
-        serializer = WishlistSerializer(wishlist)
-        return Response(serializer.data)
-    
-    elif request.method == 'PUT':
-        serializer = WishlistSerializer(wishlist, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    elif request.method == 'DELETE':
-        wishlist.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+# View for creating/retrieving wishlist items
 @api_view(['GET', 'POST'])
-def wishlist_items_list(request):
+def wishlist_items_list_create(request):
     if request.method == 'GET':
         wishlist_items = WishlistItems.objects.all()
         serializer = WishlistItemsSerializer(wishlist_items, many=True)
         return Response(serializer.data)
-    
+
     elif request.method == 'POST':
         serializer = WishlistItemsSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
 
+
+# View for handling individual wishlist item (GET, PUT, DELETE)
 @api_view(['GET', 'PUT', 'DELETE'])
-def wishlist_item_detail(request, pk):
+def wishlist_items_detail(request, pk):
     try:
         wishlist_item = WishlistItems.objects.get(pk=pk)
     except WishlistItems.DoesNotExist:
@@ -193,25 +176,27 @@ def wishlist_item_detail(request, pk):
     if request.method == 'GET':
         serializer = WishlistItemsSerializer(wishlist_item)
         return Response(serializer.data)
-    
+
     elif request.method == 'PUT':
         serializer = WishlistItemsSerializer(wishlist_item, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
     elif request.method == 'DELETE':
         wishlist_item.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-# cart && caert_item function based view
-    
 @api_view(['GET', 'POST'])
 def cart_list_create(request):
     if request.method == 'GET':
-        carts = Cart.objects.all()
+        user_id = request.GET.get('user_id')  # Get user_id from query parameters
+        if user_id:
+            carts = Cart.objects.filter(user_id=user_id)  # Filter carts by user_id
+        else:
+            carts = Cart.objects.all()
         serializer = CartSerializer(carts, many=True)
         return Response(serializer.data)
 
@@ -221,6 +206,7 @@ def cart_list_create(request):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 @api_view(['GET', 'PUT', 'DELETE'])
 def cart_detail(request, pk):
@@ -248,7 +234,12 @@ def cart_detail(request, pk):
 @api_view(['GET', 'POST'])
 def cart_items_list_create(request):
     if request.method == 'GET':
-        cart_items = CartItems.objects.all()
+        cart_id = request.GET.get('cart_id')  # Filter by cart_id if provided
+        if cart_id:
+            cart_items = CartItems.objects.filter(cart_id=cart_id).select_related('product_id')  # Efficient query
+        else:
+            cart_items = CartItems.objects.all().select_related('product_id')  # Fetch all cart items
+
         serializer = CartItemsSerializer(cart_items, many=True)
         return Response(serializer.data)
 

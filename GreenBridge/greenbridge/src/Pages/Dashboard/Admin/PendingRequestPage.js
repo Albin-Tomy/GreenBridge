@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import './PendingRequest.css'; // Updated file name
-import Header from '../../../components/Header';
+import Header from '../../../components/Navbar';
 
 const PendingRequestsPage = () => {
   const [pendingRequests, setPendingRequests] = useState([]);

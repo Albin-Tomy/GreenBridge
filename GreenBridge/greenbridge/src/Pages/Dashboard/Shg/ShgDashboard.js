@@ -2,6 +2,7 @@ import React from 'react';
 import './ShgDashboard.css'; // Import the CSS for styling
 import { FaHome, FaPlus, FaList, FaShoppingCart, FaUser } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
+import Navbar from '../../../components/Navbar';
 
 const SHGDashboard = () => {
 
@@ -12,7 +13,10 @@ const SHGDashboard = () => {
   };
 
   return (
+    <div>
+      <Navbar/>
     <div className="shg-dashboard-container">
+      
       {/* Sidebar */}
       <nav className="shg-sidebar">
         <div className="shg-sidebar-header">
@@ -51,6 +55,7 @@ const SHGDashboard = () => {
           </div>
         </section>
       </div>
+    </div>
     </div>
   );
 };

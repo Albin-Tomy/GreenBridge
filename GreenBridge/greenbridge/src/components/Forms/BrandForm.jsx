@@ -1,12 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import './forms.css';
 import axios from 'axios';
 
-const AddBrandForm = ({onCancel}) => {
+const AddBrandForm = ({onCancel,initialBrandData,isEdit}) => {
   const [brandData, setBrandData] = useState({
     name: '',
     description: '',
   });
+
+  useEffect(() => {
+    if (initialBrandData) {
+      setBrandData({
+        name: initialBrandData.name,
+        description: initialBrandData.description,
+      });
+    }
+  }, [initialBrandData]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -20,6 +29,23 @@ const AddBrandForm = ({onCancel}) => {
     Object.keys(brandData).forEach((key) => {
       formData.append(key, brandData[key]);
     });
+
+    if (isEdit) {
+      // Update 
+      axios
+        .put(
+          `http://127.0.0.1:8000/api/v1/products/brand-update/${initialBrandData.brand_id}/`,
+          formData,
+          {}
+        )
+        .then((response) => {
+          alert("Brand updated successfully!");
+          window.location.reload();
+        })
+        .catch((error) => {
+          console.error("Error updating Brand:", error.response.data);
+        });
+    } else {
     axios.post("http://127.0.0.1:8000/api/v1/products/brand-create/",formData)
     .then((res)=>{
       alert("Brand Added !")
@@ -29,15 +55,16 @@ const AddBrandForm = ({onCancel}) => {
     .catch((err)=>{
       console.log(err)
     })
+  }
   };
 
 
   return (
     <div className="form-container">
-      <h3>Add New Category</h3>
+      <h3>{isEdit?'Edit Category' :'Add New Category'}</h3>
       <form onSubmit={handleSubmit}>
         <fieldset>
-          <div className="formhead">
+          <div className="heads">
             <span>Category Details</span>
           </div>
           
@@ -46,7 +73,6 @@ const AddBrandForm = ({onCancel}) => {
             type="text"
             id="name"
             name="name"
-            className="form-input"
             value={brandData.name}
             onChange={handleInputChange}
             required
@@ -57,14 +83,13 @@ const AddBrandForm = ({onCancel}) => {
             type="text"
             id="description"
             name="description"
-            className="form-input"
             value={brandData.description}
             onChange={handleInputChange}
             required
           />
 
           <div className="form-actions">
-            <button type="submit" className="save-btn">Save </button>
+            <button type="submit" className="save-btn">{isEdit?'Update':'Save'} </button>
             <button type="reset" className="cancel-btn" onClick={onCancel}>Cancel</button>
           </div>
         </fieldset>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import './Profile.css'; // Ensure you have CSS for styling the profile page
+import './Profile.css';
+import Header from '../../../components/Header'; // Ensure you have CSS for styling the profile page
 
 const UserProfile = () => {
   const [profile, setProfile] = useState({
@@ -93,6 +94,8 @@ const UserProfile = () => {
   if (loading) return <p>Loading...</p>; // Show loading message while fetching
 
   return (
+    <div>
+      <Header/>
     <div className="profile-page">
       <h2 className="profile-heading">User Profile</h2>
       <div className="profile-details">
@@ -224,6 +227,7 @@ const UserProfile = () => {
       {isEditable && (
         <button type="submit" onClick={handleSubmit} className="save-btn">Update Profile</button>
       )}
+    </div>
     </div>
   );
 };

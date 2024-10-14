@@ -15,7 +15,7 @@
 /* Sidebar Styles */
 .shg-sidebar {
   width: 250px;
-  background-color: #2C3E50; /* Dark Blue-Grey for the sidebar */
+  background-color: #448a42; /* Dark Blue-Grey for the sidebar */
   padding: 20px;
   position: fixed;
   height: 100%;
@@ -53,7 +53,7 @@
 }
 
 .shg-sidebar-menu li a:hover {
-  background-color: #34495E; /* Slightly lighter blue-grey on hover */
+  background-color: #3bb3f9; /* Slightly lighter blue-grey on hover */
 }
 
 .shg-icon {
