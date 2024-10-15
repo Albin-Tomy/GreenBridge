@@ -20,6 +20,24 @@ def create_product(request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+# @api_view(['PUT', 'PATCH'])
+# def update_product(request, pk):
+#     try:
+#         product = Product.objects.get(pk=pk)
+#     except Product.DoesNotExist:
+#         return Response({'error': 'Product not found'}, status=status.HTTP_404_NOT_FOUND)
+
+#     data = request.data.copy()
+
+#     image_data = data.get('image')
+#     if image_data == '' or image_data is None:
+#         data.pop('image', None)
+
+#     serializer = ProductSerializer(product, data=data, partial=True)
+#     if serializer.is_valid():
+#         serializer.save()
+#         return Response(serializer.data)
+#     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 @api_view(['PUT', 'PATCH'])
 def update_product(request, pk):
     try:
@@ -29,16 +47,15 @@ def update_product(request, pk):
 
     data = request.data.copy()
 
-    image_data = data.get('image')
-    if image_data == '' or image_data is None:
+    # Remove image field if it's not provided in the request
+    if not request.FILES.get('image', None) and data.get('image') in [None, '']:
         data.pop('image', None)
 
-    serializer = ProductSerializer(product, data=data, partial=True)
+    serializer = ProductSerializer(product, data=request.data)
     if serializer.is_valid():
         serializer.save()
         return Response(serializer.data)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
     
 @api_view(['GET'])
 def list_products(request):

@@ -15,6 +15,7 @@ const ProductDetail = () => {
   const [materials, setMaterials] = useState({});
 
   const BASE_URL = 'http://127.0.0.1:8000';
+
   useEffect(() => {
     // Fetch product details
     axios.get(`http://127.0.0.1:8000/api/v1/products/details/${id}/`)
@@ -23,7 +24,8 @@ const ProductDetail = () => {
         setLoading(false);
       })
       .catch(error => {
-        setError(error.message);
+        setError('There was a problem fetching product details. Please try again later.');
+        console.error(error);
         setLoading(false);
       });
 
@@ -67,91 +69,92 @@ const ProductDetail = () => {
         setMaterials(materialMap);
       });
 
-  }, [id]);
+  }, [id]); // Only run when the product ID changes
 
-  const addToCart = () => {
-  // Retrieve the user_id from localStorage
-  const userId = localStorage.getItem('userId');
-
-  if (!userId) {
-    alert("Please log in first to add items to the cart.");
-    return;
-  }
-
-  // Step 1: Check if the user already has a cart
-  axios.get(`http://127.0.0.1:8000/api/v1/orders/cart-list/?user_id=${userId}`)
-    .then(response => {
-      let cartId;
-
-      // Step 2: If the user has a cart, retrieve the cart ID
-      if (response.data.length > 0) {
-        cartId = response.data[0].cart_id; // Assuming first cart for the user
-      } else {
-        // Step 3: If no cart exists, create a new cart for the user
-        return axios.post('http://127.0.0.1:8000/api/v1/orders/cart-list/', { user_id: userId })
-          .then(response => {
-            cartId = response.data.cart_id; // Get newly created cart ID
-          });
-      }
-
-      return cartId; // Return the cart ID for the next step
-    })
-    .then(cartId => {
-      // Step 4: Add the product to the cart using the cart ID
-      return axios.post('http://127.0.0.1:8000/api/v1/orders/cart-items-create/', {
-        cart_id: cartId,
-        product_id: id // Use the product ID from useParams
+  const addToCart = (productId) => {
+    // Retrieve the user_id from localStorage
+    const userId = localStorage.getItem('userId');
+  
+    if (!userId) {
+      alert("Please log in first to add items to the cart.");
+      return;
+    }
+  
+    // Step 1: Check if the user already has a cart
+    axios.get(`http://127.0.0.1:8000/api/v1/orders/cart-list/?user_id=${userId}`)
+      .then(response => {
+        let cartId;
+  
+        // Step 2: If the user has a cart, retrieve the cart ID
+        if (response.data.length > 0) {
+          cartId = response.data[0].cart_id; // Assuming first cart for the user
+        } else {
+          // Step 3: If no cart exists, create a new cart for the user
+          return axios.post('http://127.0.0.1:8000/api/v1/orders/cart-list/', { user_id: userId })
+            .then(response => {
+              cartId = response.data.cart_id; // Get newly created cart ID
+            });
+        }
+  
+        return cartId; // Return the cart ID for the next step
+      })
+      .then(cartId => {
+        // Step 4: Add the product to the cart using the cart ID
+        return axios.post('http://127.0.0.1:8000/api/v1/orders/cart-items-create/', {
+          user_id: userId, // This should be correct
+          product_id: productId // This should also be correct
+        });
+      })
+      .then(response => {
+        alert('Product added to cart');
+      })
+      .catch(error => {
+        console.error('There was an error adding the product to the cart!', error);
       });
-    })
-    .then(response => {
-      alert('Product added to cart');
-    })
-    .catch(error => {
-      console.error('There was an error adding the product to the cart!', error);
-    });
-};
+  };
+  
 
-const addToWishlist = () => {
-  // Retrieve the user_id from localStorage
-  const userId = localStorage.getItem('userId');
+  const addToWishlist = (productId) => {
+    // Retrieve the user_id from localStorage
+    const userId = localStorage.getItem('userId');
 
-  if (!userId) {
-    alert("Please log in first to add items to the wishlist.");
-    return;
-  }
+    if (!userId) {
+      alert("Please log in first to add items to the wishlist.");
+      return;
+    }
 
-  // Step 1: Check if the user already has a wishlist
-  axios.get(`http://127.0.0.1:8000/api/v1/orders/wishlist-list/?user_id=${userId}`)
-    .then(response => {
-      let wishlistId;
+    // Step 1: Check if the user already has a wishlist
+    axios.get(`http://127.0.0.1:8000/api/v1/orders/wishlist-list/?user_id=${userId}`)
+      .then(response => {
+        let wishlistId;
 
-      // Step 2: If the user has a wishlist, retrieve the wishlist ID
-      if (response.data.length > 0) {
-        wishlistId = response.data[0].wishlist_id;  // Assuming first wishlist for the user
-      } else {
-        // Step 3: If no wishlist exists, create a new wishlist for the user
-        return axios.post('http://127.0.0.1:8000/api/v1/orders/wishlist-list/', { user_id: userId })
-          .then(response => {
-            wishlistId = response.data.wishlist_id;  // Get newly created wishlist ID
-          });
-      }
+        // Step 2: If the user has a wishlist, retrieve the wishlist ID
+        if (response.data.length > 0) {
+          wishlistId = response.data[0].wishlist_id;  // Assuming first wishlist for the user
+        } else {
+          // Step 3: If no wishlist exists, create a new wishlist for the user
+          return axios.post('http://127.0.0.1:8000/api/v1/orders/wishlist-list/', { user_id: userId })
+            .then(response => {
+              wishlistId = response.data.wishlist_id;  // Get newly created wishlist ID
+            });
+        }
 
-      return wishlistId;  // Return the wishlist ID for the next step
-    })
-    .then(wishlistId => {
-      // Step 4: Add the product to the wishlist using the wishlist ID
-      return axios.post('http://127.0.0.1:8000/api/v1/orders/wishlist-items-create/', {
-        wishlist_id: wishlistId,
-        product_id: id  // Use the product ID from useParams
+        return wishlistId;  // Return the wishlist ID for the next step
+      })
+      .then(wishlistId => {
+        // Step 4: Add the product to the wishlist using the wishlist ID
+        return axios.post('http://127.0.0.1:8000/api/v1/orders/wishlist-items-create/', {
+          wishlist_id: wishlistId,
+          product_id: productId  // Use the product ID from the parameter
+        });
+      })
+      .then(response => {
+        alert('Product added to wishlist');
+      })
+      .catch(error => {
+        console.error('There was an error adding the product to the wishlist!', error);
       });
-    })
-    .then(response => {
-      alert('Product added to wishlist');
-    })
-    .catch(error => {
-      console.error('There was an error adding the product to the wishlist!', error);
-    });
-};
+  };
 
   if (loading) {
     return <div>Loading...</div>;
@@ -177,11 +180,11 @@ const addToWishlist = () => {
 
             <div className="product-container">
               <div className="product-image-container">
-              <img
-                    src={product.image ? `${BASE_URL}${product.image}` : 'https://via.placeholder.com/150'}
-                    alt={product.name}
-                    className="product-images"
-                  />
+                <img
+                  src={product.image ? `${BASE_URL}${product.image}` : 'https://via.placeholder.com/150'}
+                  alt={product.name}
+                  className="product-images"
+                />
               </div>
 
               <div className="product-info">
@@ -202,10 +205,10 @@ const addToWishlist = () => {
                 </div>
 
                 <div className="product-actions">
-                  <button onClick={addToWishlist} className="wishlist-btn">
+                  <button onClick={() => addToWishlist(product.id)} className="wishlist-btn">
                     <i className="fas fa-heart"></i> Add to Wishlist
                   </button>
-                  <button onClick={addToCart} className="cart-btn">
+                  <button onClick={() => addToCart(product.id)} className="cart-btn">
                     <i className="fas fa-shopping-cart"></i> Add to Cart
                   </button>
                 </div>

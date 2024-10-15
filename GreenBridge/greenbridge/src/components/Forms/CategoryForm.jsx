@@ -7,7 +7,7 @@ const AddCategoryForm = ({ onCancel, initialCategoryData, isEdit }) => {
     name: "",
     description: "",
   });
-
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (initialCategoryData) {
@@ -21,49 +21,58 @@ const AddCategoryForm = ({ onCancel, initialCategoryData, isEdit }) => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setCategoryData({ ...categoryData, [name]: value });
+    setError(""); // Clear the error message when user starts typing
   };
 
-  const handleSubmit = (e) => {
+  const checkCategoryExists = async (name) => {
+    try {
+      // Make an API call to check if the category name already exists
+      const response = await axios.get(`http://127.0.0.1:8000/api/v1/products/category-list/`);
+      const existingCategories = response.data.map((category) => category.name.toLowerCase());
+      return existingCategories.includes(name.toLowerCase());
+    } catch (error) {
+      console.error("Error checking category existence:", error);
+      return false;
+    }
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Category data:", categoryData);
+    setError("");
+
+    // Check for category name uniqueness
+    const categoryExists = await checkCategoryExists(categoryData.name);
+    if (categoryExists) {
+      setError("A category with this name already exists.");
+      return;
+    }
+
     const formData = new FormData();
     Object.keys(categoryData).forEach((key) => {
       formData.append(key, categoryData[key]);
     });
-    if (isEdit) {
-      // Update existing product
-      axios
-        .put(
+
+    const request = isEdit
+      ? axios.put(
           `http://127.0.0.1:8000/api/v1/products/category-update/${initialCategoryData.id}/`,
-          formData,
-          {}
-        )
-        .then((response) => {
-          alert("Category updated successfully!");
-          window.location.reload();
-        })
-        .catch((error) => {
-          console.error("Error updating product:", error.response.data);
-        });
-    } else {
-      axios
-        .post(
-          "http://127.0.0.1:8000/api/v1/products/category-create/",
           formData
         )
-        .then((res) => {
-          alert("Category Added !");
-          window.location.reload();
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    }
+      : axios.post("http://127.0.0.1:8000/api/v1/products/category-create/", formData);
+
+    request
+      .then((response) => {
+        alert(isEdit ? "Category updated successfully!" : "Category added successfully!");
+        window.location.reload();
+      })
+      .catch((error) => {
+        console.error("Error processing request:", error);
+        setError("An error occurred while processing the request.");
+      });
   };
 
   return (
     <div className="form-container">
-      <h3> {isEdit ? "Edit Category" : "Add New Category"}</h3>
+      <h3>{isEdit ? "Edit Category" : "Add New Category"}</h3>
       <form onSubmit={handleSubmit}>
         <fieldset>
           <div className="heads">
@@ -79,6 +88,7 @@ const AddCategoryForm = ({ onCancel, initialCategoryData, isEdit }) => {
             onChange={handleInputChange}
             required
           />
+          {error && <p className="error-message">{error}</p>}
 
           <label htmlFor="description">Description</label>
           <input

@@ -46,6 +46,10 @@ const UserProfile = () => {
     fetchProfile();
   }, [userId, token]);
 
+  const validateName = (name) => /^[A-Za-z]+$/.test(name); // Ensure the name contains only letters
+  const validatePhone = (phone) => /^[0-9]{10}$/.test(phone); // Ensure the phone number is a 10-digit number
+  const validatePincode = (pincode) => /^[0-9]{6}$/.test(pincode); // Ensure pincode is a 6-digit number
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setProfile((prevProfile) => ({ ...prevProfile, [name]: value }));
@@ -59,6 +63,25 @@ const UserProfile = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSuccessMessage(''); // Reset success message
+
+    // Validation checks
+    if (!validateName(profile.first_name)) {
+      setError('First name must contain only letters.');
+      return;
+    }
+    if (!validateName(profile.last_name)) {
+      setError('Last name must contain only letters.');
+      return;
+    }
+    if (!validatePhone(profile.phone)) {
+      setError('Phone number must be a valid 10-digit number.');
+      return;
+    }
+    if (!validatePincode(profile.default_pincode)) {
+      setError('Pincode must be a valid 6-digit number.');
+      return;
+    }
+
     try {
       const response = await axios.put(`http://localhost:8000/api/v1/auth/user_profiles/update/${userId}/`, profile, {
         headers: {
@@ -96,138 +119,138 @@ const UserProfile = () => {
   return (
     <div>
       <Header/>
-    <div className="profile-page">
-      <h2 className="profile-heading">User Profile</h2>
-      <div className="profile-details">
-        <p className="profile-item">
-          <strong>First Name:</strong> 
-          {isEditable ? (
-            <input
-              type="text"
-              name="first_name"
-              value={profile.first_name}
-              onChange={handleInputChange}
-              required
-              className="profile-input"
-            />
-          ) : (
-            <span className="profile-value">{profile.first_name}</span>
-          )}
-        </p>
-        
-        <p className="profile-item">
-          <strong>Last Name:</strong> 
-          {isEditable ? (
-            <input
-              type="text"
-              name="last_name"
-              value={profile.last_name}
-              onChange={handleInputChange}
-              required
-              className="profile-input"
-            />
-          ) : (
-            <span className="profile-value">{profile.last_name}</span>
-          )}
-        </p>
+      <div className="profile-page">
+        <h2 className="profile-heading">User Profile</h2>
+        <div className="profile-details">
+          <p className="profile-item">
+            <strong>First Name:</strong> 
+            {isEditable ? (
+              <input
+                type="text"
+                name="first_name"
+                value={profile.first_name}
+                onChange={handleInputChange}
+                required
+                className="profile-input"
+              />
+            ) : (
+              <span className="profile-value">{profile.first_name}</span>
+            )}
+          </p>
+          
+          <p className="profile-item">
+            <strong>Last Name:</strong> 
+            {isEditable ? (
+              <input
+                type="text"
+                name="last_name"
+                value={profile.last_name}
+                onChange={handleInputChange}
+                required
+                className="profile-input"
+              />
+            ) : (
+              <span className="profile-value">{profile.last_name}</span>
+            )}
+          </p>
 
-        <p className="profile-item">
-          <strong>Email:</strong> 
-          <span className="profile-value">{profile.email}</span>
-        </p>
+          <p className="profile-item">
+            <strong>Email:</strong> 
+            <span className="profile-value">{profile.email}</span>
+          </p>
 
-        <p className="profile-item">
-          <strong>Phone:</strong> 
-          {isEditable ? (
-            <input
-              type="text"
-              name="phone"
-              value={profile.phone}
-              onChange={handleInputChange}
-              required
-              className="profile-input"
-            />
-          ) : (
-            <span className="profile-value">{profile.phone}</span>
-          )}
-        </p>
+          <p className="profile-item">
+            <strong>Phone:</strong> 
+            {isEditable ? (
+              <input
+                type="text"
+                name="phone"
+                value={profile.phone}
+                onChange={handleInputChange}
+                required
+                className="profile-input"
+              />
+            ) : (
+              <span className="profile-value">{profile.phone}</span>
+            )}
+          </p>
 
-        <p className="profile-item">
-          <strong>Address:</strong> 
-          {isEditable ? (
-            <input
-              type="text"
-              name="default_address"
-              value={profile.default_address}
-              onChange={handleInputChange}
-              required
-              className="profile-input"
-            />
-          ) : (
-            <span className="profile-value">{profile.default_address}</span>
-          )}
-        </p>
+          <p className="profile-item">
+            <strong>Address:</strong> 
+            {isEditable ? (
+              <input
+                type="text"
+                name="default_address"
+                value={profile.default_address}
+                onChange={handleInputChange}
+                required
+                className="profile-input"
+              />
+            ) : (
+              <span className="profile-value">{profile.default_address}</span>
+            )}
+          </p>
 
-        <p className="profile-item">
-          <strong>City:</strong> 
-          {isEditable ? (
-            <input
-              type="text"
-              name="default_city"
-              value={profile.default_city}
-              onChange={handleInputChange}
-              required
-              className="profile-input"
-            />
-          ) : (
-            <span className="profile-value">{profile.default_city}</span>
-          )}
-        </p>
+          <p className="profile-item">
+            <strong>City:</strong> 
+            {isEditable ? (
+              <input
+                type="text"
+                name="default_city"
+                value={profile.default_city}
+                onChange={handleInputChange}
+                required
+                className="profile-input"
+              />
+            ) : (
+              <span className="profile-value">{profile.default_city}</span>
+            )}
+          </p>
 
-        <p className="profile-item">
-          <strong>State:</strong> 
-          {isEditable ? (
-            <input
-              type="text"
-              name="default_state"
-              value={profile.default_state}
-              onChange={handleInputChange}
-              required
-              className="profile-input"
-            />
-          ) : (
-            <span className="profile-value">{profile.default_state}</span>
-          )}
-        </p>
+          <p className="profile-item">
+            <strong>State:</strong> 
+            {isEditable ? (
+              <input
+                type="text"
+                name="default_state"
+                value={profile.default_state}
+                onChange={handleInputChange}
+                required
+                className="profile-input"
+              />
+            ) : (
+              <span className="profile-value">{profile.default_state}</span>
+            )}
+          </p>
 
-        <p className="profile-item">
-          <strong>Pincode:</strong> 
-          {isEditable ? (
-            <input
-              type="text"
-              name="default_pincode"
-              value={profile.default_pincode}
-              onChange={handleInputChange}
-              required
-              className="profile-input"
-            />
-          ) : (
-            <span className="profile-value">{profile.default_pincode}</span>
-          )}
-        </p>
+          <p className="profile-item">
+            <strong>Pincode:</strong> 
+            {isEditable ? (
+              <input
+                type="text"
+                name="default_pincode"
+                value={profile.default_pincode}
+                onChange={handleInputChange}
+                required
+                className="profile-input"
+              />
+            ) : (
+              <span className="profile-value">{profile.default_pincode}</span>
+            )}
+          </p>
+        </div>
+
+        {error && <p className="form-error">{error}</p>}
+        {successMessage && <p className="form-success">{successMessage}</p>}
+
+        <button type="button" onClick={handleEditToggle} className="edit-btn">
+          {isEditable ? 'Cancel' : 'Edit Profile'}
+        </button>
+
+        {isEditable && (
+          <button type="submit" onClick={handleSubmit} className="save-btn">Update Profile</button>
+        )}
       </div>
-
-      {error && <p className="form-error">{error}</p>}
-      {successMessage && <p className="form-success">{successMessage}</p>}
-
-      <button type="button" onClick={handleEditToggle} className="edit-btn">
-        {isEditable ? 'Cancel' : 'Edit Profile'}
-      </button>
-
-      {isEditable && (
-        <button type="submit" onClick={handleSubmit} className="save-btn">Update Profile</button>
-      )}
-    </div>
     </div>
   );
 };

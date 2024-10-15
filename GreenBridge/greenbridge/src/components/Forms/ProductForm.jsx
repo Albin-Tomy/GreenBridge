@@ -3,11 +3,13 @@ import config from "../../config/config";
 import axios from "axios";
 import "./forms.css";
 
-const ProductForm = ({ onCancel,initialProductData,isEdit}) => {
+const ProductForm = ({ onCancel, initialProductData, isEdit }) => {
   const [categories, setCategories] = useState([]);
   const [brands, setBrands] = useState([]);
   const [countries, setCountries] = useState([]);
   const [madeOf, setMadeOf] = useState([]);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const [productData, setProductData] = useState({
     name: "",
     description: "",
@@ -21,83 +23,100 @@ const ProductForm = ({ onCancel,initialProductData,isEdit}) => {
     image: null,
   });
 
-
-  const handleOnCancel = ()=>{
-    setProductData(null)
-    onCancel()
-  }
+  const handleOnCancel = () => {
+    setProductData(null);
+    onCancel();
+  };
 
   useEffect(() => {
     if (initialProductData) {
       setProductData({
-        name: initialProductData.name ,
-        description: initialProductData.description ,
-        price: initialProductData.price ,
+        name: initialProductData.name || "",
+        description: initialProductData.description || "",
+        price: initialProductData.price || "",
         quantity: initialProductData.quantity || 1,
         category: initialProductData.category || null,
         brand: initialProductData.brand || null,
         country: initialProductData.country || null,
         made_of: initialProductData.made_of || null,
         stock_quantity: initialProductData.stock_quantity || 1,
-        image: initialProductData.image || null, // Handle this for preview if needed
+        image: initialProductData.image || null, // Image path
+      });
+    } else {
+      setProductData({
+        name: "",
+        description: "",
+        price: "",
+        quantity: 1,
+        category: null,
+        brand: null,
+        country: null,
+        made_of: null,
+        stock_quantity: 1,
+        image: null,
       });
     }
   }, [initialProductData]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setProductData({ ...productData, [name]: value });
+    if (name === "quantity" && value < 0) {
+      setError("Quantity cannot be negative");
+    } else {
+      setError("");
+      setProductData({ ...productData, [name]: value });
+    }
   };
 
   const handleFileChange = (e) => {
     setProductData({ ...productData, image: e.target.files[0] });
   };
 
-
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    if (productData.quantity < 0) {
+      setError("Quantity cannot be negative");
+      return;
+    }
 
     const formData = new FormData();
     Object.keys(productData).forEach((key) => {
       formData.append(key, productData[key]);
     });
 
-    if (isEdit) {
-      // Update existing product
-      axios
-        .put(`http://127.0.0.1:8000/api/v1/products/update/${initialProductData.product_id}/`, formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        })
-        .then((response) => {
-          alert("Product updated successfully!");
-          console.log("Product updated successfully:", response.data);
-          window.location.reload();
-        })
-        .catch((error) => {
-          console.error("Error updating product:", error.response.data);
-        });
-    } else {
-      // Create a new product
-      axios
-        .post(`http://127.0.0.1:8000/api/v1/products/create/`, formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        })
-        .then((response) => {
-          alert("Product created successfully!");
-          console.log("Product created successfully:", response.data);
-          window.location.reload();
-        })
-        .catch((error) => {
-          console.error("Error creating product:", error.response.data);
-        });
+    if (isEdit && (!initialProductData || !initialProductData.product_id)) {
+      setError("Cannot edit product, product ID is missing.");
+      return;
     }
+
+    const request = isEdit
+      ? axios.put(
+          `http://127.0.0.1:8000/api/v1/products/update/${initialProductData.product_id}/`,
+          formData,
+          { headers: { "Content-Type": "multipart/form-data" } }
+        )
+      : axios.post(`http://127.0.0.1:8000/api/v1/products/create/`, formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+
+    setLoading(true);
+    request
+      .then((response) => {
+        alert(isEdit ? "Product updated successfully!" : "Product created successfully!");
+        window.location.reload();
+      })
+      .catch((error) => {
+        console.error("Error processing request:", error);
+        setError("An error occurred while processing the request.");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   };
 
   useEffect(() => {
+    setLoading(true);
     axios
       .get(config.getCategoryApi)
       .then((response) => {
@@ -132,15 +151,18 @@ const ProductForm = ({ onCancel,initialProductData,isEdit}) => {
       })
       .catch((error) => {
         console.error("Error fetching 'made of':", error);
+      })
+      .finally(() => {
+        setLoading(false);
       });
   }, []);
 
   return (
     <div className="form-container">
-      <h3>Add New Product</h3>
+      <h3>{isEdit ? "Edit Product" : "Add New Product"}</h3>
       <form onSubmit={handleSubmit}>
         <fieldset>
-          <div className="formhead">
+          <div className="head">
             <span>Product Details</span>
           </div>
 
@@ -149,7 +171,6 @@ const ProductForm = ({ onCancel,initialProductData,isEdit}) => {
             type="text"
             id="name"
             name="name"
-            className="form-input"
             value={productData.name}
             onChange={handleInputChange}
             required
@@ -160,7 +181,6 @@ const ProductForm = ({ onCancel,initialProductData,isEdit}) => {
             type="text"
             id="description"
             name="description"
-            className="form-input"
             value={productData.description}
             onChange={handleInputChange}
             required
@@ -170,7 +190,6 @@ const ProductForm = ({ onCancel,initialProductData,isEdit}) => {
           <select
             id="category"
             name="category"
-            className="form-input"
             value={productData.category}
             onChange={handleInputChange}
             required
@@ -187,7 +206,6 @@ const ProductForm = ({ onCancel,initialProductData,isEdit}) => {
           <select
             id="brand"
             name="brand"
-            className="form-input"
             value={productData.brand}
             onChange={handleInputChange}
             required
@@ -205,18 +223,16 @@ const ProductForm = ({ onCancel,initialProductData,isEdit}) => {
             type="text"
             id="price"
             name="price"
-            className="form-input"
             value={productData.price}
             onChange={handleInputChange}
             required
           />
 
-          <label>Stock Quantity </label>
+          <label> Quantity </label>
           <input
-            type="number"
+            type="text"
             id="quantity"
             name="quantity"
-            className="form-input"
             value={productData.quantity}
             onChange={handleInputChange}
             required
@@ -226,7 +242,6 @@ const ProductForm = ({ onCancel,initialProductData,isEdit}) => {
           <select
             id="country"
             name="country"
-            className="form-input"
             value={productData.country}
             onChange={handleInputChange}
             required
@@ -243,7 +258,6 @@ const ProductForm = ({ onCancel,initialProductData,isEdit}) => {
           <select
             id="made_of"
             name="made_of"
-            className="form-input"
             value={productData.made_of}
             onChange={handleInputChange}
             required
@@ -256,33 +270,42 @@ const ProductForm = ({ onCancel,initialProductData,isEdit}) => {
             ))}
           </select>
 
-          {/* <label>Stock Quantity</label>
+          <label>Stock Quantity</label>
           <input
             type="number"
             id="stock_quantity"
             name="stock_quantity"
-            className="form-input"
             value={productData.stock_quantity}
             onChange={handleInputChange}
             required
-          /> */}
+          />
+
+          {/* Display existing image if in edit mode */}
+          {isEdit && initialProductData && initialProductData.image && (
+            <div className="current-image">
+              <label>Current Image:</label>
+              <img
+                src={`http://127.0.0.1:8000${initialProductData.image}`} // Adjust URL if necessary
+                alt="Product"
+                style={{ width: "100px", height: "100px", objectFit: "cover" }} // You can adjust styles as needed
+              />
+            </div>
+          )}
 
           <label>Product Image</label>
           <input
             type="file"
             id="image"
             name="image"
-            className="form-input"
             accept="image/*"
             onChange={handleFileChange}
-            required
           />
 
           <div className="form-actions">
             <button type="submit" className="save-btn">
-            {isEdit ? "Update Product" : "Save Product"}
+              {isEdit ? "Update Product" : "Save Product"}
             </button>
-            <button type="reset" className="cancel-btn" onClick={handleOnCancel} >
+            <button type="reset" className="cancel-btn" onClick={handleOnCancel}>
               Cancel
             </button>
           </div>

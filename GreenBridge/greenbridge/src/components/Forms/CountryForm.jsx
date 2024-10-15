@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import "./forms.css";
 import axios from "axios";
 
@@ -7,6 +7,7 @@ const AddCountryForm = ({ onCancel, initialCountryData, isEdit }) => {
     name: "",
     description: "",
   });
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (initialCountryData) {
@@ -20,47 +21,58 @@ const AddCountryForm = ({ onCancel, initialCountryData, isEdit }) => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setCountryData({ ...countryData, [name]: value });
+    setError(""); // Clear the error when user starts typing
   };
 
-  const handleSubmit = (e) => {
+  const checkCountryExists = async (name) => {
+    try {
+      // Make an API call to check if the country name already exists
+      const response = await axios.get("http://127.0.0.1:8000/api/v1/products/country-list/");
+      const existingCountries = response.data.map((country) => country.name.toLowerCase());
+      return existingCountries.includes(name.toLowerCase());
+    } catch (error) {
+      console.error("Error checking country existence:", error);
+      return false;
+    }
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Country data:", countryData);
+    setError("");
+
+    // Check if the country name is unique
+    const countryExists = await checkCountryExists(countryData.name);
+    if (countryExists) {
+      setError("A country with this name already exists.");
+      return;
+    }
+
     const formData = new FormData();
     Object.keys(countryData).forEach((key) => {
       formData.append(key, countryData[key]);
     });
 
-    if (isEdit) {
-      // Update
-      axios
-        .put(
+    const request = isEdit
+      ? axios.put(
           `http://127.0.0.1:8000/api/v1/products/country-update/${initialCountryData.country_id}/`,
-          formData,
-          {}
+          formData
         )
-        .then((response) => {
-          alert("Country updated successfully!");
-          window.location.reload();
-        })
-        .catch((error) => {
-          console.error("Error updating country:", error.response.data);
-        });
-    } else {
-      axios
-        .post("http://127.0.0.1:8000/api/v1/products/country-create/", formData)
-        .then((res) => {
-          alert("Country Added !");
-          window.location.reload();
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    }
+      : axios.post("http://127.0.0.1:8000/api/v1/products/country-create/", formData);
+
+    request
+      .then((response) => {
+        alert(isEdit ? "Country updated successfully!" : "Country added successfully!");
+        window.location.reload();
+      })
+      .catch((error) => {
+        console.error("Error processing request:", error);
+        setError("An error occurred while processing the request.");
+      });
   };
 
   return (
     <div className="form-container">
-      <h3> {isEdit ? "Edit Country" : "Add New Country"} </h3>
+      <h3>{isEdit ? "Edit Country" : "Add New Country"}</h3>
       <form onSubmit={handleSubmit}>
         <fieldset>
           <div className="heads">
@@ -76,6 +88,7 @@ const AddCountryForm = ({ onCancel, initialCountryData, isEdit }) => {
             onChange={handleInputChange}
             required
           />
+          {error && <p className="error-message">{error}</p>}
 
           <label htmlFor="description">Description</label>
           <input

@@ -130,6 +130,7 @@ function Admin() {
       id: item.product_id,
       name: item.name,
       price: ` Rs: ${item.price}`,
+      quantity:item.quantity,
       category: getCategoryNameById(item.category),
       stock: item.stock_quantity,
     }));
@@ -353,6 +354,7 @@ function Admin() {
     // { field: "id", headerName: "ID", flex: 1 },
     { field: "name", headerName: "Name", flex: 1 },
     { field: "category", headerName: "Category", flex: 1 },
+    { field: "quantity", headerName: "Quantity", flex: 1 },
     { field: "price", headerName: "Price", type: "number", flex: 1 },
     { field: "stock", headerName: " Stock Quantity", flex: 1 },
     {
