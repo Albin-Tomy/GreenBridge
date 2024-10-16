@@ -2,7 +2,7 @@ from django.urls import path
 from . import views
 from django.conf import settings
 from django.conf.urls.static import static
-
+from .views import search_products
 
 urlpatterns = [
     path('list/', views.list_products, name='list_products'),  # List all products
@@ -10,6 +10,7 @@ urlpatterns = [
     path('delete/<int:pk>/', views.delete_product, name='delete_product'),  # Delete product
     path('create/', views.create_product, name='create_product'),  # Create product
     path('update/<int:pk>/', views.update_product, name='update_product'),  # Update product
+    path('api/search/', search_products, name='search_products'),
 
     # path('list/', views.product_list, name='product-list'),         
     # path('create/', views.product_create, name='product-create'),

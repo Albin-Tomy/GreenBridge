@@ -22,13 +22,16 @@ import CartPage from './Pages/Dashboard/Products/CartPage';
 import Wishlist from './Pages/Dashboard/Products/WishList';
 import HomePage from './Pages/Home/HomePage';
 import LandingPages from './Pages/Home/LandingPages';
+import DashboardLayout from './Pages/Dashboard/User/DashBoard';
 
 function App() {
   return (
     
     <Router>
       <Routes>
-        <Route path="/admin/home" element={<Dashboard />} />
+        <Route path="/admin/home" element={<Dashboard />}>
+        <Route path="admin/view-all-shgs" element={<AllSHGsPage />} />
+        </Route>
         <Route path="/admin/admin" element={<Admin />} />
         <Route path="/admin/pending-requests" element={<PendingRequestsPage />} />
         <Route path="/admin/view-all-shgs" element={<AllSHGsPage />} />
@@ -39,7 +42,7 @@ function App() {
         <Route path='/' element={<Home/>} />
         <Route path='/shg' element={<Staff/>}/>
         <Route path='/products' element={<ProductsPage/>}/>
-        <Route path='/profile' element={<Profile/>}/>
+        
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/password-reset-confirm/:uidb64/:token" element={<ResetPassword />} />
         <Route path='/staff' element={<Staff/>}/>
@@ -48,7 +51,9 @@ function App() {
         <Route path="/wishlist" element={<Wishlist />} />
         <Route path="/landing" element={<LandingPages />} />
         <Route path="/homepage" element={<HomePage />} />
-        
+        <Route path="/dashboard" element={<DashboardLayout />}>
+          <Route path='profile' element={<Profile/>}/>
+        </Route>
       </Routes>
     </Router>
   );

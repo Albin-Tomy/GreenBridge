@@ -1,96 +1,77 @@
-/* Container for the SHGs table */
-.shg-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-    background-color: #f9f9f9;
-  }
-  
-  /* Title for the SHG page */
-  .shg-title {
-    text-align: center;
-    margin-top: 20px;
-    color: #333;
-    font-size: 28px;
-  }
-  
-  /* Message when no SHGs are found */
-  .shg-no-data {
-    text-align: center;
-    font-size: 18px;
-    margin-top: 40px;
-    color: #666;
-  }
-  
-  /* Table styling */
-  .shg-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-    background-color: #fff;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  }
-  
-  /* Table header */
-  .shg-table-header {
-    background-color: #f4f4f4;
-  }
-  
-  .shg-table-header-cell {
-    padding: 12px 15px;
-    text-align: left;
-    font-weight: bold;
-    color: #555;
-  }
-  
-  /* Table row */
-  .shg-table-row:hover {
-    background-color: #f9f9f9;
-  }
-  
-  /* Table cells */
-  .shg-table-cell {
-    padding: 12px 15px;
-    border-bottom: 1px solid #ddd;
-    color: #333;
-  }
-  
-  /* Responsive design */
-  @media (max-width: 768px) {
-    .shg-table,
-    .shg-table thead,
-    .shg-table tbody,
-    .shg-table th,
-    .shg-table td,
-    .shg-table tr {
-      display: block;
-    }
-  
-    .shg-table-header {
-      display: none;
-    }
-  
-    .shg-table-row {
-      margin-bottom: 15px;
-      border-bottom: 2px solid #ddd;
-    }
-  
-    .shg-table-cell {
-      display: flex;
-      justify-content: space-between;
-      padding: 10px;
-      position: relative;
-      padding-left: 50%;
-    }
-  
-    .shg-table-cell:before {
-      content: attr(data-label);
-      position: absolute;
-      left: 0;
-      width: 45%;
-      padding-left: 15px;
-      font-weight: bold;
-      color: #333;
-    }
-  }
-  
+/* General container styling */
+.all-shgs-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  /* background-color: #f9f9f9; */
+}
+
+.all-shgs-container {
+  width: 100%;
+  max-width: 1200px;
+  /* background-color: #ffffff; */
+  border-radius: 8px;
+  padding: 20px;
+  /* box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); */
+}
+
+/* Title styling */
+.all-shgs-title {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* Table styling */
+.all-shgs-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.all-shgs-table-header {
+  background-color: #007bff;
+  color: #ffffff;
+}
+
+.all-shgs-table-header-cell {
+  padding: 12px;
+  text-align: left;
+  font-weight: bold;
+  border-bottom: 2px solid #ddd;
+}
+
+.all-shgs-table-row {
+  background-color: #e0f7fa;
+  transition: background-color 0.3s ease;
+}
+
+.all-shgs-table-row:nth-child(even) {
+  background-color: #b2ebf2;
+}
+
+.all-shgs-table-row:hover {
+  background-color: #80deea;
+}
+
+.all-shgs-table-cell {
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+}
+
+/* Action icons styling */
+.actions-cell {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.action-icon {
+  cursor: pointer;
+  font-size: 18px;
+  color: #007bff;
+  transition: color 0.3s ease;
+}
+
+.action-icon:hover {
+  color: #0056b3;
+}

@@ -1,127 +1,128 @@
-/* General styles for the dashboard */
-.admin-dashboard {
-    display: flex;
-    height: 100vh;
-    font-family: Arial, sans-serif;
-  }
-  
-  /* Sidebar styles */
-  .sidebar {
-    width: 250px;
-    background-color: #3f8e57;
-    color: white;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .sidebar-header {
-    font-size: 1.5rem;
-    margin-bottom: 20px;
-    text-align: center;
-  }
-  
-  /* Sidebar menu arranged in a table format */
-  .sidebar-menu {
+
+
+/* Admin Dashboard Page */
+.admin-dashboard-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #f9f9f9;
+}
+
+/* Header Styling */
+.admin-sidebar-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: #007bff;
+  color: white;
+  text-align: center;
+  padding: 15px 0;
+  z-index: 1000;
+}
+
+.admin-dashboard-title {
+  margin: 0;
+  font-size: 1.8rem;
+}
+
+/* Sidebar Styling */
+.admin-sidebar {
+  position: fixed;
+  top: 100px; 
+  left: 0;
+  width: 250px;
+  height: calc(100vh - 60px); 
+  color: #ffffff;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  overflow-y: auto;
+   /* Set a specific width for the sidebar */
+    background-color: #2ecc71; /* Green background */
+    color: #ffffff; /* White text */
+   /* Top and bottom padding */
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); /* Add shadow */
+}
+
+.admin-sidebar-menu {
+  width: 100%;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.admin-sidebar-menu tr {
+  width: 100%;
+  cursor: pointer;
+  padding: 15px;
+  transition: background-color 0.3s ease;
+}
+
+.admin-sidebar-menu tr:hover,
+.admin-sidebar-menu tr.active {
+  background-color: #1abc9c;
+}
+
+.admin-sidebar-menu td {
+  color: white;
+  font-size: 1.2rem;
+}
+
+/* Main Content Styling */
+.admin-main-content {
+  margin-left: 250px; /* Sidebar width */
+  padding: 20px;
+  background-color: #ffffff;
+  width: calc(100% - 250px); /* Full width minus sidebar */
+  min-height: calc(100vh - 60px); /* Full height minus header */
+  overflow-y: auto;
+}
+
+/* Main Content Presentation */
+/* .dashboard-mains {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 30px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  font-size: 1.2rem;
+  line-height: 1.6;
+} */
+.dashboard-main {
+  flex: 1;
+  padding: 20px;
+  background-color: #ecf0f1; /* Main content background */
+}
+/* Responsive Design for Mobile and Tablets */
+@media (max-width: 768px) {
+  .admin-sidebar {
     width: 100%;
-    text-align: left;
-    border-collapse: collapse;
+    height: auto;
+    position: relative;
   }
-  
-  .sidebar-menu tr {
-    padding: 10px 0;
+
+  .admin-main-content {
+    margin-left: 0;
+    width: 100%;
   }
-  
-  .sidebar-menu tr:hover {
-    background-color: #1abc9c;
-  }
-  
-  .sidebar-menu td {
-    padding: 15px 10px;
-    cursor: pointer;
-  }
-  
-  /* Main content styles */
-  .main-content {
-    flex-grow: 1;
-    background-color: #ecf0f1;
-    padding: 20px;
-  }
-  
-  .admin-header {
-    background-color: #318f3c;
-    color: white;
-    padding: 10px;
-    text-align: center;
-    font-size: 2rem;
-    margin-bottom: 20px;
-  }
-  
-  .content-section {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-around;
-  }
-  
-  .functionality {
-    background-color: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    width: 45%;
-    margin-bottom: 20px;
-    text-align: center;
-  }
-  
-  .functionality h3 {
-    margin-bottom: 15px;
-  }
-  
-  .functionality button {
-    background-color: #31a45f;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    margin: 5px;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  
-  .functionality button:hover {
-    background-color: #19f94a;
-  }
-  
-  /* Responsive Design */
-  @media (max-width: 768px) {
-    .sidebar {
-      width: 200px;
-    }
-  
-    .main-content {
-      padding: 10px;
-    }
-  
-    .functionality {
-      width: 100%;
-    }
-  
-    .admin-header {
-      font-size: 1.5rem;
-    }
-  }
-  
-  @media (max-width: 480px) {
-    .sidebar {
-      display: none; /* Hide sidebar for very small screens */
-    }
-  
-    .admin-header {
-      font-size: 1.2rem;
-    }
-  
-    .functionality {
-      width: 100%;
-      margin: 10px 0;
-    }
-  }
-  
+}
+
+/* Additional Button Styling */
+button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+/* Typography */
+h1, h2, h3 {
+  color: #333;
+  margin-bottom: 20px;
+}

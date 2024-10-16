@@ -24,7 +24,7 @@ const AddMadeofForm = ({onCancel,initialMadeOfData,isEdit}) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Made of data:', madeOfData);
+    console.log('Materials data:', madeOfData);
     const formData = new FormData();
     Object.keys(madeOfData).forEach((key) => {
       formData.append(key, madeOfData[key]);
@@ -38,7 +38,7 @@ const AddMadeofForm = ({onCancel,initialMadeOfData,isEdit}) => {
           {}
         )
         .then((response) => {
-          alert("Made of updated successfully!");
+          alert("Materials updated successfully!");
           window.location.reload();
         })
         .catch((error) => {
@@ -47,7 +47,7 @@ const AddMadeofForm = ({onCancel,initialMadeOfData,isEdit}) => {
     } else {
     axios.post("http://127.0.0.1:8000/api/v1/products/madeof-create/",formData)
     .then((res)=>{
-      alert("Made Of Added !")
+      alert("Material Added !")
       window.location.reload()
 
     })
@@ -59,7 +59,7 @@ const AddMadeofForm = ({onCancel,initialMadeOfData,isEdit}) => {
 
   return (
     <div className="form-container">
-      <h3>{isEdit?'Edit Made of':'Add New Made Of'}</h3>
+      <h3>{isEdit?'Edit Materials':'Add New Materials'}</h3>
       <form onSubmit={handleSubmit}>
         <fieldset>
           <div className="heads">

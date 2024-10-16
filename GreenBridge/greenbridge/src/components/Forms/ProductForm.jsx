@@ -126,23 +126,23 @@ const ProductForm = ({ onCancel, initialProductData, isEdit }) => {
         console.error("Error fetching categories:", error);
       });
 
-    axios
-      .get(config.getBrandsApi)
-      .then((response) => {
-        setBrands(response.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching brands:", error);
-      });
+    // axios
+    //   .get(config.getBrandsApi)
+    //   .then((response) => {
+    //     setBrands(response.data);
+    //   })
+    //   .catch((error) => {
+    //     console.error("Error fetching brands:", error);
+    //   });
 
-    axios
-      .get(config.getCountriesApi)
-      .then((response) => {
-        setCountries(response.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching countries:", error);
-      });
+    // axios
+    //   .get(config.getCountriesApi)
+    //   .then((response) => {
+    //     setCountries(response.data);
+    //   })
+    //   .catch((error) => {
+    //     console.error("Error fetching countries:", error);
+    //   });
 
     axios
       .get(config.getMadeofApis)
@@ -202,7 +202,7 @@ const ProductForm = ({ onCancel, initialProductData, isEdit }) => {
             ))}
           </select>
 
-          <label>Brand</label>
+          {/* <label>Brand</label>
           <select
             id="brand"
             name="brand"
@@ -216,7 +216,7 @@ const ProductForm = ({ onCancel, initialProductData, isEdit }) => {
                 {item.name}
               </option>
             ))}
-          </select>
+          </select> */}
 
           <label>Price</label>
           <input
@@ -238,7 +238,7 @@ const ProductForm = ({ onCancel, initialProductData, isEdit }) => {
             required
           />
 
-          <label>Country</label>
+          {/* <label>Country</label>
           <select
             id="country"
             name="country"
@@ -252,9 +252,9 @@ const ProductForm = ({ onCancel, initialProductData, isEdit }) => {
                 {item.name}
               </option>
             ))}
-          </select>
+          </select> */}
 
-          <label>Made Of</label>
+          <label>Material</label>
           <select
             id="made_of"
             name="made_of"

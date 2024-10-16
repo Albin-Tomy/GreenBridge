@@ -250,7 +250,7 @@ function Admin() {
     }
     if (menu === "Orders") {
       setParentMenu("Orders");
-      setAddButtonLabel("Add new Order");
+      setAddButtonLabel("");
       setForm(<AddOrderForm onCancel={handleCloseForm} initialOrderData={null} isEdit={isFormEdit}/>)
 
       axios
@@ -266,8 +266,6 @@ function Admin() {
         .catch((error) => {
           console.log(error);
         });
-      // setRows(orderRows);
-      // setColumns(orderColumns);
     }
     if (menu === "Staffs") {
       setParentMenu("Staffs");
@@ -837,14 +835,16 @@ function Admin() {
             menu={menu}
             parentMenu={parentMenu}
           />
+          <Menubox text={"Categories"} action={setMenu} menu={menu} />
+          <Menubox text={"Materials"} action={setMenu} menu={menu} />
         </div>
         <div className="submenu">
           {parentMenu === "Products" ? (
             <>
-              <Menubox text={"Categories"} action={setMenu} menu={menu} />
+              {/* <Menubox text={"Categories"} action={setMenu} menu={menu} /> */}
               {/* <Menubox text={"Brands"} action={setMenu} menu={menu} /> */}
-              <Menubox text={"Country"} action={setMenu} menu={menu} />
-              <Menubox text={"Made of"} action={setMenu} menu={menu} />
+              {/* <Menubox text={"Country"} action={setMenu} menu={menu} /> */}
+              {/* <Menubox text={"Materials"} action={setMenu} menu={menu} /> */}
             </>
           ) : (
             ""

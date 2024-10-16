@@ -1,0 +1,84 @@
+/* General Layout Styles */
+.dashboard {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background-color: #f4f7f6; /* Light background for the dashboard */
+  }
+  
+  .dashboard-content {
+    display: flex;
+    flex: 1;
+  }
+  
+  .dashboard-sidebar {
+    width: 200px; /* Set a specific width for the sidebar */
+    background-color: #2ecc71; /* Green background */
+    color: #ffffff; /* White text */
+    padding: 20px 0; /* Top and bottom padding */
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); /* Add shadow */
+  }
+  
+  .dashboard-main {
+    flex: 1;
+    padding: 20px;
+    background-color: #ecf0f1; /* Main content background */
+  }
+  
+  /* Sidebar Menu Styles */
+  .sidebar-menu {
+    width: 100%; /* Full width */
+    border-collapse: collapse; /* Collapse borders */
+  }
+  
+  .sidebar-menu td {
+    padding: 0; /* No padding for table cells */
+  }
+  
+  .sidebar-button {
+    width: 100%; /* Full width buttons */
+    padding: 15px; /* Add padding for button */
+    cursor: pointer; /* Change cursor to pointer */
+    background-color: transparent; /* Transparent background */
+    color: #ffffff; /* White text */
+    border: none; /* No border */
+    text-align: left; /* Align text to the left */
+    font-size: 16px; /* Font size */
+    transition: background-color 0.3s ease; /* Smooth background transition */
+  }
+  
+  /* Hover and Active Effects */
+  .sidebar-button:hover {
+    background-color: #27ae60; /* Darker green on hover */
+  }
+  
+  .sidebar-button.active {
+    background-color: #1abc9c; /* Active button color */
+    color: #ffffff; /* White text for active button */
+  }
+  
+  /* Header Styling */
+  .dashboard-header {
+    background-color: #2c3e50; /* Dark header */
+    padding: 20px;
+    color: #ffffff;
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    border-bottom: 1px solid #34495e; /* Separator */
+  }
+  
+  /* Main Content Styling */
+  .dashboard-main {
+    padding: 30px;
+    background-color: #ecf0f1; /* Main content background */
+    border-radius: 8px; /* Slightly rounded corners */
+  }
+  
+  /* Responsive adjustments for small screens */
+  @media (max-width: 768px) {
+    .dashboard-sidebar {
+      width: 180px; /* Adjust sidebar width */
+    }
+  }
+  

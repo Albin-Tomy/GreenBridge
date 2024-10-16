@@ -33,7 +33,7 @@ const Dropdown = ({ isOpen, toggleDropdown, handleLogout, username }) => (
         {username ? (
           <>
             <p className="dropdown-username">{username}</p>
-            <Link to="/profile">Edit Profile</Link>
+            <Link to="/dashboard">Edit Profile</Link>
             <button onClick={handleLogout} className="logout-btn">
               Logout
             </button>
@@ -58,24 +58,48 @@ const Header = () => {
   const userId = localStorage.getItem('userId');
   const token = localStorage.getItem('authToken');
 
+  // useEffect(() => {
+  //   const fetchUserProfile = async () => {
+  //     try {
+  //       const response = await axios.get(`http://localhost:8000/api/v1/auth/user_profiles/${userId}/`, {
+  //         headers: {
+  //           Authorization: `Bearer ${token}`
+  //         }
+  //       });
+  //       setUsername(response.data.first_name);
+  //     } catch (error) {
+  //       console.error('Error fetching user profile:', error);
+  //     }
+  //   };
+
+  //   if (userId && token) {
+  //     fetchUserProfile();
+  //   }
+  // }, [userId, token]);
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
         const response = await axios.get(`http://localhost:8000/api/v1/auth/user_profiles/${userId}/`, {
           headers: {
-            Authorization: `Bearer ${token}`
-          }
+            Authorization: `Bearer ${token}`,
+          },
         });
+        // Set username if profile exists
         setUsername(response.data.first_name);
       } catch (error) {
-        console.error('Error fetching user profile:', error);
+        if (error.response && error.response.status === 404) {
+          // No user profile found, redirect to create profile page
+          navigate('/profile'); // Redirect to the profile creation page
+        } else {
+          console.error('Error fetching user profile:', error);
+        }
       }
     };
-
+  
     if (userId && token) {
       fetchUserProfile();
     }
-  }, [userId, token]);
+  }, [userId, token, navigate]);
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
@@ -87,6 +111,16 @@ const Header = () => {
     setUsername(null);
     navigate('/login');
   };
+  const [searchQuery, setSearchQuery] = useState('');
+
+const handleSearchChange = (e) => {
+  setSearchQuery(e.target.value);
+};
+
+const handleSearchSubmit = (e) => {
+  e.preventDefault();
+  navigate(`/products?search=${searchQuery}`);
+};
 
   const goToWishlist = () => {
     navigate('/wishlist');
@@ -130,7 +164,7 @@ const Header = () => {
               aria-label="Search products, brands"
             />
           </form> */}
-          <form className="custom-search-bar">
+          {/* <form className="custom-search-bar">
   <button type="submit" className="custom-search-icon">
     <AiOutlineSearch />
   </button>
@@ -139,6 +173,19 @@ const Header = () => {
     className="custom-search-input"
     placeholder="Search products, brands"
     aria-label="Search products, brands"
+  />
+</form> */}
+<form className="custom-search-bar" onSubmit={handleSearchSubmit}>
+  <button type="submit" className="custom-search-icon">
+    <AiOutlineSearch />
+  </button>
+  <input
+    type="text"
+    className="custom-search-input"
+    placeholder="Search products, brands"
+    aria-label="Search products, brands"
+    value={searchQuery}
+    onChange={handleSearchChange}
   />
 </form>
 

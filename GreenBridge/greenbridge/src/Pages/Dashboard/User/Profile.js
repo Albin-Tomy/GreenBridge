@@ -118,7 +118,7 @@ const UserProfile = () => {
 
   return (
     <div>
-      <Header/>
+
       <div className="profile-page">
         <h2 className="profile-heading">User Profile</h2>
         <div className="profile-details">

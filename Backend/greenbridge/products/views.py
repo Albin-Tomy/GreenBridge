@@ -57,12 +57,28 @@ def update_product(request, pk):
         return Response(serializer.data)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
+# @api_view(['GET'])
+# def list_products(request):
+#     if request.method == 'GET':
+#         products = Product.objects.all()
+#         serializer = ProductSerializer(products, many=True)
+#         return Response(serializer.data) 
+from django.db.models import Q
+
 @api_view(['GET'])
 def list_products(request):
-    if request.method == 'GET':
+    # Get the search query parameter
+    search_query = request.GET.get('search', '')
+
+    if search_query:
+        # Filter products based on search query
+        products = Product.objects.filter(Q(name__icontains=search_query) | Q(description__icontains=search_query))
+    else:
+        # If no search query, return all products
         products = Product.objects.all()
-        serializer = ProductSerializer(products, many=True)
-        return Response(serializer.data)    
+
+    serializer = ProductSerializer(products, many=True)
+    return Response(serializer.data)   
 
 @api_view(['GET'])
 def product_details(request, pk):
@@ -459,3 +475,12 @@ def subcategory_delete(request, pk):
 
     subcategory.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
+
+from django.http import JsonResponse
+from .models import Product
+
+def search_products(request):
+    query = request.GET.get('q', '')
+    products = Product.objects.filter(name__icontains=query)  # Filter by product name
+    results = [{'id': product.id, 'name': product.name, 'price': product.price} for product in products]
+    return JsonResponse(results, safe=False)
