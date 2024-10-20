@@ -112,17 +112,17 @@ header {
 }
 
 /* Search Bar */
-.custom-search-bar {
+/* .custom-search-bar {
     display: flex;
     align-items: center;
     position: relative;
     max-width: 300px;
     flex-grow: 0.5;
-    margin-left: 0; /* Move search bar to the left */
+    margin-left: 0; 
 }
 
 .custom-search-inputs {
-    padding: 0.5em 1.2em 0.5em 2.5em; /* Ensure padding is sufficient inside the input */
+    padding: 0.5em 1.2em 0.5em 2.5em; 
     border: 1px solid #ccc;
     border-radius: 20px;
     outline: none;
@@ -130,16 +130,101 @@ header {
     width: 100%;
 }
 
-.custom-search-icon {
+.custom-search-icons {
     background: none;
     border: none;
     position: absolute;
-    left: -65px; /* Move the icon outside of the search box */
+    left: -65px; 
     font-size: 1.5em;
     color: #eeeeee;
     cursor: pointer;
+} */
+/* Accessibility: Hide the label for visual users but keep it for screen readers */
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    border: 0;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+  }
+  
+  /* Wrapper to contain the search input */
+  /* Wrapper to contain the search input with rounded corners */
+/* .search-bar {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    max-width: 400px;
+    border: 1px solid #ccc;
+    border-radius: 50px;
+    background-color: #fff;
+    padding: 0.5rem 1rem;
+    position: relative;
+  }
+  
+  .search-input-wrapper {
+    width: 100%;
+    position: relative;
+  }
+  
+  .search-input {
+    width: 100%;
+    padding: 0.75rem 2.5rem 0.75rem 1.5rem; 
+    border: none;
+    border-radius: 50px; 
+    font-size: 1rem;
+    outline: none;
+    background-color: transparent;
+  }
+  
+  
+  .search-input::placeholder {
+    color: #888;
+  }
+  
+  
+  .search-input-wrapper::before {
+    content: '';
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: url('data:image/svg+xml;base64,...') no-repeat center;
+    background-size: 1.5rem 1.5rem;
+    width: 1.5rem;
+    height: 1.5rem;
+  } */
+  .search-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #ffffff;
+    border-radius: 50px;
+    padding: 10px 20px;
+    width: fit-content;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
 }
 
+.search-input {
+    border: none;
+    outline: none;
+    font-size: 16px;
+    color: #555;
+    background: transparent;
+    padding: 8px 12px;
+    border-radius: 20px;
+    width: 250px; 
+}
+
+.search-input::placeholder {
+    color: #999;
+}  
+
+
+  
 /* Home Icon */
 .home-icon {
     margin-left: 10px;

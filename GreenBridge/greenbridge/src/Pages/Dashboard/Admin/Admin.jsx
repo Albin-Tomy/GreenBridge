@@ -96,7 +96,7 @@ function Admin() {
         setMadeOf(response.data);
       })
       .catch((error) => {
-        console.error("Error fetching made of:", error);
+        console.error("Error fetching Material:", error);
       });
 
       axios
@@ -210,7 +210,7 @@ function Admin() {
         return confirmDeleteBrand;
       case "Country":
         return confirmDeleteCountry;
-      case "Made of":
+      case "Material":
         return confirmDeleteMadeof;
 
       case "Orders":
@@ -337,8 +337,8 @@ function Admin() {
 
       setColumns(countryColumns);
     }
-    if (menu === "Made of") {
-      setAddButtonLabel("Add Made of");
+    if (menu === "Material") {
+      setAddButtonLabel("Add Material");
       setRows(restructureMadeofData(madeOf));
       setColumns(madeOfColumns);
       setForm(<AddMadeofForm  onCancel={handleCloseForm}/>)
@@ -656,7 +656,7 @@ function Admin() {
         setOpen(false);
         setRows(prevRows => prevRows.filter(row => row.id !== selectedId));
         if (response.status === 200) {
-          alert("Made of deleted !");
+          alert("Material deleted !");
           window.location.reload()
         }
       })
@@ -836,7 +836,7 @@ function Admin() {
             parentMenu={parentMenu}
           />
           <Menubox text={"Categories"} action={setMenu} menu={menu} />
-          <Menubox text={"Materials"} action={setMenu} menu={menu} />
+          <Menubox text={"Material"} action={setMenu} menu={menu} />
         </div>
         <div className="submenu">
           {parentMenu === "Products" ? (

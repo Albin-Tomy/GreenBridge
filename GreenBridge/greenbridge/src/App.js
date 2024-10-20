@@ -23,7 +23,10 @@ import Wishlist from './Pages/Dashboard/Products/WishList';
 import HomePage from './Pages/Home/HomePage';
 import LandingPages from './Pages/Home/LandingPages';
 import DashboardLayout from './Pages/Dashboard/User/DashBoard';
-
+import ShgAdmin from './Pages/Dashboard/Shg/ShgAdmin';
+import Products from './Pages/Dashboard/Shg/Products';
+import Orders from './Pages/Dashboard/Shg/Orders';
+import AddressSelection from './Pages/Dashboard/Products/AddressSelection';
 function App() {
   return (
     
@@ -42,6 +45,7 @@ function App() {
         <Route path='/' element={<Home/>} />
         <Route path='/shg' element={<Staff/>}/>
         <Route path='/products' element={<ProductsPage/>}/>
+        <Route path="/address-list" element={<AddressSelection />} />
         
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/password-reset-confirm/:uidb64/:token" element={<ResetPassword />} />
@@ -53,6 +57,11 @@ function App() {
         <Route path="/homepage" element={<HomePage />} />
         <Route path="/dashboard" element={<DashboardLayout />}>
           <Route path='profile' element={<Profile/>}/>
+        </Route>
+
+        <Route path="/shgadmin" element={<ShgAdmin />}>
+          <Route path="products" element={<Products />} />
+          <Route path="orders" element={<Orders />} />
         </Route>
       </Routes>
     </Router>

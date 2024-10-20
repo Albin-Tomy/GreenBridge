@@ -281,13 +281,33 @@ const ProductForm = ({ onCancel, initialProductData, isEdit }) => {
           />
 
           {/* Display existing image if in edit mode */}
-          {isEdit && initialProductData && initialProductData.image && (
+          {/* {isEdit && initialProductData && initialProductData.image && (
             <div className="current-image">
               <label>Current Image:</label>
               <img
                 src={`http://127.0.0.1:8000${initialProductData.image}`} // Adjust URL if necessary
                 alt="Product"
                 style={{ width: "100px", height: "100px", objectFit: "cover" }} // You can adjust styles as needed
+              />
+            </div>
+          )} */}
+          {isEdit && initialProductData && initialProductData.image && (
+            <div className="current-image">
+              <label>Current Image:</label>
+              <img
+                src={`http://127.0.0.1:8000${initialProductData.image}`} // Adjust URL if necessary
+                alt="Product"
+                style={{ width: "100px", height: "100px", objectFit: "cover" }}
+              />
+            </div>
+          )}
+
+          {productData.image && typeof productData.image === "object" && (
+            <div className="image-preview">
+              <img
+                src={URL.createObjectURL(productData.image)}
+                alt="Preview"
+                style={{ width: "100px", height: "100px", objectFit: "cover" }}
               />
             </div>
           )}

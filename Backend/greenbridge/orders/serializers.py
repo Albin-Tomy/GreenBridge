@@ -18,6 +18,7 @@ class OrderSerializer(serializers.ModelSerializer):
 
 
 class WishlistItemsSerializer(serializers.ModelSerializer):
+    product = ProductSerializer(source='product_id', read_only=True)
     class Meta:
         model = WishlistItems
         fields = '__all__'

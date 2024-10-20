@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     'adminpanel',
     'products',
     'orders',
+    'wastecollection',
     
 
 ]

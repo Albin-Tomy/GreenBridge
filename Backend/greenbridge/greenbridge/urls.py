@@ -28,6 +28,7 @@ urlpatterns = [
     path('api/adminpanel/', include('adminpanel.urls')),
     path('api/v1/products/',include('products.urls'),name='api/v1/products'),
     path('api/v1/orders/',include('orders.urls'),name='api/v1/orders'),
+    path('api/v1/collection',include('wastecollection.urls'),name='api/v1/collection'),
     
     
 

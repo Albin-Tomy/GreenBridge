@@ -1,116 +1,113 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import './wishlist.css'; // Link to your CSS file
+import './wishlist.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTrash, faShoppingCart } from '@fortawesome/free-solid-svg-icons';
+import { toast } from 'react-toastify';
+import Header from '../../../components/Header';
 
 const Wishlist = () => {
-  const [wishlist, setWishlist] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [wishlistItems, setWishlistItems] = useState([]);
   const userId = localStorage.getItem('userId');
-  const token = localStorage.getItem('authToken');
+
+  const BASE_URL = 'http://127.0.0.1:8000';
 
   useEffect(() => {
-    const fetchWishlist = async () => {
-      try {
-        const response = await axios.get(`http://localhost:8000/api/v1/orders/wishlist-list/?user_id=${userId}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+    if (userId) {
+      // Step 1: Fetch the wishlist for the logged-in user
+      axios.get(`http://127.0.0.1:8000/api/v1/orders/wishlist-list/?user_id=${userId}`)
+        .then(response => {
+          const wishlist = response.data[0]; // Assuming only one wishlist per user
+          if (wishlist) {
+            // Step 2: Fetch wishlist items by wishlist_id
+            axios.get(`http://127.0.0.1:8000/api/v1/orders/wishlist-items-create/?wishlist_id=${wishlist.wishlist_id}`)
+              .then(itemsResponse => {
+                setWishlistItems(itemsResponse.data);
+              })
+              .catch(error => {
+                toast.error('Error fetching wishlist items!');
+              });
+          }
+        })
+        .catch(error => {
+          toast.error('Error fetching wishlist!');
         });
-        setWishlist(response.data);
-        setLoading(false);
-      } catch (error) {
-        console.error('Error fetching wishlist:', error);
-        setLoading(false);
-      }
-    };
-
-    fetchWishlist();
-  }, [userId, token]);
-
-  const removeFromWishlist = async (itemId) => {
-    try {
-      await axios.delete(`http://localhost:8000/api/v1/orders/wishlist-items-detail/${itemId}/`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setWishlist(wishlist.filter(item => item.id !== itemId));
-    } catch (error) {
-      console.error('Error removing item from wishlist:', error);
     }
+  }, [userId]);
+
+  const addToCart = (productId) => {
+    const quantity = 1; // Default quantity for adding to cart
+    axios.get(`http://127.0.0.1:8000/api/v1/orders/cart-list/?user_id=${userId}`)
+      .then(response => {
+        let cartId;
+
+        if (response.data.length > 0) {
+          cartId = response.data[0].cart_id; // Assuming first cart for the user
+        } else {
+          return axios.post('http://127.0.0.1:8000/api/v1/orders/cart-list/', { user_id: userId })
+            .then(response => {
+              cartId = response.data.cart_id;
+              return cartId;
+            });
+        }
+
+        return cartId;
+      })
+      .then(cartId => {
+        const dataToSend = {
+          user_id: userId,
+          product_id: productId,
+          quantity: quantity
+        };
+
+        return axios.post('http://127.0.0.1:8000/api/v1/orders/cart-items-create/', dataToSend);
+      })
+      .then(() => {
+        toast.success('Product added to cart!');
+      })
+      .catch(error => {
+        toast.error('Error adding the product to the cart!');
+      });
   };
 
-  const addToCart = async (productId) => {
-    try {
-      let cartResponse = await axios.get(`http://localhost:8000/api/v1/orders/cart-list/?user_id=${userId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+  const removeFromWishlist = (wishlistItemId) => {
+    axios.delete(`http://127.0.0.1:8000/api/v1/orders/wishlist-items/${wishlistItemId}/`)
+      .then(() => {
+        setWishlistItems(wishlistItems.filter(item => item.wishlist_item_id !== wishlistItemId));
+        toast.success('Item removed from wishlist');
+      })
+      .catch(error => {
+        toast.error('Error removing item from wishlist!');
       });
-
-      let cartId;
-      if (cartResponse.data.length > 0) {
-        cartId = cartResponse.data[0].cart_id;
-      } else {
-        const newCartResponse = await axios.post('http://localhost:8000/api/v1/orders/cart-list/', {
-          user_id: userId
-        }, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        cartId = newCartResponse.data.cart_id;
-      }
-
-      await axios.post('http://localhost:8000/api/v1/orders/cart-items-create/', {
-        cart_id: cartId,
-        product_id: productId
-      }, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      alert('Product added to cart');
-    } catch (error) {
-      console.error('Error adding product to cart:', error);
-    }
   };
-
-  if (loading) {
-    return <p>Loading Wishlist...</p>;
-  }
 
   return (
+    <div>
+      <Header></Header>
     <div className="wishlist-page">
-      <h1 className="wishlist-heading">Your Wishlist</h1>
+      <h1>Your Wishlist</h1>
 
       <div className="wishlist-container">
-        {wishlist.length > 0 ? (
-          wishlist.map((wishlistItem) => (
-            <div key={wishlistItem.id} className="wishlist-item">
+        {wishlistItems.length > 0 ? (
+          wishlistItems.map((item) => (
+            // Ensure item.product exists before trying to access its properties
+            <div key={item.wishlist_item_id} className="wishlist-item">
+              {/* <img src={item.product?.image || 'https://via.placeholder.com/100'} alt={item.product?.name || 'Product'} /> */}
               <img
-                src={wishlistItem.product?.image || "https://via.placeholder.com/100"}
-                alt={wishlistItem.product?.name || "Product"}
-                className="wishlist-item-image"
-              />
-              <div className="wishlist-item-details">
-                <h4 className="wishlist-item-name">{wishlistItem.product?.name || "Unnamed Product"}</h4>
-                <p className="wishlist-item-price">₹ {wishlistItem.product?.price || "N/A"}</p>
+                    src={item.product.image ? `${BASE_URL}${item.product.image}` : 'https://via.placeholder.com/150'}
+                    alt={item.product.name}
+                    className="product-image"
+                  />
+              <div className="item-details">
+                <h4>{item.product?.name || 'Product Name'}</h4>
+                <p>₹ {item.product?.price || 'N/A'}</p>
               </div>
-              <div className="wishlist-item-actions">
-                <button
-                  className="wishlist-remove-btn"
-                  onClick={() => removeFromWishlist(wishlistItem.id)}
-                >
-                  <i className="fas fa-trash"></i> Remove
+              <div className="wishlist-actions">
+                <button className="remove-btn" onClick={() => removeFromWishlist(item.wishlist_item_id)}>
+                  <FontAwesomeIcon icon={faTrash} /> Remove
                 </button>
-                <button
-                  className="wishlist-add-to-cart-btn"
-                  onClick={() => wishlistItem.product ? addToCart(wishlistItem.product.id) : alert("Product not available")}
-                  disabled={!wishlistItem.product}
-                >
-                  <i className="fas fa-shopping-cart"></i> Add to Cart
+                <button className="cart-btn" onClick={() => addToCart(item.product?.product_id)}>
+                  <FontAwesomeIcon icon={faShoppingCart} /> Add to Cart
                 </button>
               </div>
             </div>
@@ -119,6 +116,7 @@ const Wishlist = () => {
           <p>Your wishlist is empty.</p>
         )}
       </div>
+    </div>
     </div>
   );
 };
