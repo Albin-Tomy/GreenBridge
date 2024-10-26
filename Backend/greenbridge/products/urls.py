@@ -11,12 +11,7 @@ urlpatterns = [
     path('create/', views.create_product, name='create_product'),  # Create product
     path('update/<int:pk>/', views.update_product, name='update_product'),  # Update product
     path('api/search/', search_products, name='search_products'),
-
-    # path('list/', views.product_list, name='product-list'),         
-    # path('create/', views.product_create, name='product-create'),
-    # path('details/<int:pk>/', views.product_detail, name='product-detail'),
-    # path('update/<int:pk>/', views.product_update, name='product-update'),
-    # path('delete/<int:pk>/', views.product_delete, name='product-delete'),
+    path('filter/', views.product_filter, name='product_filter'),
 
     path('category-list/', views.category_list, name='category-list'),
     path('category-create/', views.category_create, name='category-create'),

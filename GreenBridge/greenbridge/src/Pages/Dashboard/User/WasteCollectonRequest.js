@@ -2,33 +2,72 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 const WasteCollectionRequest = () => {
-    const [wasteSubcategories, setWasteSubcategories] = useState([]);
-    const [locations, setLocations] = useState([]);
     const [formData, setFormData] = useState({
+        waste_category: '',
         waste_subcategory: '',
         location: '',
-        collection_status: false, // Adjust as needed
+        collection_status: 'Not Started',
     });
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(null);
+    const [wasteCategories, setWasteCategories] = useState([]);
+    const [wasteSubcategories, setWasteSubcategories] = useState([]);
+    const [locations, setLocations] = useState([]);
+    const userId = localStorage.getItem('userId'); // Store the logged-in user's ID
 
+    // Fetch waste categories on component mount
     useEffect(() => {
-        // Fetch waste subcategories and locations from your backend
-        const fetchSubcategoriesAndLocations = async () => {
+        const fetchCategories = async () => {
             try {
-                const [subcategoriesResponse, locationsResponse] = await Promise.all([
-                    axios.get('/api/waste-subcategories/'), // Adjust URL as needed
-                    axios.get('/api/locations/'), // Adjust URL as needed
-                ]);
-                setWasteSubcategories(subcategoriesResponse.data);
-                setLocations(locationsResponse.data);
+                const response = await axios.get('http://127.0.0.1:8000/api/v1/collection/waste-categories/', {
+                    headers: {
+                        'Authorization': `Token ${localStorage.getItem('token')}`,
+                    },
+                });
+                setWasteCategories(response.data);
             } catch (err) {
-                console.error('Error fetching data:', err);
+                console.error('Failed to fetch waste categories:', err);
             }
         };
 
-        fetchSubcategoriesAndLocations();
+        const fetchLocations = async () => {
+            try {
+                const response = await axios.get('http://127.0.0.1:8000/api/v1/collection/locations/', {
+                    headers: {
+                        'Authorization': `Token ${localStorage.getItem('token')}`,
+                    },
+                });
+                setLocations(response.data);
+            } catch (err) {
+                console.error('Failed to fetch locations:', err);
+            }
+        };
+
+        fetchCategories();
+        fetchLocations();
     }, []);
+
+    // Fetch subcategories when a category is selected
+    useEffect(() => {
+        const fetchSubcategories = async () => {
+            if (formData.waste_category) {
+                try {
+                    const response = await axios.get(`http://127.0.0.1:8000/api/v1/collection/waste-subcategories/?category=${formData.waste_category}`, {
+                        headers: {
+                            'Authorization': `Token ${localStorage.getItem('token')}`,
+                        },
+                    });
+                    setWasteSubcategories(response.data);
+                } catch (err) {
+                    console.error('Failed to fetch waste subcategories:', err);
+                }
+            } else {
+                setWasteSubcategories([]);
+            }
+        };
+
+        fetchSubcategories();
+    }, [formData.waste_category]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -38,22 +77,27 @@ const WasteCollectionRequest = () => {
         });
     };
 
+    // Handle form submission for a new waste collection request
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError(null);
         setSuccess(null);
-        
+
         try {
-            const response = await axios.post('/api/request-waste-collection/', formData, {
+            await axios.post('http://127.0.0.1:8000/api/v1/collection/requests/', {
+                ...formData,
+                user: userId, // Include the logged-in user's ID in the request
+            }, {
                 headers: {
-                    'Authorization': `Token ${localStorage.getItem('token')}`, // Adjust if you're using a different auth method
+                    'Authorization': `Token ${localStorage.getItem('token')}`,
                 },
             });
             setSuccess('Request submitted successfully!');
             setFormData({
+                waste_category: '',
                 waste_subcategory: '',
                 location: '',
-                collection_status: false,
+                collection_status: 'Not Started',
             });
         } catch (err) {
             setError('Failed to submit request. Please try again.');
@@ -65,10 +109,31 @@ const WasteCollectionRequest = () => {
             <h2>Request Waste Collection</h2>
             <form onSubmit={handleSubmit}>
                 <div>
+                    <label htmlFor="waste_category">Waste Category</label>
+                    <select
+                        name="waste_category"
+                        value={formData.waste_category}
+                        onChange={handleChange}
+                    >
+                        <option value="">Select a category</option>
+                        {wasteCategories.map(category => (
+                            <option key={category.id} value={category.id}>
+                                {category.name}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+
+                <div>
                     <label htmlFor="waste_subcategory">Waste Subcategory</label>
-                    <select name="waste_subcategory" onChange={handleChange} value={formData.waste_subcategory}>
+                    <select
+                        name="waste_subcategory"
+                        value={formData.waste_subcategory}
+                        onChange={handleChange}
+                        disabled={!formData.waste_category} // Disable if no category is selected
+                    >
                         <option value="">Select a subcategory</option>
-                        {wasteSubcategories.map((subcategory) => (
+                        {wasteSubcategories.map(subcategory => (
                             <option key={subcategory.id} value={subcategory.id}>
                                 {subcategory.name}
                             </option>
@@ -78,24 +143,18 @@ const WasteCollectionRequest = () => {
 
                 <div>
                     <label htmlFor="location">Location</label>
-                    <select name="location" onChange={handleChange} value={formData.location}>
+                    <select
+                        name="location"
+                        value={formData.location}
+                        onChange={handleChange}
+                    >
                         <option value="">Select a location</option>
-                        {locations.map((location) => (
+                        {locations.map(location => (
                             <option key={location.id} value={location.id}>
-                                {location.location_name}
+                                {location.name}
                             </option>
                         ))}
                     </select>
-                </div>
-
-                <div>
-                    <label htmlFor="collection_status">Collection Status</label>
-                    <input
-                        type="checkbox"
-                        name="collection_status"
-                        onChange={(e) => setFormData({ ...formData, collection_status: e.target.checked })}
-                        checked={formData.collection_status}
-                    />
                 </div>
 
                 <button type="submit">Submit Request</button>
@@ -108,3 +167,4 @@ const WasteCollectionRequest = () => {
 };
 
 export default WasteCollectionRequest;
+

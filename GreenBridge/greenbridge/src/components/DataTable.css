@@ -1,0 +1,86 @@
+.admin-table-container {
+    margin-top: 20px;
+    width: 100%;
+    overflow-x: auto;
+    padding: 0;
+  }
+  
+  .admin-custom-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .admin-custom-table th, 
+  .admin-custom-table td {
+    padding: 12px;
+    border: 1px solid #e0e0e0;
+    text-align: left;
+  }
+  
+  .admin-custom-table th {
+    background-color: #343a40;
+    color: white;
+    font-weight: bold;
+  }
+  
+  .admin-custom-table tr:nth-child(even) {
+    background-color: #f8f9fa;
+  }
+  
+  .admin-custom-table tr:hover {
+    background-color: #f1f1f1;
+  }
+  
+  .admin-action-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    margin-right: 8px;
+    font-size: 18px;
+    color: #6c757d;
+    transition: color 0.3s;
+  }
+  
+  .admin-action-btn:hover {
+    color: #007bff;
+  }
+  
+  .admin-edit-btn {
+    color: #17a2b8;
+  }
+  
+  .admin-delete-btn {
+    color: #dc3545;
+  }
+  
+  .admin-toggle-btn {
+    color: #28a745;
+  }
+  
+  .admin-pagination {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    align-items: center;
+  }
+  
+  .admin-pagination button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .admin-pagination button:disabled {
+    background-color: #c0c0c0;
+    cursor: not-allowed;
+  }
+  
+  .admin-pagination span {
+    font-weight: bold;
+  }
+ 
+  
+ 

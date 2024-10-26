@@ -3,13 +3,13 @@ import axios from 'axios';
 import './wishlist.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash, faShoppingCart } from '@fortawesome/free-solid-svg-icons';
-import { toast } from 'react-toastify';
+import { toast, ToastContainer } from 'react-toastify'; // Import ToastContainer
+import 'react-toastify/dist/ReactToastify.css'; // Import toast styles
 import Header from '../../../components/Header';
 
 const Wishlist = () => {
   const [wishlistItems, setWishlistItems] = useState([]);
   const userId = localStorage.getItem('userId');
-
   const BASE_URL = 'http://127.0.0.1:8000';
 
   useEffect(() => {
@@ -74,7 +74,7 @@ const Wishlist = () => {
     axios.delete(`http://127.0.0.1:8000/api/v1/orders/wishlist-items/${wishlistItemId}/`)
       .then(() => {
         setWishlistItems(wishlistItems.filter(item => item.wishlist_item_id !== wishlistItemId));
-        toast.success('Item removed from wishlist');
+        toast.info('Item removed from wishlist');
       })
       .catch(error => {
         toast.error('Error removing item from wishlist!');
@@ -83,40 +83,50 @@ const Wishlist = () => {
 
   return (
     <div>
-      <Header></Header>
-    <div className="wishlist-page">
-      <h1>Your Wishlist</h1>
+      <Header />
+      <div className="wishlist-page">
+        <h1>Your Wishlist</h1>
 
-      <div className="wishlist-container">
-        {wishlistItems.length > 0 ? (
-          wishlistItems.map((item) => (
-            // Ensure item.product exists before trying to access its properties
-            <div key={item.wishlist_item_id} className="wishlist-item">
-              {/* <img src={item.product?.image || 'https://via.placeholder.com/100'} alt={item.product?.name || 'Product'} /> */}
-              <img
-                    src={item.product.image ? `${BASE_URL}${item.product.image}` : 'https://via.placeholder.com/150'}
-                    alt={item.product.name}
-                    className="product-image"
-                  />
-              <div className="item-details">
-                <h4>{item.product?.name || 'Product Name'}</h4>
-                <p>₹ {item.product?.price || 'N/A'}</p>
+        <div className="wishlist-container">
+          {wishlistItems.length > 0 ? (
+            wishlistItems.map((item) => (
+              // Ensure item.product exists before trying to access its properties
+              <div key={item.wishlist_item_id} className="wishlist-item">
+                <img
+                  src={item.product.image ? `${BASE_URL}${item.product.image}` : 'https://via.placeholder.com/150'}
+                  alt={item.product.name}
+                  className="product-image"
+                />
+                <div className="item-details">
+                  <h4>{item.product?.name || 'Product Name'}</h4>
+                  <p>₹ {item.product?.price || 'N/A'}</p>
+                </div>
+                <div className="wishlist-actions">
+                  <button className="remove-btn" onClick={() => removeFromWishlist(item.wishlist_item_id)}>
+                    <FontAwesomeIcon icon={faTrash} /> Remove
+                  </button>
+                  <button className="cart-btn" onClick={() => addToCart(item.product?.product_id)}>
+                    <FontAwesomeIcon icon={faShoppingCart} /> Add to Cart
+                  </button>
+                </div>
               </div>
-              <div className="wishlist-actions">
-                <button className="remove-btn" onClick={() => removeFromWishlist(item.wishlist_item_id)}>
-                  <FontAwesomeIcon icon={faTrash} /> Remove
-                </button>
-                <button className="cart-btn" onClick={() => addToCart(item.product?.product_id)}>
-                  <FontAwesomeIcon icon={faShoppingCart} /> Add to Cart
-                </button>
-              </div>
-            </div>
-          ))
-        ) : (
-          <p>Your wishlist is empty.</p>
-        )}
+            ))
+          ) : (
+            <p>Your wishlist is empty.</p>
+          )}
+        </div>
       </div>
-    </div>
+      <ToastContainer // Add ToastContainer here
+        position="top-center"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
     </div>
   );
 };

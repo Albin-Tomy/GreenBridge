@@ -73,16 +73,59 @@ class CartItems(models.Model):
 
 
 
+
+    
+# class Payment(models.Model):
+#     PAYMENT_METHOD_CHOICES = [
+#         ('online', 'Online'),
+#         ('cod', 'Cash on Delivery'),
+#     ]
+
+#     # payment_id = models.AutoField(primary_key=True)
+#     payment_id = models.CharField(max_length=255)
+#     cart_id = models.ForeignKey('Cart', on_delete=models.CASCADE)
+#     amount = models.FloatField()
+#     payment_method = models.CharField(max_length=10, choices=PAYMENT_METHOD_CHOICES, default='online')
+#     is_successful = models.BooleanField(default=False)
+#     updated_at = models.DateTimeField(auto_now=True)
+#     created_at = models.DateTimeField(auto_now_add=True)
+
+#     def __str__(self):
+#         return f"Payment {self.payment_id} for Cart {self.cart_id}"
+# class Payment(models.Model):
+#     PAYMENT_METHOD_CHOICES = [
+#         ('online', 'Online'),
+#         ('cod', 'Cash on Delivery'),
+#     ]
+
+#     payment_id = models.CharField(max_length=255, blank=True, null=True)  # Allow null and blank values initially
+#     cart_id = models.ForeignKey('Cart', on_delete=models.CASCADE)
+#     amount = models.FloatField()
+#     payment_method = models.CharField(max_length=10, choices=PAYMENT_METHOD_CHOICES, default='online')
+#     is_successful = models.BooleanField(default=False)
+#     updated_at = models.DateTimeField(auto_now=True)
+#     created_at = models.DateTimeField(auto_now_add=True)
+
+#     def __str__(self):
+#         return f"Payment {self.payment_id or 'N/A'} for Cart {self.cart_id}"
 class Payment(models.Model):
-    payment_id = models.AutoField(primary_key=True)
-    cart_id = models.ForeignKey(Cart, on_delete=models.CASCADE)
+    PAYMENT_METHOD_CHOICES = [
+        ('online', 'Online'),
+        ('cod', 'Cash on Delivery'),
+    ]
+
+    payment_id = models.CharField(max_length=255, blank=True, null=True)
+    order_id = models.ForeignKey('Order', on_delete=models.SET_NULL, null=True, blank=True)  # Link to Order model
+    cart_id = models.ForeignKey('Cart', on_delete=models.CASCADE)
     amount = models.FloatField()
+    payment_method = models.CharField(max_length=10, choices=PAYMENT_METHOD_CHOICES, default='online')
+    is_successful = models.BooleanField(default=False)
     updated_at = models.DateTimeField(auto_now=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
-    def _str_(self):
-        return f"Payment {self.payment_id} for Cart {self.cart_id}"
-    
+    def __str__(self):
+        return f"Payment {self.payment_id or 'N/A'} for Cart {self.cart_id}"
+
 
 class Address(models.Model):
     address_id = models.AutoField(primary_key=True)

@@ -484,3 +484,40 @@ def search_products(request):
     products = Product.objects.filter(name__icontains=query)  # Filter by product name
     results = [{'id': product.id, 'name': product.name, 'price': product.price} for product in products]
     return JsonResponse(results, safe=False)
+
+
+@api_view(['GET'])
+def product_filter(request):
+    category = request.query_params.get('category')
+    brand = request.query_params.get('brand')
+    country = request.query_params.get('country')
+    made_of = request.query_params.get('made_of')
+    sort = request.query_params.get('sort')
+
+    # Building filters based on query parameters
+    filters = Q()
+    if category and category != 'all':
+        filters &= Q(category__name=category)
+    if brand and brand != 'all':
+        filters &= Q(brand__name=brand)
+    if country and country != 'all':
+        filters &= Q(country__name=country)
+    if made_of and made_of != 'all':
+        filters &= Q(made_of__name=made_of)
+
+    # Applying the filters
+    products = Product.objects.filter(filters)
+
+    # Sorting logic
+    if sort == 'price-asc':
+        products = products.order_by('price')
+    elif sort == 'price-desc':
+        products = products.order_by('-price')
+    elif sort == 'rating':  # Assuming the Product model has a 'rating' field
+        products = products.order_by('-rating')
+    else:
+        products = products.order_by('-created_at')  # Default sorting by newest
+
+    # Serialize and return the products
+    serializer = ProductSerializer(products, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)

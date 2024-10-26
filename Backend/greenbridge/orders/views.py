@@ -8,9 +8,6 @@ from .models import Order, OrderItems,Wishlist, WishlistItems,Cart, CartItems,Pa
 from .serializers import OrderSerializer, OrderItemsSerializer,WishlistSerializer, WishlistItemsSerializer
 from .serializers import CartSerializer, CartItemsSerializer,PaymentSerializer,AddressSerializer,ShippingSerializer
 
-# order && order_item function based view
-
-
 
 # Wishlist && wishlist_item function based view
 
@@ -85,44 +82,7 @@ def wishlist_items_detail(request, pk):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 # cart && caert_item function based view
-    
-# @api_view(['GET', 'POST'])
-# def cart_list_create(request):
-#     if request.method == 'GET':
-#         user_id = request.query_params.get('user_id')
-#         if user_id:
-#             carts = Cart.objects.filter(user_id=user_id)
-#         else:
-#             carts = Cart.objects.all()
-        
-#         serializer = CartSerializer(carts, many=True)
-#         return Response(serializer.data)
 
-#     elif request.method == 'POST':
-#         serializer = CartSerializer(data=request.data)
-#         if serializer.is_valid():
-#             serializer.save()
-#             return Response(serializer.data, status=status.HTTP_201_CREATED)
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-# @api_view(['GET'])
-# def cart_list_create(request):
-#     user_id = request.query_params.get('user_id')
-    
-#     if not user_id:
-#         return Response({'error': 'User ID is required'}, status=status.HTTP_400_BAD_REQUEST)
-
-#     try:
-#         # Get the cart for the logged-in user
-#         cart = Cart.objects.get(user_id=user_id)
-#     except Cart.DoesNotExist:
-#         return Response({'error': 'Cart not found'}, status=status.HTTP_404_NOT_FOUND)
-
-#     # Get all items in the cart
-#     cart_items = CartItems.objects.filter(cart_id=cart.cart_id)
-    
-#     # Serialize the cart items along with product details
-#     serializer = CartItemsSerializer(cart_items, many=True)
-#     return Response(serializer.data, status=status.HTTP_200_OK)
 
 # View for listing or creating carts
 @api_view(['GET', 'POST'])
@@ -227,29 +187,6 @@ def cart_items_list_create(request):
     return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
-
-
-# @api_view(['GET', 'PUT', 'DELETE'])
-# def cart_items_detail(request, pk):
-#     try:
-#         cart_item = CartItems.objects.get(pk=pk)
-#     except CartItems.DoesNotExist:
-#         return Response(status=status.HTTP_404_NOT_FOUND)
-
-#     if request.method == 'GET':
-#         serializer = CartItemsSerializer(cart_item)
-#         return Response(serializer.data)
-
-#     elif request.method == 'PUT':
-#         serializer = CartItemsSerializer(cart_item, data=request.data)
-#         if serializer.is_valid():
-#             serializer.save()
-#             return Response(serializer.data)
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-#     elif request.method == 'DELETE':
-#         cart_item.delete()
-#         return Response(status=status.HTTP_204_NO_CONTENT)    
 @api_view(['GET', 'PUT', 'DELETE', 'PATCH'])  # Add PATCH here
 def cart_items_detail(request, pk):
     try:
@@ -278,8 +215,22 @@ def cart_items_detail(request, pk):
     elif request.method == 'DELETE':
         cart_item.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
+@api_view(['DELETE'])
+def clear_cart_items(request):
+    user_id = request.query_params.get('user_id')
+    if not user_id:
+        return Response({'error': 'User ID is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        cart = Cart.objects.get(user_id=user_id)
+        CartItems.objects.filter(cart_id=cart.cart_id).delete()
+        return Response({'message': 'Cart cleared successfully'}, status=status.HTTP_200_OK)
+    except Cart.DoesNotExist:
+        return Response({'error': 'Cart not found'}, status=status.HTTP_404_NOT_FOUND)
 
 
+# order && order_item function based view
 
 @api_view(['GET', 'POST'])
 def order_list(request):
@@ -400,108 +351,206 @@ def order_item_detail(request, pk):
         return Response(status=status.HTTP_204_NO_CONTENT)
 # Payment function based view   
     
-@api_view(['GET', 'POST'])
-def payment_list_create(request):
-    if request.method == 'GET':
-        payments = Payment.objects.all()
-        serializer = PaymentSerializer(payments, many=True)
-        return Response(serializer.data)
+# @api_view(['GET', 'POST'])
+# def payment_list_create(request):
+#     if request.method == 'GET':
+#         payments = Payment.objects.all()
+#         serializer = PaymentSerializer(payments, many=True)
+#         return Response(serializer.data)
 
-    elif request.method == 'POST':
-        serializer = PaymentSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+#     elif request.method == 'POST':
+#         serializer = PaymentSerializer(data=request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data, status=status.HTTP_201_CREATED)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-@api_view(['GET', 'PUT', 'DELETE'])
-def payment_detail(request, pk):
-    try:
-        payment = Payment.objects.get(pk=pk)
-    except Payment.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+# @api_view(['GET', 'PUT', 'DELETE'])
+# def payment_detail(request, pk):
+#     try:
+#         payment = Payment.objects.get(pk=pk)
+#     except Payment.DoesNotExist:
+#         return Response(status=status.HTTP_404_NOT_FOUND)
 
-    if request.method == 'GET':
-        serializer = PaymentSerializer(payment)
-        return Response(serializer.data)
+#     if request.method == 'GET':
+#         serializer = PaymentSerializer(payment)
+#         return Response(serializer.data)
 
-    elif request.method == 'PUT':
-        serializer = PaymentSerializer(payment, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+#     elif request.method == 'PUT':
+#         serializer = PaymentSerializer(payment, data=request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    elif request.method == 'DELETE':
-        payment.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)  
+#     elif request.method == 'DELETE':
+#         payment.delete()
+#         return Response(status=status.HTTP_204_NO_CONTENT)  
+
+# @api_view(['POST'])
+# def payment_create(request):
+#     serializer = PaymentSerializer(data=request.data)
+#     if serializer.is_valid():
+#         serializer.save()
+#         return Response(serializer.data, status=status.HTTP_201_CREATED)
+#     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+# @api_view(['PUT'])
+# def payment_update(request, pk):
+#     try:
+#         payment = Payment.objects.get(pk=pk)
+#     except Payment.DoesNotExist:
+#         return Response(status=status.HTTP_404_NOT_FOUND)
+    
+#     serializer = PaymentSerializer(payment, data=request.data)
+#     if serializer.is_valid():
+#         serializer.save()
+#         return Response(serializer.data)
+#     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+# @api_view(['DELETE'])
+# def payment_delete(request, pk):
+#     try:
+#         payment = Payment.objects.get(pk=pk)
+#     except Payment.DoesNotExist:
+#         return Response(status=status.HTTP_404_NOT_FOUND)
+    
+#     payment.delete()
+#     return Response(status=status.HTTP_204_NO_CONTENT)     
+
+
+from rest_framework import status
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from django.utils import timezone
+from .models import Payment, Cart, Order
+from .serializers import PaymentSerializer
+import razorpay
+
+# Initialize Razorpay client
+razorpay_client = razorpay.Client(auth=("rzp_test_yIjQWNT42YCgb7", "Ynez8xNEVxPeFn3DDYV2TgqQ"))
 
 @api_view(['POST'])
-def payment_create(request):
-    serializer = PaymentSerializer(data=request.data)
-    if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+def create_payment(request):
+    payment_method = request.data.get('payment_method')
+    amount = request.data.get('amount')
+    cart_id = request.data.get('cart_id')
 
-@api_view(['PUT'])
-def payment_update(request, pk):
     try:
-        payment = Payment.objects.get(pk=pk)
+        cart = Cart.objects.get(cart_id=cart_id)
+    except Cart.DoesNotExist:
+        return Response({'error': 'Invalid cart ID'}, status=status.HTTP_400_BAD_REQUEST)
+
+    if payment_method == 'cod':
+        # Create order entry before saving payment
+        order = Order.objects.create(
+            user_id=cart.user_id,
+            order_status="Placed",
+            order_date=timezone.now(),
+            tax_amount=0,  # Modify as needed
+            total_amount=amount
+        )
+
+        payment = Payment(
+            payment_method='cod',
+            amount=amount,
+            cart_id=cart,
+            is_successful=True,
+            order_id=order  # Link to order
+        )
+        payment.save()
+        return Response({'message': 'Order placed successfully with COD', 'order_id': order.order_id}, status=status.HTTP_201_CREATED)
+
+    elif payment_method == 'online':
+        # Razorpay order creation
+        razorpay_order = razorpay_client.order.create({
+            'amount': int(amount * 100),
+            'currency': 'INR',
+            'payment_capture': 1
+        })
+
+        payment = Payment(
+            payment_method='online',
+            amount=amount,
+            cart_id=cart,
+            payment_id=razorpay_order['id'],
+            is_successful=False
+        )
+        payment.save()
+        return Response({'order_id': razorpay_order['id']}, status=status.HTTP_201_CREATED)
+
+
+@api_view(['POST'])
+def verify_payment(request):
+    payment_id = request.data.get('payment_id')
+    razorpay_order_id = request.data.get('order_id')
+
+    try:
+        payment = Payment.objects.get(payment_id=razorpay_order_id)
+        razorpay_payment = razorpay_client.payment.fetch(payment_id)
+
+        if razorpay_payment['status'] == 'captured':
+            # Create an order for the successful payment
+            order = Order.objects.create(
+                user_id=payment.cart_id.user_id,
+                order_status="Placed",
+                order_date=timezone.now(),
+                tax_amount=0,
+                total_amount=payment.amount
+            )
+
+            # Update payment details
+            payment.is_successful = True
+            payment.payment_id = payment_id  # Save actual Razorpay payment ID
+            payment.order_id = order  # Associate the order with payment
+            payment.save()
+            return Response({'message': 'Payment verified and order created', 'order_id': order.order_id}, status=status.HTTP_200_OK)
+
+        else:
+            return Response({'error': 'Payment not captured. Please try again.'}, status=status.HTTP_400_BAD_REQUEST)
+
     except Payment.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-    
-    serializer = PaymentSerializer(payment, data=request.data)
-    if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'error': 'Payment not found'}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-@api_view(['DELETE'])
-def payment_delete(request, pk):
-    try:
-        payment = Payment.objects.get(pk=pk)
-    except Payment.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-    
-    payment.delete()
-    return Response(status=status.HTTP_204_NO_CONTENT)     
 
-@api_view(['GET', 'POST'])
-def address_list(request):
-    if request.method == 'GET':
-        addresses = Address.objects.all()
-        serializer = AddressSerializer(addresses, many=True)
-        return Response(serializer.data)
 
-    elif request.method == 'POST':
-        serializer = AddressSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+# @api_view(['GET', 'POST'])
+# def address_list(request):
+#     if request.method == 'GET':
+#         addresses = Address.objects.all()
+#         serializer = AddressSerializer(addresses, many=True)
+#         return Response(serializer.data)
 
-@api_view(['GET', 'PUT', 'DELETE'])
-def address_detail(request, pk):
-    try:
-        address = Address.objects.get(pk=pk)
-    except Address.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+#     elif request.method == 'POST':
+#         serializer = AddressSerializer(data=request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data, status=status.HTTP_201_CREATED)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    if request.method == 'GET':
-        serializer = AddressSerializer(address)
-        return Response(serializer.data)
+# @api_view(['GET', 'PUT', 'DELETE'])
+# def address_detail(request, pk):
+#     try:
+#         address = Address.objects.get(pk=pk)
+#     except Address.DoesNotExist:
+#         return Response(status=status.HTTP_404_NOT_FOUND)
 
-    elif request.method == 'PUT':
-        serializer = AddressSerializer(address, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+#     if request.method == 'GET':
+#         serializer = AddressSerializer(address)
+#         return Response(serializer.data)
 
-    elif request.method == 'DELETE':
-        address.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+#     elif request.method == 'PUT':
+#         serializer = AddressSerializer(address, data=request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+#     elif request.method == 'DELETE':
+#         address.delete()
+#         return Response(status=status.HTTP_204_NO_CONTENT)
     
 
  #  Address function based view   

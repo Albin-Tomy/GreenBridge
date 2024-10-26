@@ -1,0 +1,23 @@
+.payment-page {
+    text-align: center;
+    padding: 20px;
+    margin-top: 100px;
+  }
+  
+  .payment-methods {
+    margin-top: 20px;
+  }
+  
+  .pay-now-btn {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #F37254;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .pay-now-btn:hover {
+    background-color: #d05b45;
+  }
+  

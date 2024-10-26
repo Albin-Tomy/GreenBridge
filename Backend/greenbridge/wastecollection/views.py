@@ -92,17 +92,13 @@ def waste_subcategory_detail(request, pk):
         subcategory.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-# Request API View
-
 @api_view(['GET', 'POST'])
 def request_list_create(request):
-    # GET: List all requests
     if request.method == 'GET':
         requests = Request.objects.all()
         serializer = RequestSerializer(requests, many=True)
         return Response(serializer.data)
-    
-    # POST: Create a new request
+
     elif request.method == 'POST':
         serializer = RequestSerializer(data=request.data)
         if serializer.is_valid():
@@ -110,28 +106,93 @@ def request_list_create(request):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
 @api_view(['GET', 'PUT', 'DELETE'])
 def request_detail(request, pk):
     try:
         req = Request.objects.get(pk=pk)
     except Request.DoesNotExist:
         return Response({"error": "Request not found"}, status=status.HTTP_404_NOT_FOUND)
-    
-    # GET: Retrieve a single request by ID
+
     if request.method == 'GET':
         serializer = RequestSerializer(req)
         return Response(serializer.data)
-    
-    # PUT: Update a specific request
+
     elif request.method == 'PUT':
         serializer = RequestSerializer(req, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    # DELETE: Delete a specific request
+
     elif request.method == 'DELETE':
         req.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+@api_view(['PUT'])
+def approve_request(request, pk):
+    try:
+        req = Request.objects.get(pk=pk)
+    except Request.DoesNotExist:
+        return Response({"error": "Request not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    if request.data.get('request_status') not in ['Approved', 'Rejected']:
+        return Response({"error": "Invalid request status"}, status=status.HTTP_400_BAD_REQUEST)
+
+    req.request_status = request.data.get('request_status')
+    req.save()
+    return Response({"message": f"Request {req.request_status}"})
+
+@api_view(['PUT'])
+def update_collection_status(request, pk):
+    try:
+        req = Request.objects.get(pk=pk)
+    except Request.DoesNotExist:
+        return Response({"error": "Request not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    if request.data.get('collection_status') not in ['On the Way', 'Completed']:
+        return Response({"error": "Invalid collection status"}, status=status.HTTP_400_BAD_REQUEST)
+
+    req.collection_status = request.data.get('collection_status')
+    req.save()
+    return Response({"message": f"Collection Status {req.collection_status}"})
+
+@api_view(['GET', 'POST'])
+def location_list_create(request):
+    # GET: List all locations
+    if request.method == 'GET':
+        locations = Location.objects.all()
+        serializer = LocationSerializer(locations, many=True)
+        return Response(serializer.data)
+
+    # POST: Create a new location
+    elif request.method == 'POST':
+        serializer = LocationSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET', 'PUT', 'DELETE'])
+def location_detail(request, pk):
+    try:
+        location = Location.objects.get(pk=pk)
+    except Location.DoesNotExist:
+        return Response({"error": "Location not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    # GET: Retrieve a single location by ID
+    if request.method == 'GET':
+        serializer = LocationSerializer(location)
+        return Response(serializer.data)
+
+    # PUT: Update a specific location
+    elif request.method == 'PUT':
+        serializer = LocationSerializer(location, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    # DELETE: Delete a specific location
+    elif request.method == 'DELETE':
+        location.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

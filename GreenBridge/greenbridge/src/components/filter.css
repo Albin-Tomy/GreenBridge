@@ -1,0 +1,112 @@
+/* Filter.css */
+
+.hard-filter-sidebar {
+  position: fixed;
+  top: 80px; /* Matches the height of the header */
+  left: 0;
+  width: 250px;
+  padding: 20px;
+  background-color: white;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  height: calc(100vh - 80px);
+  overflow-y: auto;
+  font-family: 'Arial', sans-serif; /* Set a modern font for the sidebar */
+}
+
+/* Ensure the product section has enough margin to avoid overlapping with the sidebar */
+.product-displays {
+  margin-left: 270px; /* Adjust to match the sidebar width */
+  padding: 20px;
+}
+
+.hard-filter-sidebar h3 {
+  font-size: 2rem; /* Larger heading for emphasis */
+  color: #0056b3; /* Slightly darker primary color for better contrast */
+  margin-bottom: 25px;
+  margin-top: 30px;
+  text-align: center; /* Centered heading */
+  font-weight: 700; /* Bolder font weight for prominence */
+  border-bottom: 2px solid #e0e0e0; /* Divider below heading */
+  padding-bottom: 10px;
+  letter-spacing: 0.05rem; /* Subtle spacing */
+}
+
+.hard-sort-bar, .hard-filter-group {
+  margin-bottom: 25px;
+}
+
+.hard-sort-bar label, .hard-filter-group h4 {
+  font-size: 1.2rem; /* Increase font size for better readability */
+  font-weight: 600; /* Make the text a bit bolder */
+  color: #444; /* Darker shade for better legibility */
+  margin-bottom: 10px;
+  display: block;
+   /* Uppercase for headings */
+  letter-spacing: 0.06rem; /* Slightly increase letter spacing */
+}
+
+select {
+  width: 100%;
+  padding: 14px; /* More padding for better click area */
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  font-size: 1rem;
+  background-color: #f7f9fb; /* Softer light gray background */
+  transition: all 0.3s ease; /* Smooth transition */
+  color: #333;
+  cursor: pointer;
+  font-weight: 500; /* Slightly bold text for the select input */
+}
+
+select:focus {
+  border-color: #0056b3; /* Darker blue border on focus */
+  outline: none;
+  background-color: #ffffff;
+}
+
+select:hover {
+  border-color: #0056b3;
+}
+
+option {
+  padding: 12px;
+}
+
+/* Filter Group Titles */
+.hard-filter-group h4 {
+  font-size: 1.3rem;
+  margin-bottom: 12px;
+  color: #0056b3; /* Match heading color */
+}
+
+/* Add some hover effects */
+select:hover {
+  cursor: pointer;
+  border-color: #0056b3;
+  background-color: #f2f2f2;
+}
+
+/* Styling for checkboxes and radio buttons */
+.hard-filter-group input[type="checkbox"],
+.hard-filter-group input[type="radio"] {
+  margin-right: 10px;
+  accent-color: #0056b3; /* Blue color for checkbox and radio buttons */
+}
+
+/* General text styling for filter items */
+.hard-filter-group label {
+  font-size: 1rem;
+  color: #666;
+}
+
+/* Responsive behavior */
+@media (max-width: 768px) {
+  .hard-filter-sidebar {
+    width: 100%;
+    padding: 20px;
+  }
+  .product-displays {
+    margin-left: 0;
+  }
+}

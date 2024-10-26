@@ -12,11 +12,15 @@
   }
   
   .dashboard-sidebar {
+    
     width: 200px; /* Set a specific width for the sidebar */
     background-color: #2ecc71; /* Green background */
     color: #ffffff; /* White text */
     padding: 20px 0; /* Top and bottom padding */
     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); /* Add shadow */
+    z-index: 10; 
+    margin-top: 6.2rem;
+    position:fixed;
   }
   
   .dashboard-main {

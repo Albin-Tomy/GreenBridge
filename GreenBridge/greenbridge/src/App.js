@@ -27,11 +27,19 @@ import ShgAdmin from './Pages/Dashboard/Shg/ShgAdmin';
 import Products from './Pages/Dashboard/Shg/Products';
 import Orders from './Pages/Dashboard/Shg/Orders';
 import AddressSelection from './Pages/Dashboard/Products/AddressSelection';
+import WasteCollectionRequest from './Pages/Dashboard/User/WasteCollectonRequest';
+import WasteCategory from './Pages/Dashboard/User/WasteCategory';
+import WasteSubcategory from './Pages/Dashboard/User/WasteSubCategory';
+import LocationForm from './Pages/Dashboard/User/LocationForm';
+import SHGRequests from './Pages/Dashboard/Shg/ShgRequest';
+import AdminDash from './Pages/Dashboard/Admin/AdminDash';
+import Payment from './Pages/Dashboard/Products/PaymentPage';
 function App() {
   return (
     
     <Router>
       <Routes>
+        
         <Route path="/admin/home" element={<Dashboard />}>
         <Route path="admin/view-all-shgs" element={<AllSHGsPage />} />
         </Route>
@@ -42,17 +50,24 @@ function App() {
         <Route path="/login" element={<RegLogin />} />
         <Route path="/signup" element={<RegLogin />} />
         <Route path="/home" element={<LandingPage />} />
-        <Route path='/' element={<Home/>} />
+        <Route path="/" element={<Home />} />
         <Route path='/shg' element={<Staff/>}/>
         <Route path='/products' element={<ProductsPage/>}/>
         <Route path="/address-list" element={<AddressSelection />} />
-        
+        <Route path="/request" element={<WasteCollectionRequest />} />
+        <Route path="/category" element={<WasteCategory />} />
+        <Route path="/subcategory" element={<WasteSubcategory />} />
+        <Route path="/location" element={<LocationForm />} />
+        <Route path="/shgrequest" element={<SHGRequests />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/password-reset-confirm/:uidb64/:token" element={<ResetPassword />} />
         <Route path='/staff' element={<Staff/>}/>
         <Route path="/products/:id" element={<ProductDetail/>} />
         <Route path="/cart" element={<CartPage />} />
         <Route path="/wishlist" element={<Wishlist />} />
+        <Route path="/admindash" element={<AdminDash />} />
+
+        <Route path="/payment" element={<Payment />} />
         <Route path="/landing" element={<LandingPages />} />
         <Route path="/homepage" element={<HomePage />} />
         <Route path="/dashboard" element={<DashboardLayout />}>

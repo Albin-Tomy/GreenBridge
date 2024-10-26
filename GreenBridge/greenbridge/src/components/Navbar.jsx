@@ -5,7 +5,7 @@ import { GoHeart } from 'react-icons/go';
 import { IoBagHandleOutline } from 'react-icons/io5';
 import { AiOutlineSearch } from 'react-icons/ai';
 import { FaBars } from 'react-icons/fa';
-import './Navbar.css'; // Ensure you have this file in your project
+import './Header.css'; // Ensure you have this file in your project
 import logo from '../assets/logo.png'; // Ensure you have the logo image in this path
 
 
