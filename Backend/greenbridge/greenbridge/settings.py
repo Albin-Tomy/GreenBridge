@@ -262,3 +262,13 @@ SIMPLE_JWT = {
     'ROTATE_REFRESH_TOKENS': True,               # Option to rotate refresh tokens
     'BLACKLIST_AFTER_ROTATION': True,            # Invalidate the refresh token after rotation
 }
+
+import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
+
+# Retrieve Razorpay credentials from environment variables
+RAZORPAY_API_KEY = os.getenv("RAZORPAY_API_KEY")
+RAZORPAY_API_SECRET = os.getenv("RAZORPAY_API_SECRET")

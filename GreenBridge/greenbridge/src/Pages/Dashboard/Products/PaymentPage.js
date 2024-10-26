@@ -68,21 +68,6 @@ const PaymentPage = () => {
     }
   };
 
-  // Handle Cash on Delivery payment
-  // const handleCODPayment = () => {
-  //   axios.post(`${BASE_URL}/api/v1/orders/payments/create/`, {
-  //     payment_method: 'cod',
-  //     amount: total,
-  //     cart_id: cartId,
-  //   })
-  //   .then(response => {
-  //     toast.success('Order placed successfully with Cash on Delivery!');
-  //   })
-  //   .catch(error => {
-  //     console.error("COD Payment error:", error);
-  //     toast.error('Failed to place order. Please try again.');
-  //   });
-  // };
   const handleCODPayment = () => {
     axios.post(`${BASE_URL}/api/v1/orders/payments/create/`, {
       payment_method: 'cod',

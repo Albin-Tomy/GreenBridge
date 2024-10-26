@@ -426,9 +426,12 @@ from django.utils import timezone
 from .models import Payment, Cart, Order
 from .serializers import PaymentSerializer
 import razorpay
+from django.conf import settings
 
 # Initialize Razorpay client
-razorpay_client = razorpay.Client(auth=("rzp_test_yIjQWNT42YCgb7", "Ynez8xNEVxPeFn3DDYV2TgqQ"))
+# razorpay_client = razorpay.Client(auth=("rzp_test_yIjQWNT42YCgb7", "Ynez8xNEVxPeFn3DDYV2TgqQ"))
+razorpay_client = razorpay.Client(auth=(settings.RAZORPAY_API_KEY, settings.RAZORPAY_API_SECRET))
+
 
 @api_view(['POST'])
 def create_payment(request):

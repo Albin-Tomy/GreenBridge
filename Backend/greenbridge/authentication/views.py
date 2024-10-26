@@ -4,54 +4,24 @@ from rest_framework.decorators import api_view,permission_classes
 from rest_framework.response import Response
 from .models import User,User_profile
 from .serializers import UserSerializer,UserProfileSerializer
-from django.contrib.auth.hashers import make_password
 from rest_framework import status
 from django.contrib.auth import authenticate
-from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.tokens import default_token_generator
-from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from django.core.mail import send_mail
-from django.utils.http import urlsafe_base64_encode,urlsafe_base64_decode
-from django.utils.encoding import force_bytes
 from django.template.loader import render_to_string
 from .serializers import PasswordResetRequestSerializer,PasswordResetConfirmSerializer
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
-from rest_framework import status
-from .models import User_profile
-from .serializers import UserProfileSerializer
-# from bson import id
-# from bson import ObjectId 
 from django.shortcuts import get_object_or_404
 from django.db import transaction
+from django.urls import reverse
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes
+from django.contrib.auth.hashers import make_password
+from .models import User, User_profile
+from django.http import HttpResponse  # assuming your custom User model is defined here
+from django.contrib.auth import get_user_model
+from rest_framework_simplejwt.tokens import RefreshToken
 
-# @api_view(['POST'])
-# def user_registration(request):
-#     if request.method == 'POST':
-#         try:
-#             data = request.data
-#             email = data.get('email')
-#             password = data.get('password')
-
-#             if not email or not password:
-#                 return Response({"error": "Email and password are required."}, status=status.HTTP_400_BAD_REQUEST)
-
-#             if User.objects.filter(email=email).exists():
-#                 return Response({"error": "User with this email already exists."}, status=status.HTTP_400_BAD_REQUEST)
-
-#             user = User.objects.create(
-#                 email=email,
-#                 password=make_password(password),
-#                 is_active=True
-#             )
-            
-#             serializer = UserSerializer(user)
-#             return Response(serializer.data, status=status.HTTP_201_CREATED)
-#         except Exception as e:
-#             print(f"Error : {str(e)}")
-#             return Response({"error": "Failed to create user"}, status=status.HTTP_400_BAD_REQUEST)
-#     return Response({"error": "Invalid request method."}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 @api_view(['POST'])
 def user_registration(request):
     if request.method == 'POST':
@@ -71,13 +41,13 @@ def user_registration(request):
                 user = User.objects.create(
                     email=email,
                     password=make_password(password),
-                    is_active=True
+                    is_active=False  # Set to inactive until email is verified
                 )
 
                 # Create the user profile for the registered user
                 User_profile.objects.create(
                     user=user,
-                    first_name='',  # You can adjust or fetch actual values for these fields
+                    first_name='',
                     last_name='',
                     phone='',
                     default_address='',
@@ -86,41 +56,31 @@ def user_registration(request):
                     default_pincode=''
                 )
 
+                # Generate email verification token
+                token = default_token_generator.make_token(user)
+                uid = urlsafe_base64_encode(force_bytes(user.pk))
+
+                # Construct verification URL
+                verification_url = request.build_absolute_uri(
+                    reverse('verify_email', kwargs={'uidb64': uid, 'token': token})
+                )
+
+                # Send verification email
+                send_mail(
+                    'Verify Your Email',
+                    f'Click the link to verify your email: {verification_url}',
+                    'your_email@example.com',  # Replace with your sender email
+                    [email],
+                    fail_silently=False,
+                )
+
             serializer = UserSerializer(user)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response({"message": "Registration successful. Please check your email to verify your account."}, status=status.HTTP_201_CREATED)
         except Exception as e:
             print(f"Error : {str(e)}")
             return Response({"error": "Failed to create user"}, status=status.HTTP_400_BAD_REQUEST)
     return Response({"error": "Invalid request method."}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
-# @api_view(['POST'])
-# def user_login(request):
-#     if request.method == 'POST':
-#         data = request.data
-#         email = data.get('email')
-#         password = data.get('password')
-
-#         if not email or not password:
-#             return Response({"error": "Email and password are required."}, status=status.HTTP_400_BAD_REQUEST)
-
-#         user = authenticate(email=email, password=password)
-        
-#         if user is not None:
-#             if user.is_active:
-#                 refresh = RefreshToken.for_user(user)
-#                 return Response({
-#                     # 'refresh': str(refresh),
-#                     # 'access': str(refresh.access_token),
-#                     # 'user': UserSerializer(user).data
-#                     'refresh': str(refresh),
-#                     'access': str(refresh.access_token),
-#                     'user_id': user.id,    # Send user ID in the login response
-#                     'user': UserSerializer(user).data
-#                 }, status=status.HTTP_200_OK)
-#             else:
-#                 return Response({"error": "Account is disabled."}, status=status.HTTP_403_FORBIDDEN)
-#         else:
-#             return Response({"error": "Invalid credentials."}, status=status.HTTP_401_UNAUTHORIZED)
         
 @api_view(['POST'])
 def user_login(request):
@@ -254,50 +214,45 @@ def password_reset_confirm(request, uidb64, token):
  
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-@api_view(['POST'])
-def google_sign_in(request):
-    access_token = request.data.get('token')
-    print("Received access_token:", access_token)
-    if not access_token:
-        return Response({'error': 'Token is required'}, status=status.HTTP_400_BAD_REQUEST)
+# @api_view(['POST'])
+# def google_sign_in(request):
+#     access_token = request.data.get('token')
+#     print("Received access_token:", access_token)
+#     if not access_token:
+#         return Response({'error': 'Token is required'}, status=status.HTTP_400_BAD_REQUEST)
 
-    # Verify the access token with Google
-    google_response = requests.get(
-        f"https://www.googleapis.com/oauth2/v1/userinfo?access_token={access_token}"
-    )
+#     # Verify the access token with Google
+#     google_response = requests.get(
+#         f"https://www.googleapis.com/oauth2/v1/userinfo?access_token={access_token}"
+#     )
 
-    if google_response.status_code != 200:
-        return Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
+#     if google_response.status_code != 200:
+#         return Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
 
-    google_data = google_response.json()
-    email = google_data.get('email')
+#     google_data = google_response.json()
+#     email = google_data.get('email')
 
-    # Use the google_user_id to identify the user
-    try:
-        user = User.objects.get(email=email)
-    except User.DoesNotExist:
-        user = User.objects.create(
-            email=email,
-        )
-        user.save()
+#     # Use the google_user_id to identify the user
+#     try:
+#         user = User.objects.get(email=email)
+#     except User.DoesNotExist:
+#         user = User.objects.create(
+#             email=email,
+#         )
+#         user.save()
 
-    # Generate JWT tokens
-    refresh = RefreshToken.for_user(user)
-    access_token = str(refresh.access_token)
+#     # Generate JWT tokens
+#     refresh = RefreshToken.for_user(user)
+#     access_token = str(refresh.access_token)
 
-    return Response({
-        'access_token': access_token,
-        'refresh_token': str(refresh),
-        'user': {
-            'id': user.id,
-            'email': user.email,
-        }
-    }, status=status.HTTP_200_OK)
-
-# @api_view(['GET'])
-# def get_all_users(request):
-#     users = User.objects.all().values('id', 'email')  # Select only 'id' and 'email' fields
-#     return Response(users, status=status.HTTP_200_OK)
+#     return Response({
+#         'access_token': access_token,
+#         'refresh_token': str(refresh),
+#         'user': {
+#             'id': user.id,
+#             'email': user.email,
+#         }
+#     }, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 def get_all_users(request):
@@ -314,3 +269,177 @@ def delete_user(request, user_id):
     user = get_object_or_404(User, id=user_id)
     user.delete()
     return Response({"message": "User deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
+
+
+
+User = get_user_model()
+
+@api_view(['GET'])
+def verify_email(request, uidb64, token):
+    try:
+        # Decode the user ID from the URL
+        uid = urlsafe_base64_decode(uidb64).decode()
+        user = get_object_or_404(User, pk=uid)
+
+        # Verify the token
+        if default_token_generator.check_token(user, token):
+            # Activate the user account
+            user.is_active = True
+            user.save()
+
+            # Enhanced HTML response for successful verification
+            html_content = """
+            <html>
+            <head>
+                <style>
+                    body {
+                        font-family: Arial, sans-serif;
+                        background-color: #f0f8ff;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        height: 100vh;
+                        margin: 0;
+                    }
+                    .message-container {
+                        text-align: center;
+                        background-color: #fff;
+                        padding: 40px;
+                        border-radius: 8px;
+                        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+                    }
+                    .message-container h1 {
+                        font-size: 32px;
+                        color: #4CAF50;
+                    }
+                    .message-container p {
+                        font-size: 18px;
+                        color: #333;
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="message-container">
+                    <h1>Email Verified Successfully!</h1>
+                    <p>You can now log in.</p>
+                </div>
+            </body>
+            </html>
+            """
+            return HttpResponse(html_content)
+        else:
+            # Enhanced response for invalid or expired token
+            html_content = """
+            <html>
+            <head>
+                <style>
+                    body {
+                        font-family: Arial, sans-serif;
+                        background-color: #ffebee;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        height: 100vh;
+                        margin: 0;
+                    }
+                    .message-container {
+                        text-align: center;
+                        background-color: #fff;
+                        padding: 40px;
+                        border-radius: 8px;
+                        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+                    }
+                    .message-container h1 {
+                        font-size: 32px;
+                        color: #f44336;
+                    }
+                    .message-container p {
+                        font-size: 18px;
+                        color: #333;
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="message-container">
+                    <h1>Invalid Verification Link</h1>
+                    <p>The verification link is invalid or has expired.</p>
+                </div>
+            </body>
+            </html>
+            """
+            return HttpResponse(html_content, status=400)
+    except Exception as e:
+        print(f"Verification Error: {str(e)}")
+        # Enhanced response for unexpected errors
+        html_content = """
+        <html>
+        <head>
+            <style>
+                body {
+                    font-family: Arial, sans-serif;
+                    background-color: #ffe0b2;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    height: 100vh;
+                    margin: 0;
+                }
+                .message-container {
+                    text-align: center;
+                    background-color: #fff;
+                    padding: 40px;
+                    border-radius: 8px;
+                    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+                }
+                .message-container h1 {
+                    font-size: 32px;
+                    color: #ff9800;
+                }
+                .message-container p {
+                    font-size: 18px;
+                    color: #333;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="message-container">
+                <h1>Error Occurred</h1>
+                <p>An error occurred during email verification. Please try again later.</p>
+            </div>
+        </body>
+        </html>
+        """
+        return HttpResponse(html_content, status=400)
+
+
+@api_view(['POST'])
+def google_sign_in(request):
+    access_token = request.data.get('token')
+    if not access_token:
+        return Response({'error': 'Token is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+    google_response = requests.get(
+        f"https://www.googleapis.com/oauth2/v1/userinfo?access_token={access_token}"
+    )
+
+    if google_response.status_code != 200:
+        return Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
+
+    google_data = google_response.json()
+    email = google_data.get('email')
+
+    # Create or get the user
+    user, created = User.objects.get_or_create(email=email)
+
+    # Generate JWT tokens
+    refresh = RefreshToken.for_user(user)
+    access_token = str(refresh.access_token)
+
+    return Response({
+        'access_token': access_token,
+        'refresh_token': str(refresh),
+        'user': {
+            'id': user.id,
+            'email': user.email,
+        }
+    }, status=status.HTTP_200_OK)

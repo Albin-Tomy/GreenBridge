@@ -95,7 +95,7 @@ const Wishlist = () => {
                 <img
                   src={item.product.image ? `${BASE_URL}${item.product.image}` : 'https://via.placeholder.com/150'}
                   alt={item.product.name}
-                  className="product-image"
+                  className="wishlist-product-image"
                 />
                 <div className="item-details">
                   <h4>{item.product?.name || 'Product Name'}</h4>

@@ -74,6 +74,7 @@ const Login = ({ setIslogin }) => {
 //       [ user ]
 //   );
 
+
   useEffect(() => {
     // Clear inputs when component mounts
     setEmail('');

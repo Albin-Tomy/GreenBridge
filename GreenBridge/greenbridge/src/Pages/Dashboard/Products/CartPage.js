@@ -91,7 +91,7 @@ const CartPage = () => {
                   <img
                     src={item.product.image ? `${BASE_URL}${item.product.image}` : 'https://via.placeholder.com/150'}
                     alt={item.product.name}
-                    className="product-image"
+                    className="cart-product-image"
                   />
                   <div className="item-details">
                     <h4 className="item-name">{item.product.name}</h4>
@@ -115,7 +115,7 @@ const CartPage = () => {
                       </button>
                     </div>
                   </div>
-                  <button className="remove-btn" onClick={() => removeItem(item.cart_item_id)}>
+                  <button className="cart-remove-btn" onClick={() => removeItem(item.cart_item_id)}>
                     <FaTrash />
                   </button>
                 </div>
@@ -125,13 +125,16 @@ const CartPage = () => {
             )}
           </div>
 
-          <div className="cart-summary">
-            <h3 className="summary-title">Order Summary</h3>
-            <p className="summary-item">Subtotal: <span className="summary-amount">₹ {total - 100}</span></p>
-            <p className="summary-item">Shipping: <span className="summary-amount">₹ 100</span></p>
-            <h4 className="summary-total">Total: <span className="summary-amount">₹ {total}</span></h4>
-            <button className="checkout-btn" onClick={handleCheckout}>Proceed to Checkout</button>
-          </div>
+          {/* Render cart summary only if cartItems has items */}
+      {cartItems.length > 0 && (
+        <div className="cart-summary">
+          <h3 className="summary-title">Order Summary</h3>
+          <p className="summary-item">Subtotal: <span className="summary-amount">₹ {total - 100}</span></p>
+          <p className="summary-item">Shipping: <span className="summary-amount">₹ 100</span></p>
+          <h4 className="summary-total">Total: <span className="summary-amount">₹ {total}</span></h4>
+          <button className="checkout-btn" onClick={handleCheckout}>Proceed to Checkout</button>
+        </div>
+      )}
         </div>
       </div>
     </div>
