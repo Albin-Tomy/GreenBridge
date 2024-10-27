@@ -17,7 +17,7 @@
 .page-title {
   font-family: 'Playfair Display', serif;
   font-size: 48px;
-  color: #d11010;
+  color: #009327;
   margin-bottom: 40px;
   text-align: center;
   letter-spacing: 1px;
@@ -30,8 +30,17 @@
 }
 
 
-
-
+.cart-btn:disabled {
+  cursor: not-allowed;
+  background-color: #ccc; /* Optional: change button color to indicate it's disabled */
+  color: #666; /* Optional: change text color */
+}
+.hard-out-of-stock-label {
+  color: rgb(247, 5, 5);
+  font-size: 18px;
+  font-weight: bold;
+  text-align: center;
+}
 .main-contents {
   display: flex;
  
@@ -143,8 +152,8 @@
   border-top: 1px solid #eee;
 }
 
-.wishlist-btns, .cart-btns {
-  background-color: #e60023;
+.wishlist-btns{
+  background-color: #ff0000;
   color: white;
   padding: 10px 15px;
   font-size: 14px;
@@ -157,6 +166,19 @@
   transition: background-color 0.3s ease;
 }
 
+.cart-btns{
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px 15px;
+  font-size: 14px;
+  border: none;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
 .wishlist-btn:hover, .cart-btn:hover {
   background-color: #c7001d;
 }

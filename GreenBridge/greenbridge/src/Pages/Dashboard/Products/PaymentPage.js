@@ -127,21 +127,6 @@ const PaymentPage = () => {
     }
   };
 
-  // Verify payment after successful Razorpay transaction
-  // const verifyPayment = async (paymentId, orderId) => {
-  //   try {
-  //     const response = await axios.post(`${BASE_URL}/api/v1/orders/payments/verify/`, {
-  //       payment_id: paymentId,
-  //       order_id: orderId,
-  //     });
-  //     console.log('Payment verified successfully:', response.data);
-  //     toast.success('Payment verified successfully!');
-  //   } catch (error) {
-  //     console.error('Payment verification failed:', error);
-  //     toast.error('Payment verification failed. Please contact support.');
-  //   }
-  // };
-  // Verify payment after successful Razorpay transaction
 const verifyPayment = async (paymentId, orderId) => {
   try {
     const response = await axios.post(`${BASE_URL}/api/v1/orders/payments/verify/`, {

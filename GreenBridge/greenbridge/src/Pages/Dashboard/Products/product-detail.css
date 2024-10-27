@@ -8,17 +8,19 @@
 }
 
 /* Body styles for better readability */
-body {
+/* body {
   font-family: 'Poppins', sans-serif;
   background-color: #f3f3f3;
   color: #333;
   line-height: 1.6;
-}
+} */
 
 .product-detail-page {
   padding: 40px;
   max-width: 1200px;
-  margin: 0 auto;
+  margin-top: 120px;
+  margin-left: 150px;
+  /* margin: 0 auto; */
   background-color: #fff; /* White background for product detail page */
   border-radius: 10px; /* Rounded corners */
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Shadow for elevation */
@@ -99,6 +101,12 @@ body {
   font-size: 32px;
   margin-bottom: 20px;
   color: #333;
+}
+
+.cart-btns:disabled {
+  cursor: not-allowed;
+  background-color: #ccc; /* Optional: change button color to indicate it's disabled */
+  color: #666; /* Optional: change text color */
 }
 
 .price {

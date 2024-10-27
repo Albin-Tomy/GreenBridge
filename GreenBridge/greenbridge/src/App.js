@@ -42,6 +42,7 @@ function App() {
         
         <Route path="/admin/home" element={<Dashboard />}>
         <Route path="admin/view-all-shgs" element={<AllSHGsPage />} />
+        <Route path="admin/pending-requests" element={<PendingRequestsPage />} />
         </Route>
         <Route path="/admin/admin" element={<Admin />} />
         <Route path="/admin/pending-requests" element={<PendingRequestsPage />} />
@@ -49,8 +50,8 @@ function App() {
         <Route path='/shgregister' element={<ShgRegistration />} />
         <Route path="/login" element={<RegLogin />} />
         <Route path="/signup" element={<RegLogin />} />
-        <Route path="/home" element={<LandingPage />} />
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<LandingPage />} />
+        {/* <Route path="/" element={<Home />} /> */}
         <Route path='/shg' element={<Staff/>}/>
         <Route path='/products' element={<ProductsPage/>}/>
         <Route path="/address-list" element={<AddressSelection />} />

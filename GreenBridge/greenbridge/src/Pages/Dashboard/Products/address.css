@@ -1,6 +1,7 @@
 .address-selection-page {
     max-width: 800px;
     margin: 0 auto;
+    margin-top: 100px;
     font-family: Arial, sans-serif;
   }
   
@@ -40,18 +41,24 @@
     margin: 0;
   }
   
-  .edit-btn, .delete-btn {
+  .address-edit-btn{
     background: none;
     border: none;
     cursor: pointer;
     font-size: 1.2rem;
+    color:#007BFF
+  }
+  .address-delete-btn{
+    color:red;
+    background: none;
+    font-size: 1.2rem;
   }
   
-  .edit-btn:hover {
+  .address-edit-btn:hover {
     color: #007bff;
   }
   
-  .delete-btn:hover {
+  .address-delete-btn:hover {
     color: #e74c3c;
   }
   
@@ -63,7 +70,7 @@
     border-radius: 5px;
   }
   
-  button {
+  /* button {
     padding: 10px 20px;
     border: none;
     border-radius: 5px;
@@ -74,7 +81,88 @@
   button:disabled {
     background-color: #ccc;
     cursor: not-allowed;
-  }
+  } */
+   /* Basic button styling */
+.toggle-address-form {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  background-color: #4CAF50; /* Example color for active state */
+  color: white;
+  transition: background-color 0.3s ease;
+}
+
+/* Button when hovered */
+.toggle-address-form:hover {
+  background-color: #45a049; /* Slightly darker shade */
+}
+
+/* Disabled button styling */
+.toggle-address-form:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+/* Active state styling for the button */
+.toggle-address-form.active {
+  background-color: #f44336; /* Example color when active */
+  color: white;
+}
+/* Deliver Here button styling */
+.deliver-here-btn {
+  padding: 10px 20px;
+  background-color: #4CAF50; /* Example: green color */
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  margin-right: 10px;
+  transition: background-color 0.3s ease;
+}
+
+/* Hover state for Deliver Here button */
+.deliver-here-btn:hover {
+  background-color: #45a049; /* Slightly darker shade of green */
+}
+
+/* Disabled button styling */
+.deliver-here-btn:disabled,
+.address-edit-btn:disabled,
+.address-delete-btn:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+/* Submit button styling for Add/Update Address */
+.submit-btn {
+  padding: 12px 24px;
+  background-color: #007bff; /* Example: blue color */
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+  width: 100%; /* Optional: make it full-width */
+  margin-top: 15px; /* Add some spacing above */
+}
+
+/* Hover state for Submit button */
+.submit-btn:hover {
+  background-color: #0056b3; /* Slightly darker shade of blue */
+}
+
+/* Disabled state styling */
+.submit-btn:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+
   
   .selected-address-info {
     margin-top: 20px;

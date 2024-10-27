@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AiOutlineSearch, AiFillHome, AiOutlineShoppingCart } from 'react-icons/ai';
-import { FaBars, FaArrowLeft, FaArrowRight, FaHeart } from 'react-icons/fa';
+import { FaBars, FaArrowLeft, FaArrowRight, FaHeart,FaTimes } from 'react-icons/fa';
 import './Header.css';
 import logo from '../assets/logo.png';
 import axios from 'axios';
@@ -97,6 +97,12 @@ const Header = () => {
     navigate('/login');
   };
 
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(prevState => !prevState);
+  };
+
   const [searchQuery, setSearchQuery] = useState('');
 
   const handleSearchChange = (e) => {
@@ -182,9 +188,30 @@ const Header = () => {
         </div>
 
         {/* Mobile Menu Icon */}
-        <label htmlFor="nav-toggle" className="menu-icon">
+        {/* <label htmlFor="nav-toggle" className="menu-icon">
           <FaBars />
-        </label>
+        </label> */}
+        {/* Mobile Menu Icon */}
+      <label 
+        htmlFor="nav-toggle" 
+        className="menu-icon" 
+        onClick={toggleMobileMenu}
+        aria-expanded={isMobileMenuOpen}
+        aria-label="Toggle navigation menu"
+      >
+        {isMobileMenuOpen ? <FaTimes /> : <FaBars />}
+      </label>
+
+      {/* Mobile Navigation Menu */}
+      <nav className={`mobile-nav ${isMobileMenuOpen ? 'open' : 'closed'}`}>
+        <ul>
+          <li><a href="/" onClick={toggleMobileMenu}>Home</a></li>
+          <li><a href="/products" onClick={toggleMobileMenu}>Products</a></li>
+          <li><a href="/about" onClick={toggleMobileMenu}>About</a></li>
+          <li><a href="/services" onClick={toggleMobileMenu}>Services</a></li>
+          <li><a href="/contact" onClick={toggleMobileMenu}>Contact</a></li>
+        </ul>
+      </nav>
       </header>
 
       {/* Navigation buttons below the header in the right corner */}

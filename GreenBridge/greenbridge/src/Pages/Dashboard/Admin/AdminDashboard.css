@@ -107,7 +107,7 @@
 }
 
 /* Additional Button Styling */
-button {
+/* button {
   background-color: #007bff;
   color: white;
   border: none;
@@ -115,7 +115,7 @@ button {
   padding: 10px 20px;
   cursor: pointer;
   transition: background-color 0.3s ease;
-}
+} */
 
 button:hover {
   background-color: #0056b3;

@@ -177,11 +177,11 @@ header {
     gap: 2em;
     margin-right: 3em; /* Move the entire icon section to the left */
 }
-
+/* 
 .icon-links {
     display: flex;
     gap: 1.5em;
-    margin-right: -10px; /* Adjust this value to move the icons slightly to the left */
+    margin-right: -10px; 
 }
 
 .icon-linkss {
@@ -189,9 +189,9 @@ header {
     align-items: center;
     text-decoration: none;
     color: #f1f3f5;
-    background: none; /* Remove background */
-    padding: 0; /* Remove padding */
-    border: none; /* Remove border */
+    background: none; 
+    padding: 0; 
+    border: none; 
     transition: color 0.3s;
 }
 
@@ -199,12 +199,52 @@ header {
     color: #f9fafa;
 }
 
-/* Icon Label */
+
 .icon-label {
     font-size: 1em;
     margin-left: 0.3em;
     color: #f0ebeb;
-}
+} */
+
+/* Container for icons */
+.icon-links {
+    display: flex;
+    gap: 1.5em;
+    margin-right: -10px; /* Adjust the value as needed to align icons */
+  }
+  
+  /* Styling for individual icon buttons */
+  .icon-linkss {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: #f1f3f5; /* Light gray color */
+    background: none; /* No background */
+    padding: 8px 12px; /* Add padding for better clickable area */
+    border: none; /* No border */
+    border-radius: 5px; /* Optional: Rounded corners */
+    cursor: pointer;
+    transition: color 0.3s, background-color 0.3s;
+  }
+  
+  /* Hover effect for icon buttons */
+  .icon-linkss:hover {
+    color: #f9fafa; /* Slightly lighter color */
+    background-color: rgba(255, 255, 255, 0.1); /* Light background on hover */
+  }
+  
+  /* Active state for icon buttons */
+  .icon-linkss:active {
+    transform: scale(0.95); /* Slightly shrink on click */
+  }
+  
+  /* Icon label styling */
+  .icon-label {
+    font-size: 1em;
+    margin-left: 0.3em;
+    color: #f0ebeb; /* Slightly lighter gray */
+  }
+  
 
 /* Dropdown Button */
 .dropbtn {
@@ -387,3 +427,59 @@ header {
         gap: 1em;
     }
 } */
+.menu-icon {
+    font-size: 20px;
+    /* margin-top: 50px; */
+    cursor: pointer;
+    display: inline-block;
+    padding: 8px;
+    transition: transform 0.3s ease;
+    z-index: 1100; 
+    align-items: center;
+  }
+  
+  .menu-icon:hover {
+    transform: scale(1.1);
+  }
+  
+  /* Mobile Navigation Styles */
+  .mobile-nav {
+    position: fixed;
+    top: 6.4rem;
+    right: -100%;
+    width: 250px;
+    height: 100%;
+    background-color: rgb(28, 185, 247);
+    color: #fff;
+    transition: right 0.3s ease;
+    z-index: 1000;
+    padding-top: 60px; /* Space for header height */
+  }
+  
+  .mobile-nav.open {
+    right: 0; /* Slide in when open */
+  }
+  
+  .mobile-nav.closed {
+    right: -100%; /* Slide out when closed */
+  }
+  
+  .mobile-nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .mobile-nav li {
+    padding: 10px 20px;
+    border-bottom: 1px solid #444;
+  }
+  
+  .mobile-nav a {
+    color: #fff;
+    text-decoration: none;
+  }
+  
+  .mobile-nav a:hover {
+    text-decoration: underline;
+  }

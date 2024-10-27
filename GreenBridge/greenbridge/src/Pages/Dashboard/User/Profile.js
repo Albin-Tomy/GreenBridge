@@ -55,6 +55,45 @@ const UserProfile = () => {
     setProfile((prevProfile) => ({ ...prevProfile, [name]: value }));
   };
 
+  const countryOptions = {
+    India: [
+      'Andhra Pradesh',
+      'Arunachal Pradesh',
+      'Assam',
+      'Bihar',
+      'Chhattisgarh',
+      'Goa',
+      'Gujarat',
+      'Haryana',
+      'Himachal Pradesh',
+      'Jharkhand',
+      'Karnataka',
+      'Kerala',
+      'Madhya Pradesh',
+      'Maharashtra',
+      'Manipur',
+      'Meghalaya',
+      'Mizoram',
+      'Nagaland',
+      'Odisha',
+      'Punjab',
+      'Rajasthan',
+      'Sikkim',
+      'Tamil Nadu',
+      'Telangana',
+      'Tripura',
+      'Uttar Pradesh',
+      'Uttarakhand',
+      'West Bengal',
+      'Andaman and Nicobar Islands',
+      'Chandigarh',
+      'Dadra and Nagar Haveli and Daman and Diu',
+      'Lakshadweep',
+      'Delhi',
+      'Puducherry',
+    ]
+  };
+
   const handleEditToggle = () => {
     setIsEditable(!isEditable); // Toggle edit mode
     setError(''); // Reset error message when toggling
@@ -207,7 +246,7 @@ const UserProfile = () => {
             )}
           </p>
 
-          <p className="profile-item">
+          {/* <p className="profile-item">
             <strong>State:</strong> 
             {isEditable ? (
               <input
@@ -221,7 +260,28 @@ const UserProfile = () => {
             ) : (
               <span className="profile-value">{profile.default_state}</span>
             )}
-          </p>
+          </p> */}
+          <p className="profile-item">
+    <strong>State:</strong> 
+    {isEditable ? (
+      <select
+        name="default_state"
+        value={profile.default_state}
+        onChange={handleInputChange}
+        required
+        className="profile-input"
+      >
+        <option value="">Select State</option>
+        {countryOptions.India.map((state) => (
+          <option key={state} value={state}>
+            {state}
+          </option>
+        ))}
+      </select>
+    ) : (
+      <span className="profile-value">{profile.default_state}</span>
+    )}
+  </p>
 
           <p className="profile-item">
             <strong>Pincode:</strong> 

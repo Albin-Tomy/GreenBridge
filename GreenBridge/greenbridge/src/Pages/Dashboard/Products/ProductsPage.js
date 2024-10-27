@@ -26,6 +26,12 @@ const ProductPage = () => {
   const searchParams = new URLSearchParams(location.search);
   const searchQuery = searchParams.get('search') || '';
   const userId = localStorage.getItem('userId');
+  const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
+
+  useEffect(() => {
+    // Check if the user is logged in
+    setIsUserLoggedIn(!!userId);
+  }, [userId]);
 
     // Fetch products with applied filters
     const fetchProducts = () => {
@@ -99,7 +105,7 @@ const ProductPage = () => {
 
   const addToCart = (productId, quantity = 1) => {
     const userId = localStorage.getItem('userId');
-    if (!userId) {
+    if (!isUserLoggedIn) {
       toast.error("Please log in first to add items to the cart.");
       return;
     }
@@ -234,6 +240,9 @@ const ProductPage = () => {
                       <h4>{product.name}</h4>
                       <p className="price">₹ {product.price}</p>
                     </div>
+                    {(!product.is_active || product.stock_quantity === 0) && (
+                      <p className="hard-out-of-stock-label">Out of Stock</p>
+                    )}
                     <div className="product-actions">
                       <button className="wishlist-btns" onClick={() => addToWishlist(product.product_id)}>
                         <i className="fas fa-heart"></i> Wishlist
@@ -243,7 +252,8 @@ const ProductPage = () => {
                           <i className="fas fa-shopping-cart"></i> Go to Cart
                         </button>
                       ) : (
-                        <button className="cart-btns" onClick={() => addToCart(product.product_id, 1)}>
+                        <button disabled={!product.is_active || product.stock_quantity === 0}
+                         className="cart-btns" onClick={() => addToCart(product.product_id, 1)}>
                           <i className="fas fa-shopping-cart"></i> Add to Cart
                         </button>
                       )}

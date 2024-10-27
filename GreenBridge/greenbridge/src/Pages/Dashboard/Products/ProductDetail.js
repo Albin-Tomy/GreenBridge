@@ -204,17 +204,21 @@ const ProductDetail = () => {
                     <li>Stock Quantity: {product.stock_quantity}</li>
                   </ul>
                 </div>
+                {(!product.is_active || product.stock_quantity === 0) && (
+                      <p className="hard-out-of-stock-label">Out of Stock</p>
+                    )}
 
                 <div className="product-actions">
                 <button onClick={() => addToWishlist(product.product_id)} className="wishlist-btn">
                     <i className="fas fa-heart"></i> Add to Wishlist
                   </button>
                   {isProductInCart() ? (
-                    <button onClick={() => navigate('/cart')} className="go-to-cart-btn">
+                    <button onClick={() => navigate('/cart')} className="cart-btn">
                       <i className="fas fa-shopping-cart"></i> Go to Cart
                     </button>
                   ) : (
-                    <button onClick={() => addToCart(product.product_id, 1)} className="cart-btn">
+                    <button disabled={!product.is_active || product.stock_quantity === 0}
+                    onClick={() => addToCart(product.product_id, 1)} className="cart-btn">
                       <i className="fas fa-shopping-cart"></i> Add to Cart
                     </button>
                   )}

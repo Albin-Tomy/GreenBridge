@@ -68,27 +68,126 @@ const AddressSelection = () => {
     setTotal(subtotal + shipping);
   };
 
+  const updateQuantity = (id, newQuantity, stock) => {
+    if (newQuantity < 1) return;  // Prevent quantity from going below 1
+    if (newQuantity > stock) {  // Prevent quantity from exceeding stock
+      toast.error('Quantity cannot exceed available stock!');  // Display toast message
+      return;
+    }
+
+    axios.patch(`${BASE_URL}/api/v1/orders/cart-items-detail/${id}/`, { quantity: newQuantity })
+      .then(response => {
+        const updatedItems = cartItems.map(item => 
+          item.cart_item_id === id ? { ...item, quantity: newQuantity } : item
+        );
+        setCartItems(updatedItems);
+        calculateTotal(updatedItems);
+        toast.success('Quantity updated successfully!');  // Display success toast
+      })
+      .catch(error => console.error('Error updating quantity:', error));
+  };
+
+  // Remove an item from the cart
+  const removeItem = (id) => {
+    axios.delete(`${BASE_URL}/api/v1/orders/cart-items-detail/${id}/`)
+      .then(() => {
+        const updatedItems = cartItems.filter(item => item.cart_item_id !== id);
+        setCartItems(updatedItems);
+        calculateTotal(updatedItems);
+        toast.info('Item removed from the cart!');  // Display removal toast
+      })
+      .catch(error => console.error('Error removing item:', error));
+  };
+
   const handleAddressSelect = (addressId) => {
     setSelectedAddress(addressId);
     toast.success('Address selected for delivery!');
     fetchCartItems(); // Fetch cart items when an address is selected
   };
 
+  const countryOptions = {
+    India: [
+      'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh',
+      'Delhi', 'Goa', 'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jammu and Kashmir',
+      'Jharkhand', 'Karnataka', 'Kerala', 'Madhya Pradesh', 'Maharashtra',
+      'Manipur', 'Meghalaya', 'Mizoram', 'Nagaland', 'Odisha', 'Punjab',
+      'Rajasthan', 'Sikkim', 'Tamil Nadu', 'Telangana', 'Tripura', 'Uttar Pradesh',
+      'Uttarakhand', 'West Bengal'
+    ],
+    USA: [
+      'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado',
+      'Connecticut', 'Delaware', 'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois',
+      'Indiana', 'Iowa', 'Kansas', 'Kentucky', 'Louisiana', 'Maine', 'Maryland',
+      'Massachusetts', 'Michigan', 'Minnesota', 'Mississippi', 'Missouri', 'Montana',
+      'Nebraska', 'Nevada', 'New Hampshire', 'New Jersey', 'New Mexico', 'New York',
+      'North Carolina', 'North Dakota', 'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania',
+      'Rhode Island', 'South Carolina', 'South Dakota', 'Tennessee', 'Texas', 'Utah',
+      'Vermont', 'Virginia', 'Washington', 'West Virginia', 'Wisconsin', 'Wyoming'
+    ],
+    Canada: [
+      'Alberta', 'British Columbia', 'Manitoba', 'New Brunswick',
+      'Newfoundland and Labrador', 'Nova Scotia', 'Ontario', 'Prince Edward Island',
+      'Quebec', 'Saskatchewan'
+    ],
+    Australia: [
+      'New South Wales', 'Victoria', 'Queensland', 'Western Australia',
+      'South Australia', 'Tasmania', 'Northern Territory', 'Australian Capital Territory'
+    ],
+    Germany: [
+      'Baden-Württemberg', 'Bavaria', 'Berlin', 'Brandenburg', 'Bremen', 'Hamburg',
+      'Hesse', 'Lower Saxony', 'Mecklenburg-Vorpommern', 'North Rhine-Westphalia',
+      'Rhineland-Palatinate', 'Saarland', 'Saxony', 'Saxony-Anhalt', 'Schleswig-Holstein',
+      'Thuringia'
+    ],
+    UnitedKingdom: [
+      'England', 'Scotland', 'Wales', 'Northern Ireland'
+    ],
+    France: [
+      'Auvergne-Rhône-Alpes', 'Bourgogne-Franche-Comté', 'Brittany', 'Centre-Val de Loire',
+      'Corsica', 'Grand Est', 'Hauts-de-France', 'Île-de-France', 'Normandy',
+      'Nouvelle-Aquitaine', 'Occitanie', 'Pays de la Loire', 'Provence-Alpes-Côte d\'Azur'
+    ]
+    // Add more countries and states as needed
+  };
+  const [states, setStates] = useState([]);
+
+  // const handleNewAddressChange = (e) => {
+  //   setNewAddress({ ...newAddress, [e.target.name]: e.target.value });
+  // };
   const handleNewAddressChange = (e) => {
-    setNewAddress({ ...newAddress, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setNewAddress({ ...newAddress, [name]: value });
+
+    // If country changes, update states list and reset the selected state
+    if (name === 'country') {
+      setStates(countryOptions[value] || []);
+      setNewAddress({ ...newAddress, country: value, state: '' }); // Reset state
+    }
   };
 
   const validateAddress = () => {
     const validationErrors = {};
+  
+    // Check required fields
     if (!newAddress.address_line1) validationErrors.address_line1 = 'Address Line 1 is required';
     if (!newAddress.city) validationErrors.city = 'City is required';
     if (!newAddress.state) validationErrors.state = 'State is required';
     if (!newAddress.country) validationErrors.country = 'Country is required';
-    if (!newAddress.pincode) validationErrors.pincode = 'Pincode is required';
+    
+    // Validate pincode
+    if (!newAddress.pincode) {
+      validationErrors.pincode = 'Pincode is required';
+    } else if (!validatePincode(newAddress.pincode)) {
+      validationErrors.pincode = 'Pincode must be a 6-digit number';
+    }
+  
     setErrors(validationErrors);
     return Object.keys(validationErrors).length === 0;
   };
-
+  
+  // Pincode validation function
+  const validatePincode = (pincode) => /^[0-9]{6}$/.test(pincode);
+  
   const handleAddOrUpdateAddress = () => {
     if (!validateAddress()) return;
 
@@ -148,6 +247,8 @@ const AddressSelection = () => {
       .catch(error => console.error('Error deleting address:', error));
   };
 
+
+
   const resetForm = () => {
     setNewAddress({
       address_line1: '',
@@ -204,8 +305,8 @@ const AddressSelection = () => {
         onClick={() => handleAddressSelect(address.address_id)}
       >
         <p>{address.address_line1}, {address.city}, {address.state}, {address.country}, {address.pincode}</p>
-        <button className="edit-btn" onClick={(e) => { e.stopPropagation(); handleEditAddress(address.address_id); }}><FaEdit /></button>
-        <button className="delete-btn" onClick={(e) => { e.stopPropagation(); handleDeleteAddress(address.address_id); }}><FaTrash /></button>
+        <button className="address-edit-btn" onClick={(e) => { e.stopPropagation(); handleEditAddress(address.address_id); }}><FaEdit /></button>
+        <button className="address-delete-btn" onClick={(e) => { e.stopPropagation(); handleDeleteAddress(address.address_id); }}><FaTrash /></button>
       </div>
     ))
   ) : (
@@ -225,7 +326,7 @@ const AddressSelection = () => {
 
       {/* Add New Address Section */}
       <h3>{editingAddressId ? 'Edit Address' : 'Add New Address'}</h3>
-      <button className="toggle-address-form" onClick={() => setShowAddressForm(prev => !prev)}>
+      <button className={`toggle-address-form ${showAddressForm ? 'active' : ''}`} onClick={() => setShowAddressForm(prev => !prev)}>
         {showAddressForm ? 'Hide Address Form' : 'Add New Address'}
       </button>
 
@@ -249,22 +350,33 @@ const AddressSelection = () => {
           />
           {errors.city && <p className="error">{errors.city}</p>}
           
-          <input
-            type="text"
-            name="state"
-            placeholder="State"
-            value={newAddress.state}
-            onChange={handleNewAddressChange}
-          />
-          {errors.state && <p className="error">{errors.state}</p>}
-          
-          <input
-            type="text"
-            name="country"
-            placeholder="Country"
-            value={newAddress.country}
-            onChange={handleNewAddressChange}
-          />
+          <select
+        name="country"
+        value={newAddress.country}
+        onChange={handleNewAddressChange}
+      >
+        <option value="">Select Country</option>
+        {Object.keys(countryOptions).map((country) => (
+          <option key={country} value={country}>
+            {country}
+          </option>
+        ))}
+      </select>
+      {errors.country && <p className="error">{errors.country}</p>}
+
+      <select
+        name="state"
+        value={newAddress.state}
+        onChange={handleNewAddressChange}
+        disabled={!newAddress.country}
+      >
+        <option value="">Select State</option>
+        {states.map((state) => (
+          <option key={state} value={state}>
+            {state}
+          </option>
+        ))}
+      </select>
           {errors.country && <p className="error">{errors.country}</p>}
           
           <input
@@ -288,20 +400,45 @@ const AddressSelection = () => {
           {cartSummaryVisible && (
             <>
               <h3>Your Cart Items</h3>
-              {cartItems.map(item => (
+              {cartItems.length > 0 ? (
+              cartItems.map(item => (
                 <div className="cart-item" key={item.cart_item_id}>
                   <img
                     src={item.product.image ? `${BASE_URL}${item.product.image}` : 'https://via.placeholder.com/150'}
                     alt={item.product.name}
-                    className="product-image"
+                    className="cart-product-image"
                   />
                   <div className="item-details">
                     <h4 className="item-name">{item.product.name}</h4>
                     <p className="item-price">Price: <span className="price-amount">₹ {item.product.price}</span></p>
                     <p className="item-quantity">Quantity: <span className="quantity-amount">{item.quantity}</span></p>
+                    <div className="quantity-control">
+                      <button
+                        className="qty-btn"
+                        onClick={() => updateQuantity(item.cart_item_id, item.quantity - 1, item.product.stock_quantity)}
+                        disabled={item.quantity <= 1}  // Disable if quantity is 1
+                      >
+                        -
+                      </button>
+                      <span className="quantity">{item.quantity}</span>
+                      <button
+                        className="qty-btn"
+                        onClick={() => updateQuantity(item.cart_item_id, item.quantity + 1, item.product.stock_quantity)}
+                        disabled={item.quantity >= item.product.stock_quantity}  // Disable if quantity equals stock
+                      >
+                        +
+                      </button>
+                    </div>
                   </div>
+                  <button className="cart-remove-btn" onClick={() => removeItem(item.cart_item_id)}>
+                    <FaTrash />
+                  </button>
                 </div>
-              ))}
+              ))
+            ) : (
+              <p>Your cart is empty</p>
+            )
+            }
               <div className="cart-summary">
                 <h4 className="summary-total">Total: <span className="summary-amount">₹ {total}</span></h4>
                 <button className="confirm-delivery-btn" onClick={handleContinue}>Continue</button>

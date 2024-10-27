@@ -59,8 +59,8 @@ const AdminDashboard = () => {
                 <td>SHG Registrations</td>
               </tr>
               <tr
-                onClick={() => handleNavigation('/dashboard/pending-requests')}
-                className={location.pathname === '/dashboard/pending-requests' ? 'active' : ''}
+                onClick={() => handleNavigation('admin/pending-requests')}
+                className={location.pathname === 'admin/pending-requests' ? 'active' : ''}
               >
                 <td>Pending Requests</td>
               </tr>
@@ -76,12 +76,12 @@ const AdminDashboard = () => {
               >
                 <td>Products</td>
               </tr>
-              <button
+              <tr
                 onClick={() => handleNavigation('/dashboard/settings')}
                 className={location.pathname === '/dashboard/settings' ? 'active' : ''}
               >
                 <td>Settings</td>
-                </button>
+                </tr>
             </tbody>
           </table>
         </aside>

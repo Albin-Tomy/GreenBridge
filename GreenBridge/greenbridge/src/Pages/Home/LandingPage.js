@@ -27,16 +27,17 @@ const LandingPage = () => {
 
       {/* Hero Section */}
       <section className="hero-section">
+      <div className="hero-image">
+          <img src={shg} alt="Empowering Communities" />
+        </div>
         <div className="hero-content">
           <h2>Empowering Self Help Groups for a Better Future</h2>
           <p>Together, we enable communities to thrive by providing tools, resources, and opportunities to SHGs. Explore our services and join the movement.</p>
           <button onClick={goToProducts} >
-                <span className="contact-btn">Explore Now</span>
+                <span className="contact-btns">Explore Now</span>
               </button>
         </div>
-        <div className="hero-image">
-          <img src={shg} alt="Empowering Communities" />
-        </div>
+        
       </section>
 
       {/* Services Section */}

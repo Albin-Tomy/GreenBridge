@@ -39,6 +39,9 @@ urlpatterns = [
     path('subcategory-details/<int:pk>/', views.subcategory_detail, name='subcategory-detail'),  # Retrieve subcategory details
     path('subcategory-update/<int:pk>/', views.subcategory_update, name='subcategory-update'),  # Update a subcategory
     path('subcategory-delete/<int:pk>/', views.subcategory_delete, name='subcategory-delete'),  # Delete a subcategory
+
+    path('disable-or-enable/<int:pk>/',views.disable_enable_product,name='disable_or_enable_product'),
+
 ]
 
 if settings.DEBUG:

@@ -521,3 +521,21 @@ def product_filter(request):
     # Serialize and return the products
     serializer = ProductSerializer(products, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+def disable_enable_product(request,pk):
+    try:
+        product = Product.objects.get(pk=pk)
+        if product.is_active == True:
+            product.is_active  = False
+        else:
+            product.is_active = True
+        product.save()
+        return Response({'message':f"Product active status changed to : {product.is_active} "},status=status.HTTP_200_OK)
+    except Product.DoesNotExist:
+        print(f"ERROR: Product for this id doesnot exist!")
+        return Response({'message': f"No Product found for the given id {pk}"},status=status.HTTP_204_NO_CONTENT)
+    except Exception as e:
+        print(f"ERROR: {e}")
+        return Response({'message': f"An error occurred while processing your request"},status=status.HTTP_500_INTERNAL_SERVER_ERROR)

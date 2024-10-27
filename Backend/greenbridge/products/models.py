@@ -85,6 +85,7 @@ class Product(models.Model):
     image = models.ImageField(upload_to='product_images/', null=True, blank=True)  
     updated_at = models.DateTimeField(auto_now=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return self.name

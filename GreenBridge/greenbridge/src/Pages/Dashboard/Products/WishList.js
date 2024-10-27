@@ -80,6 +80,7 @@ const Wishlist = () => {
         toast.error('Error removing item from wishlist!');
       });
   };
+  
 
   return (
     <div>

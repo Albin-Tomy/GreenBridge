@@ -44,6 +44,10 @@ const Header = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [username, setUsername] = useState(null); // State to store the user's name
   const navigate = useNavigate();
+  const [displayName, setDisplayName] = useState("Login");
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const userId = localStorage.getItem('userId');
+  const token = localStorage.getItem('authToken'); // Track login state
 
   // Fetch the logged-in user's name from localStorage
   useEffect(() => {
@@ -58,10 +62,11 @@ const Header = () => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('authToken'); // Remove JWT token
-    localStorage.removeItem('user'); // Clear user data
-    setUsername(null); // Clear the username state
-    navigate('/');
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('userId');
+    setDisplayName("Login");
+    setIsLoggedIn(false); // User is logged out
+    navigate('/login');
   };
 
   return (

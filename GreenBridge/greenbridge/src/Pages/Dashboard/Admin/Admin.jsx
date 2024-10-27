@@ -19,6 +19,7 @@ import AddStaffForm from "../../../components/Forms/StaffsForm";
 import AddMadeofForm from '../../../components/Forms/MadeofForm';
 import AddBrandForm from "../../../components/Forms/BrandForm";
 import AddCountryForm from "../../../components/Forms/CountryForm";
+import { Switch } from '@mui/material';
 
 import { getItemById ,categoryItemById,getBrandById,getCountryById,getMadeofById} from "../Shg/helper";
 import { orderItemById } from "../Shg/helper";
@@ -133,6 +134,7 @@ function Admin() {
       quantity:item.quantity,
       category: getCategoryNameById(item.category),
       stock: item.stock_quantity,
+      is_active:item.is_active
     }));
   };
 
@@ -370,6 +372,53 @@ function Admin() {
       ),
       flex: 1,
     },
+
+    // {
+    //   field: "disable_or_enable",
+    //   headerName: "Disable/Enable",
+    //   renderCell: (params) => (
+    //     <button
+    //       onClick={() => handleDisableProduct(params.row.id)}
+    //       style={{
+    //         cursor: 'pointer',
+    //         backgroundColor: params.row.is_active ? 'green' : 'red',
+    //         color: '#fff',
+    //         border: 'none',
+    //         padding: '8px 12px',
+    //         borderRadius: '4px'
+    //       }}
+    //     >
+    //       {params.row.is_active ? 'Enabled' : 'Disabled'}
+    //     </button>
+    //   ),
+    //   flex: 1
+    // }
+    {
+      field: "disable_or_enable",
+      headerName: "Disable/Enable",
+      renderCell: (params) => (
+        <Switch
+          checked={params.row.is_active}
+          onChange={() => handleDisableProduct(params.row.id)}
+          color="default"
+          sx={{
+            '& .MuiSwitch-switchBase.Mui-checked': {
+              color: 'green', // Color when enabled
+            },
+            '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+              backgroundColor: 'green', // Track color when enabled
+            },
+            '& .MuiSwitch-switchBase': {
+              color: 'red', // Color when disabled
+            },
+            '& .MuiSwitch-switchBase + .MuiSwitch-track': {
+              backgroundColor: 'red', // Track color when disabled
+            },
+          }}
+        />
+      ),
+      flex: 1
+    }
   ];
 
   const orderColumns = [
@@ -580,6 +629,20 @@ function Admin() {
     setSelectedId(id);
     console.log("selected id for delete",id)
   };
+
+  const handleDisableProduct = (id)=>{
+    console.log("Disable product id",id)
+
+    axios.post(`http://localhost:8000/api/v1/products/disable-or-enable/${id}/`)
+    .then((response)=>{
+      console.log("response-dis",response)
+      window.location.reload()
+    })
+    .catch((error)=>{
+      console.log("ERROR: ",error)
+    })
+
+  }
 
   const confirmDeleteProduct = () => {
     axios

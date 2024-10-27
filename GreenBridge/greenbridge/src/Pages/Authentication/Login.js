@@ -89,7 +89,7 @@ const Login = ({ setIslogin }) => {
       } else if (user.is_shg) {
         navigate('/shg');
       } else {
-        navigate('/home');
+        navigate('/');
       }
     }
   }, [navigate]);
@@ -126,7 +126,7 @@ const Login = ({ setIslogin }) => {
         } else if (response.data.user.is_shg) {
           navigate('/shg'); // Redirect to SHG dashboard
         } else {
-          navigate('/home'); // Redirect to general user dashboard
+          navigate('/'); // Redirect to general user dashboard
         }
       } else {
         alert('User is not activated/approved. Please try again later.');

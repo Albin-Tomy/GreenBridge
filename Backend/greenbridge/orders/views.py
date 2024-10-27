@@ -462,6 +462,11 @@ def create_payment(request):
             order_id=order  # Link to order
         )
         payment.save()
+
+        create_order_items(order, cart_id)
+
+        update_stock_quantities(cart)
+
         return Response({'message': 'Order placed successfully with COD', 'order_id': order.order_id}, status=status.HTTP_201_CREATED)
 
     elif payment_method == 'online':
@@ -507,6 +512,11 @@ def verify_payment(request):
             payment.payment_id = payment_id  # Save actual Razorpay payment ID
             payment.order_id = order  # Associate the order with payment
             payment.save()
+
+            update_stock_quantities(payment.cart_id)
+
+            create_order_items(order, payment.cart_id)
+            
             return Response({'message': 'Payment verified and order created', 'order_id': order.order_id}, status=status.HTTP_200_OK)
 
         else:
@@ -517,8 +527,40 @@ def verify_payment(request):
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
+from django.shortcuts import get_object_or_404
 
+# Helper function to update stock quantities for the items in the cart
+def update_stock_quantities(cart):
+    cart_items = CartItems.objects.filter(cart_id=cart.cart_id)
+    for item in cart_items:
+        product = get_object_or_404(Product, product_id=item.product_id.product_id)
+        if product.stock_quantity >= item.quantity:
+            product.stock_quantity -= item.quantity  # Decrease stock quantity
+            product.save()
+        else:
+            # If stock is insufficient, raise an error or handle accordingly
+            raise ValueError(f'Insufficient stock for product: {product.name}')
+        
+def create_order_items(order, cart_id):
+    cart_items = CartItems.objects.filter(cart_id=cart_id)
+    for item in cart_items:
+        # Get product and quantity from each cart item
+        product = item.product_id
+        quantity = item.quantity
 
+        # Calculate price based on product price and quantity
+        price = product.price * quantity
+
+        # Create an OrderItem instance
+        OrderItems.objects.create(
+            order_id=order,
+            product_id=product,
+            quantity=quantity,
+            price=price
+        )
+
+    # Clear cart items after order items are created
+    cart_items.delete()
 # @api_view(['GET', 'POST'])
 # def address_list(request):
 #     if request.method == 'GET':
