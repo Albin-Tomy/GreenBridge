@@ -23,22 +23,31 @@ import Wishlist from './Pages/Dashboard/Products/WishList';
 import HomePage from './Pages/Home/HomePage';
 import LandingPages from './Pages/Home/LandingPages';
 import DashboardLayout from './Pages/Dashboard/User/DashBoard';
-import ShgAdmin from './Pages/Dashboard/Shg/ShgAdmin';
-import Products from './Pages/Dashboard/Shg/Products';
-import Orders from './Pages/Dashboard/Shg/Orders';
+// import ShgAdmin from './Pages/Dashboard/Shg/ShgAdmin';
+// import Products from './Pages/Dashboard/Shg/Products';
+// import Orders from './Pages/Dashboard/Shg/Orders';
 import AddressSelection from './Pages/Dashboard/Products/AddressSelection';
 import WasteCollectionRequest from './Pages/Dashboard/User/WasteCollectonRequest';
 import WasteCategory from './Pages/Dashboard/User/WasteCategory';
 import WasteSubcategory from './Pages/Dashboard/User/WasteSubCategory';
 import LocationForm from './Pages/Dashboard/User/LocationForm';
 import SHGRequests from './Pages/Dashboard/Shg/ShgRequest';
-import AdminDash from './Pages/Dashboard/Admin/AdminDash';
+// import AdminDash from './Pages/Dashboard/Admin/AdminDash';
 import Payment from './Pages/Dashboard/Products/PaymentPage';
+import StaffOrders from './Pages/Dashboard/Shg/StaffOrders';
+import AllSh from './Pages/Dashboard/Admin/AllSh';
+import PendingShg from './Pages/Dashboard/Admin/PendingShg';
+import Shgwaste from './Pages/Dashboard/Shg/ShgWaste';
+
+import UserOrders from './Pages/Dashboard/Products/UserOrders';
+import Sidebar from './components/SideBar';
+
 function App() {
   return (
     
     <Router>
       <Routes>
+        
         
         <Route path="/admin/home" element={<Dashboard />}>
         <Route path="admin/view-all-shgs" element={<AllSHGsPage />} />
@@ -66,7 +75,17 @@ function App() {
         <Route path="/products/:id" element={<ProductDetail/>} />
         <Route path="/cart" element={<CartPage />} />
         <Route path="/wishlist" element={<Wishlist />} />
-        <Route path="/admindash" element={<AdminDash />} />
+        {/* <Route path="/admindash" element={<AdminDash />} /> */}
+        <Route path="/stafforder" element={<StaffOrders />} />
+
+        <Route path="/shgwaste" element={<Shgwaste />} />
+        
+        <Route path="/userorder" element={<UserOrders />} />
+
+        <Route path="/sidebar" element={<Sidebar />} />
+
+        <Route path="/allsh" element={<AllSh />} />
+        <Route path="/pendingshg" element={<PendingShg />} />
 
         <Route path="/payment" element={<Payment />} />
         <Route path="/landing" element={<LandingPages />} />
@@ -75,10 +94,10 @@ function App() {
           <Route path='profile' element={<Profile/>}/>
         </Route>
 
-        <Route path="/shgadmin" element={<ShgAdmin />}>
+        {/* <Route path="/shgadmin" element={<ShgAdmin />}>
           <Route path="products" element={<Products />} />
           <Route path="orders" element={<Orders />} />
-        </Route>
+        </Route> */}
       </Routes>
     </Router>
   );

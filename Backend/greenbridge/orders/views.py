@@ -232,6 +232,57 @@ def clear_cart_items(request):
 
 # order && order_item function based view
 
+# @api_view(['GET'])
+# def user_orders(request, user_id):
+#     try:
+#         orders = Order.objects.filter(user_id=user_id)
+#         serialized_orders = []
+
+#         for order in orders:
+#             order_serializer = OrderSerializer(order)
+#             order_items = OrderItems.objects.filter(order_id=order.order_id)
+#             order_items_serializer = OrderItemsSerializer(order_items, many=True)
+            
+#             serialized_orders.append({
+#                 'order': order_serializer.data,
+#                 'order_items': order_items_serializer.data
+#             })
+
+#         return Response(serialized_orders, status=status.HTTP_200_OK)
+
+#     except Order.DoesNotExist:
+#         return Response({'error': 'No orders found for this user'}, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['GET'])
+def user_orders(request, user_id):
+    try:
+        orders = Order.objects.filter(user_id=user_id)
+        serialized_orders = []
+
+        for order in orders:
+            order_serializer = OrderSerializer(order)
+            order_items = OrderItems.objects.filter(order_id=order.order_id)
+            order_items_serializer = OrderItemsSerializer(order_items, many=True)
+            
+            serialized_orders.append({
+                'order': order_serializer.data,
+                'order_items': order_items_serializer.data
+            })
+
+        return Response(serialized_orders, status=status.HTTP_200_OK)
+
+    except Order.DoesNotExist:
+        return Response({'error': 'No orders found for this user'}, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['GET'])
+def order_items(request, order_id):
+    try:
+        items = OrderItems.objects.filter(order_id=order_id)
+        serializer = OrderItemsSerializer(items, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
 @api_view(['GET', 'POST'])
 def order_list(request):
     if request.method == 'GET':
@@ -349,74 +400,10 @@ def order_item_detail(request, pk):
     elif request.method == 'DELETE':
         order_item.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
 # Payment function based view   
-    
-# @api_view(['GET', 'POST'])
-# def payment_list_create(request):
-#     if request.method == 'GET':
-#         payments = Payment.objects.all()
-#         serializer = PaymentSerializer(payments, many=True)
-#         return Response(serializer.data)
 
-#     elif request.method == 'POST':
-#         serializer = PaymentSerializer(data=request.data)
-#         if serializer.is_valid():
-#             serializer.save()
-#             return Response(serializer.data, status=status.HTTP_201_CREATED)
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-# @api_view(['GET', 'PUT', 'DELETE'])
-# def payment_detail(request, pk):
-#     try:
-#         payment = Payment.objects.get(pk=pk)
-#     except Payment.DoesNotExist:
-#         return Response(status=status.HTTP_404_NOT_FOUND)
-
-#     if request.method == 'GET':
-#         serializer = PaymentSerializer(payment)
-#         return Response(serializer.data)
-
-#     elif request.method == 'PUT':
-#         serializer = PaymentSerializer(payment, data=request.data)
-#         if serializer.is_valid():
-#             serializer.save()
-#             return Response(serializer.data)
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-#     elif request.method == 'DELETE':
-#         payment.delete()
-#         return Response(status=status.HTTP_204_NO_CONTENT)  
-
-# @api_view(['POST'])
-# def payment_create(request):
-#     serializer = PaymentSerializer(data=request.data)
-#     if serializer.is_valid():
-#         serializer.save()
-#         return Response(serializer.data, status=status.HTTP_201_CREATED)
-#     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-# @api_view(['PUT'])
-# def payment_update(request, pk):
-#     try:
-#         payment = Payment.objects.get(pk=pk)
-#     except Payment.DoesNotExist:
-#         return Response(status=status.HTTP_404_NOT_FOUND)
-    
-#     serializer = PaymentSerializer(payment, data=request.data)
-#     if serializer.is_valid():
-#         serializer.save()
-#         return Response(serializer.data)
-#     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-# @api_view(['DELETE'])
-# def payment_delete(request, pk):
-#     try:
-#         payment = Payment.objects.get(pk=pk)
-#     except Payment.DoesNotExist:
-#         return Response(status=status.HTTP_404_NOT_FOUND)
-    
-#     payment.delete()
-#     return Response(status=status.HTTP_204_NO_CONTENT)     
 
 
 from rest_framework import status
@@ -561,6 +548,8 @@ def create_order_items(order, cart_id):
 
     # Clear cart items after order items are created
     cart_items.delete()
+
+    
 # @api_view(['GET', 'POST'])
 # def address_list(request):
 #     if request.method == 'GET':

@@ -1,0 +1,79 @@
+.waste-category-form {
+     /* Standard width for the form */
+    margin-top: 100px; /* Center the form on the page */
+    padding: 20px;
+    width :600px;
+    height: 300px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    background-color: #ffffff; /* White background for a clean look */
+    font-family: Arial, sans-serif; /* Standard font */
+}
+
+.form-title {
+    margin-bottom: 25px; /* More space below the title */
+    font-size: 1.5em;
+    color: #333;
+    text-align: center;
+    background-color: #007bff; /* Background color for title */
+    color: white; /* White text for the title */
+    padding: 10px; /* Padding for title background */
+    border-radius: 4px; /* Rounded edges for title */
+}
+
+.form-label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #555;
+}
+
+.form-input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    font-size: 1em;
+    transition: border-color 0.3s;
+}
+
+.form-input:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+.form-button-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    margin-top: 20px; /* Space above the button container */
+}
+.form-save-btn,
+.form-cancel-btn {
+    padding: 10px 15px;
+    font-size: 1em;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 4;
+}
+
+
+.form-save-btn {
+    background-color: #28a745;
+    color: white;
+}
+
+.form-save-btn:hover {
+    background-color: #218838;
+}
+
+.form-cancel-btn {
+    background-color: #dc3545;
+    color: white;
+}
+
+.form-cancel-btn:hover {
+    background-color: #c82333;
+}

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import './wasteCollection.css';
 
 const WasteCollectionRequest = () => {
     const [formData, setFormData] = useState({
@@ -105,15 +106,74 @@ const WasteCollectionRequest = () => {
     };
 
     return (
-        <div>
+        // <div>
+        //     <h2>Request Waste Collection</h2>
+        //     <form onSubmit={handleSubmit}>
+        //         <div>
+        //             <label htmlFor="waste_category">Waste Category</label>
+        //             <select
+        //                 name="waste_category"
+        //                 value={formData.waste_category}
+        //                 onChange={handleChange}
+        //             >
+        //                 <option value="">Select a category</option>
+        //                 {wasteCategories.map(category => (
+        //                     <option key={category.id} value={category.id}>
+        //                         {category.name}
+        //                     </option>
+        //                 ))}
+        //             </select>
+        //         </div>
+
+        //         <div>
+        //             <label htmlFor="waste_subcategory">Waste Subcategory</label>
+        //             <select
+        //                 name="waste_subcategory"
+        //                 value={formData.waste_subcategory}
+        //                 onChange={handleChange}
+        //                 disabled={!formData.waste_category} // Disable if no category is selected
+        //             >
+        //                 <option value="">Select a subcategory</option>
+        //                 {wasteSubcategories.map(subcategory => (
+        //                     <option key={subcategory.id} value={subcategory.id}>
+        //                         {subcategory.name}
+        //                     </option>
+        //                 ))}
+        //             </select>
+        //         </div>
+
+        //         <div>
+        //             <label htmlFor="location">Location</label>
+        //             <select
+        //                 name="location"
+        //                 value={formData.location}
+        //                 onChange={handleChange}
+        //             >
+        //                 <option value="">Select a location</option>
+        //                 {locations.map(location => (
+        //                     <option key={location.id} value={location.id}>
+        //                         {location.name}
+        //                     </option>
+        //                 ))}
+        //             </select>
+        //         </div>
+
+        //         <button type="submit">Submit Request</button>
+        //     </form>
+
+        //     {error && <p style={{ color: 'red' }}>{error}</p>}
+        //     {success && <p style={{ color: 'green' }}>{success}</p>}
+        // </div>
+        <div className="waste-collection-container">
             <h2>Request Waste Collection</h2>
-            <form onSubmit={handleSubmit}>
-                <div>
+            <form className="waste-collection-form" onSubmit={handleSubmit}>
+                <div className="form-group">
                     <label htmlFor="waste_category">Waste Category</label>
                     <select
                         name="waste_category"
                         value={formData.waste_category}
                         onChange={handleChange}
+                        className="form-control"
                     >
                         <option value="">Select a category</option>
                         {wasteCategories.map(category => (
@@ -124,13 +184,14 @@ const WasteCollectionRequest = () => {
                     </select>
                 </div>
 
-                <div>
+                <div className="form-group">
                     <label htmlFor="waste_subcategory">Waste Subcategory</label>
                     <select
                         name="waste_subcategory"
                         value={formData.waste_subcategory}
                         onChange={handleChange}
-                        disabled={!formData.waste_category} // Disable if no category is selected
+                        className="form-control"
+                        disabled={!formData.waste_category}
                     >
                         <option value="">Select a subcategory</option>
                         {wasteSubcategories.map(subcategory => (
@@ -141,12 +202,13 @@ const WasteCollectionRequest = () => {
                     </select>
                 </div>
 
-                <div>
+                <div className="form-group">
                     <label htmlFor="location">Location</label>
                     <select
                         name="location"
                         value={formData.location}
                         onChange={handleChange}
+                        className="form-control"
                     >
                         <option value="">Select a location</option>
                         {locations.map(location => (
@@ -157,11 +219,11 @@ const WasteCollectionRequest = () => {
                     </select>
                 </div>
 
-                <button type="submit">Submit Request</button>
+                <button type="submit" className="submit-btn">Submit Request</button>
             </form>
 
-            {error && <p style={{ color: 'red' }}>{error}</p>}
-            {success && <p style={{ color: 'green' }}>{success}</p>}
+            {error && <p className="error-message">{error}</p>}
+            {success && <p className="success-message">{success}</p>}
         </div>
     );
 };

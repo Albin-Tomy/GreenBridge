@@ -2,7 +2,7 @@ const config = {
     registrationApi: process.env.REACT_APP_REGISTER_API ,
     loginApi: process.env.REACT_APP_LOGIN_API ,
     passwordResetApi:process.env.REACT_APP_FORGET_PASSWORD_API,
-    // googleAuthLoginApi: process.env.REACT_APP_GOOGLE_AUTH_API ,
+    googleAuthLoginApi: process.env.REACT_APP_GOOGLE_AUTH_API ,
     getProductApi: process.env.REACT_APP_GET_PRODUCT_API ,
     createProductApi: process.env.REACT_APP_ADD_PRODUCT_API ,
     deleteProductApi: process.env.REACT_APP_DELETE_PRODUCT_API ,
@@ -20,7 +20,7 @@ const config = {
     deleteCountryApi:process.env.REACT_APP_DELETE_COUNTRIES_API,
     deleteBrandApi:process.env.REACT_APP_DELETE_BRANDS_API,
 
-    googleAuthLoginApi: 'http://localhost:8000/api/v1/auth/google-signin/'
+    // googleAuthLoginApi: 'http://localhost:8000/api/v1/auth/google-signin/'
 
   };
    

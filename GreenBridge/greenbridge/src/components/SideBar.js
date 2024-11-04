@@ -1,116 +1,154 @@
+// import React, { useState, useEffect } from 'react';
+// import { FaHome, FaCog, FaUser, FaEnvelope } from 'react-icons/fa';
+// import './Sidebar.css'; // Place the CSS code in a separate file to reuse the same styles
 
-import React, { useState } from "react";
-import "./sidebar.css";
-import { RiArrowRightSFill, RiArrowDownSFill } from "react-icons/ri";
+// const Sidebar = () => {
+//   const [isSidebarLocked, setIsSidebarLocked] = useState(false);
+//   const [sidebarPosition, setSidebarPosition] = useState('-200px');
 
-function Sidebar({ setSelectedMenu }) {
-  const [selectedMenu, setActiveMenu] = useState("");
-  const [showProductSubmenu, setShowProductSubmenu] = useState(true);
-  const [showOrderSubmenu, setShowOrderSubmenu] = useState(false);
-  const [showStaffSubmenu, setShowStaffSubmenu] = useState(false);
-  const [showUserSubmenu, setShowUserSubmenu] = useState(false);
+//   useEffect(() => {
+//     // Event listener to show sidebar when the mouse is near the left edge
+//     const handleMouseMove = (event) => {
+//       if (event.clientX <= 20 && !isSidebarLocked) {
+//         setSidebarPosition('0');
+//       } else if (!isSidebarLocked) {
+//         setSidebarPosition('-200px');
+//       }
+//     };
 
-  const handleMenuClick = (menu) => {
-    setActiveMenu(menu);
-    setSelectedMenu(menu);
+//     document.addEventListener('mousemove', handleMouseMove);
+
+//     return () => {
+//       document.removeEventListener('mousemove', handleMouseMove);
+//     };
+//   }, [isSidebarLocked]);
+
+//   // Lock sidebar visibility on mouse enter and unlock on mouse leave
+//   const handleMouseEnter = () => {
+//     setIsSidebarLocked(true);
+//     setSidebarPosition('0');
+//   };
+
+//   const handleMouseLeave = () => {
+//     setIsSidebarLocked(false);
+//     setSidebarPosition('-200px');
+//   };
+
+//   return (
+//     <div>
+//       {/* Sidebar */}
+//       <div
+//         className="sidebar"
+//         style={{ left: sidebarPosition }}
+//         onMouseEnter={handleMouseEnter}
+//         onMouseLeave={handleMouseLeave}
+//       >
+//         <a href="#home">
+//           <div className="icon-container"><FaHome /></div>
+//           <span>Home</span>
+//         </a>
+//         <a href="#services">
+//           <div className="icon-container"><FaCog /></div>
+//           <span>Services</span>
+//         </a>
+//         <a href="#about">
+//           <div className="icon-container"><FaUser /></div>
+//           <span>About</span>
+//         </a>
+//         <a href="#contact">
+//           <div className="icon-container"><FaEnvelope /></div>
+//           <span>Contact</span>
+//         </a>
+//       </div>
+
+//       {/* Content */}
+//       <div style={{ marginLeft: '20px', padding: '20px' }}>
+//         <h1>Move your mouse to the left edge to see the sidebar!</h1>
+//         <p>This floating sidebar shows only icons when the cursor hovers near the left edge. The icons become circular on hover, and text labels appear when the sidebar is fully visible.</p>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default Sidebar;
+import React, { useState, useEffect } from 'react';
+import { FaHome, FaCog, FaUser, FaEnvelope, FaClipboardList, FaRecycle, FaUsers } from 'react-icons/fa';
+import './Sidebar.css'; // Place the CSS code in a separate file to reuse the same styles
+
+const Sidebar = () => {
+  const [isSidebarLocked, setIsSidebarLocked] = useState(false);
+  const [sidebarPosition, setSidebarPosition] = useState('-200px');
+
+  useEffect(() => {
+    // Event listener to show sidebar when the mouse is near the left edge
+    const handleMouseMove = (event) => {
+      if (event.clientX <= 20 && !isSidebarLocked) {
+        setSidebarPosition('0');
+      } else if (!isSidebarLocked) {
+        setSidebarPosition('-200px');
+      }
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+    };
+  }, [isSidebarLocked]);
+
+  // Lock sidebar visibility on mouse enter and unlock on mouse leave
+  const handleMouseEnter = () => {
+    setIsSidebarLocked(true);
+    setSidebarPosition('0');
+  };
+
+  const handleMouseLeave = () => {
+    setIsSidebarLocked(false);
+    setSidebarPosition('-200px');
   };
 
   return (
-    <div className="sidebar-container">
-      <div className="title">
-        <span style={{ color: "green" }}>W</span>ineHaus
-      </div>
-      <div className="sidebar-menus">
-        {/* Products */}
-        <div className="menu-title" onClick={() => setShowProductSubmenu((prev) => !prev)}>
-          <span>Products</span>
-          {showProductSubmenu ? <RiArrowDownSFill className="menu-icon" /> : <RiArrowRightSFill />}
-        </div>
-        {showProductSubmenu && (
-          <>
-            <div
-              className={`menu-item ${selectedMenu === "allProducts" ? "active" : ""}`}
-              onClick={() => handleMenuClick("allProducts")}
-            >
-              All Products
-            </div>
-            <div
-              className={`menu-item ${selectedMenu === "brands" ? "active" : ""}`}
-              onClick={() => handleMenuClick("brands")}
-            >
-              Brands
-            </div>
-            <div
-              className={`menu-item ${selectedMenu === "categories" ? "active" : ""}`}
-              onClick={() => handleMenuClick("categories")}
-            >
-              Categories
-            </div>
-            <div
-              className={`menu-item ${selectedMenu === "countries" ? "active" : ""}`}
-              onClick={() => handleMenuClick("countries")}
-            >
-              Countries
-            </div>
-            <div
-              className={`menu-item ${selectedMenu === "madeOf" ? "active" : ""}`}
-              onClick={() => handleMenuClick("madeOf")}
-            >
-              Made of
-            </div>
-          </>
-        )}
-
-        {/* Orders */}
-        <div className="menu-title" onClick={() => setShowOrderSubmenu((prev) => !prev)}>
+    <div>
+      {/* Sidebar */}
+      <div
+        className="sidebar"
+        style={{ left: sidebarPosition }}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+      >
+        <a href="#home">
+          <div className="icon-container"><FaHome /></div>
+          <span>Home</span>
+        </a>
+        <a href="#services">
+          <div className="icon-container"><FaCog /></div>
+          <span>Services</span>
+        </a>
+        <a href="#about">
+          <div className="icon-container"><FaUser /></div>
+          <span>About</span>
+        </a>
+        <a href="#contact">
+          <div className="icon-container"><FaEnvelope /></div>
+          <span>Contact</span>
+        </a>
+        <a href="#staff">
+          <div className="icon-container"><FaUsers /></div>
+          <span>Staff</span>
+        </a>
+        <a href="#orders">
+          <div className="icon-container"><FaClipboardList /></div>
           <span>Orders</span>
-          {showOrderSubmenu ? <RiArrowDownSFill className="menu-icon" /> : <RiArrowRightSFill />}
-        </div>
-        {showOrderSubmenu && (
-          <>
-            <div
-              className={`menu-item ${selectedMenu === "allOrders" ? "active" : ""}`}
-              onClick={() => handleMenuClick("allOrders")}
-            >
-              All Orders
-            </div>
-          </>
-        )}
-
-        {/* Staffs */}
-        <div className="menu-title" onClick={() => setShowStaffSubmenu((prev) => !prev)}>
-          <span>Staffs</span>
-          {showStaffSubmenu ? <RiArrowDownSFill className="menu-icon" /> : <RiArrowRightSFill />}
-        </div>
-        {showStaffSubmenu && (
-          <>
-            <div
-              className={`menu-item ${selectedMenu === "allStaffs" ? "active" : ""}`}
-              onClick={() => handleMenuClick("allStaffs")}
-            >
-              All Staffs
-            </div>
-          </>
-        )}
-
-        {/* Users */}
-        <div className="menu-title" onClick={() => setShowUserSubmenu((prev) => !prev)}>
-          <span>Users</span>
-          {showUserSubmenu ? <RiArrowDownSFill className="menu-icon" /> : <RiArrowRightSFill />}
-        </div>
-        {showUserSubmenu && (
-          <>
-            <div
-              className={`menu-item ${selectedMenu === "allUsers" ? "active" : ""}`}
-              onClick={() => handleMenuClick("allUsers")}
-            >
-              All Users
-            </div>
-          </>
-        )}
+        </a>
+        <a href="#waste">
+          <div className="icon-container"><FaRecycle /></div>
+          <span>Waste</span>
+        </a>
       </div>
+
+      {/* Content */}
     </div>
   );
-}
+};
 
 export default Sidebar;
