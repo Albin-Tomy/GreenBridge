@@ -207,9 +207,9 @@ const Header = () => {
         <ul>
           <li><a href="/" onClick={toggleMobileMenu}>Home</a></li>
           <li><a href="/products" onClick={toggleMobileMenu}>Products</a></li>
-          <li><a href="/about" onClick={toggleMobileMenu}>About</a></li>
-          <li><a href="/services" onClick={toggleMobileMenu}>Services</a></li>
-          <li><a href="/contact" onClick={toggleMobileMenu}>Contact</a></li>
+          <li><a href="/profile" onClick={toggleMobileMenu}>User Profile</a></li>
+          <li><a href="/request" onClick={toggleMobileMenu}>Waste collection Services</a></li>
+          <li><a href="/userview" onClick={toggleMobileMenu}>View Request </a></li>
         </ul>
       </nav>
       </header>

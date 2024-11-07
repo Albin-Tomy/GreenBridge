@@ -33,7 +33,7 @@ const LandingPage = () => {
         <div className="hero-content">
           <h2>Empowering Self Help Groups for a Better Future</h2>
           <p>Together, we enable communities to thrive by providing tools, resources, and opportunities to SHGs. Explore our services and join the movement.</p>
-          <button onClick={goToProducts} >
+          <button onClick={goToProducts}  id ="explorenow">
                 <span className="contact-btns">Explore Now</span>
               </button>
         </div>

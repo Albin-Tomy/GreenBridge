@@ -201,7 +201,7 @@ const ProductDetail = () => {
                   <ul>
                     <li>Category: {categories[product.category]}</li>
                     <li>Material: {materials[product.made_of]}</li>
-                    <li>Stock Quantity: {product.stock_quantity}</li>
+                    
                   </ul>
                 </div>
                 {(!product.is_active || product.stock_quantity === 0) && (

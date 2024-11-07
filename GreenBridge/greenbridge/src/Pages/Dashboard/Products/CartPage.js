@@ -96,7 +96,7 @@ const CartPage = () => {
                   <div className="item-details">
                     <h4 className="item-name">{item.product.name}</h4>
                     <p className="item-price">Price: <span className="price-amount">₹ {item.product.price}</span></p>
-                    <p className="item-stock">Stock Quantity: {item.product.stock_quantity}</p> {/* Display stock quantity */}
+                   {/* Display stock quantity */}
                     <div className="quantity-control">
                       <button
                         className="qty-btn"

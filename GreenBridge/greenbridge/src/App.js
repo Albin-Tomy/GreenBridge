@@ -41,6 +41,7 @@ import Shgwaste from './Pages/Dashboard/Shg/ShgWaste';
 
 import UserOrders from './Pages/Dashboard/Products/UserOrders';
 import Sidebar from './components/SideBar';
+import UserRequestView from './Pages/Dashboard/User/UserRequest';
 
 function App() {
   return (
@@ -83,6 +84,8 @@ function App() {
         <Route path="/userorder" element={<UserOrders />} />
 
         <Route path="/sidebar" element={<Sidebar />} />
+
+        <Route path="/userview" element={<UserRequestView />} />
 
         <Route path="/allsh" element={<AllSh />} />
         <Route path="/pendingshg" element={<PendingShg />} />

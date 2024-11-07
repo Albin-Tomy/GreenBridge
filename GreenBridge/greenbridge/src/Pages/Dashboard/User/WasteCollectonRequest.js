@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './wasteCollection.css';
+import Header from '../../../components/Header';
 
 const WasteCollectionRequest = () => {
     const [formData, setFormData] = useState({
@@ -164,6 +165,8 @@ const WasteCollectionRequest = () => {
         //     {error && <p style={{ color: 'red' }}>{error}</p>}
         //     {success && <p style={{ color: 'green' }}>{success}</p>}
         // </div>
+        <div>
+            <Header/>
         <div className="waste-collection-container">
             <h2>Request Waste Collection</h2>
             <form className="waste-collection-form" onSubmit={handleSubmit}>
@@ -224,6 +227,7 @@ const WasteCollectionRequest = () => {
 
             {error && <p className="error-message">{error}</p>}
             {success && <p className="success-message">{success}</p>}
+        </div>
         </div>
     );
 };

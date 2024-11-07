@@ -1,0 +1,105 @@
+.user-container {
+    margin: 100px auto;
+    max-width: 1000px; /* Increased width */
+    background-color: #ffffff;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+}
+
+.user-heading {
+    font-size: 28px;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 30px;
+    color: #333333;
+}
+
+.user-error,
+.user-success {
+    text-align: center;
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 20px;
+    padding: 10px;
+    border-radius: 5px;
+    max-width: 600px;
+    margin: 0 auto 20px;
+}
+
+.user-error {
+    color: #d9534f; /* Red for errors */
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+}
+
+.user-success {
+    color: #28a745; /* Green for success */
+    background-color: #d4edda;
+    border: 1px solid #c3e6cb;
+}
+
+.user-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.user-table th, 
+.user-table td {
+    padding: 15px 20px;
+    text-align: left;
+    border-bottom: 1px solid #e0e0e0;
+    font-size: 16px;
+    color: #555555;
+}
+
+.user-table th {
+    background-color: #f9f9f9;
+    color: #333333;
+    font-weight: 600;
+}
+
+.user-table tr:hover {
+    background-color: #f5f5f5;
+}
+
+.user-button {
+    padding: 10px 20px;
+    font-size: 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.user-complete {
+    background-color: #28a745; /* Green for completion */
+    color: #ffffff;
+}
+
+.user-complete:hover {
+    background-color: #218838;
+    transform: scale(1.05); /* Slight scaling effect on hover */
+}
+
+.user-complete:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+    .user-container {
+        padding: 20px;
+    }
+
+    .user-table th, 
+    .user-table td {
+        padding: 10px;
+        font-size: 14px;
+    }
+
+    .user-heading {
+        font-size: 24px;
+    }
+}
