@@ -1,0 +1,30 @@
+{
+  "files": {
+    "main.css": "/static/css/main.d2f92db8.css",
+    "main.js": "/static/js/main.5f774a39.js",
+    "static/js/239.41e5bad8.chunk.js": "/static/js/239.41e5bad8.chunk.js",
+    "static/js/213.ed2c0fa4.chunk.js": "/static/js/213.ed2c0fa4.chunk.js",
+    "static/js/553.58dfe16b.chunk.js": "/static/js/553.58dfe16b.chunk.js",
+    "static/js/453.81b0b88f.chunk.js": "/static/js/453.81b0b88f.chunk.js",
+    "static/media/hanticraft.jpeg": "/static/media/hanticraft.1bfb616ffb8f676e4a16.jpeg",
+    "static/media/shg.png": "/static/media/shg.3e94d0361bdcf8f476a6.png",
+    "static/media/furniture.jpg": "/static/media/furniture.9d18b832ac80b69a8b0c.jpg",
+    "static/media/logo.png": "/static/media/logo.9bb16d9ecedd4a9c7430.png",
+    "static/media/utensils.jpeg": "/static/media/utensils.26210f88d06ff868480c.jpeg",
+    "static/media/trees.jpg": "/static/media/trees.c20a9a993f18d3d77298.jpg",
+    "static/media/nature.jpg": "/static/media/nature.43cbc921c8d9dfabd7da.jpg",
+    "static/media/honey.jpg": "/static/media/honey.2aa1459e7924b00741d4.jpg",
+    "static/media/shgtraining.jpeg": "/static/media/shgtraining.0c38a45bb19a1530372f.jpeg",
+    "index.html": "/index.html",
+    "main.d2f92db8.css.map": "/static/css/main.d2f92db8.css.map",
+    "main.5f774a39.js.map": "/static/js/main.5f774a39.js.map",
+    "239.41e5bad8.chunk.js.map": "/static/js/239.41e5bad8.chunk.js.map",
+    "213.ed2c0fa4.chunk.js.map": "/static/js/213.ed2c0fa4.chunk.js.map",
+    "553.58dfe16b.chunk.js.map": "/static/js/553.58dfe16b.chunk.js.map",
+    "453.81b0b88f.chunk.js.map": "/static/js/453.81b0b88f.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.d2f92db8.css",
+    "static/js/main.5f774a39.js"
+  ]
+}
