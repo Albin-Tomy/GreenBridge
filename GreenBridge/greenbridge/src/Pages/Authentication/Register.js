@@ -52,7 +52,7 @@ const Register = ({ setIslogin }) => {
     }
 
     try {
-      const response = await axios.post('http://localhost:8000/api/v1/auth/register/', {
+      const response = await axios.post('https://albintomy.pythonanywhere.com/api/v1/auth/register/', {
         email,
         password,
       });

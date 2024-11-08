@@ -275,7 +275,7 @@ function Admin() {
       setForm(<AddStaffForm onCancel={handleCloseForm}/>)
 
       axios
-        .get('http://localhost:8000/api/v1/staffs/list/')
+        .get('https://albintomy.pythonanywhere.com/api/v1/staffs/list/')
         .then((response) => {
           console.log("staffs",response.data);
           const transformedStaffData = transformStaffData(response.data)
@@ -294,7 +294,7 @@ function Admin() {
       setParentMenu("Users");
       setAddButtonLabel("Add User");
       axios
-        .get('http://localhost:8000/api/v1/auth/users/')
+        .get('https://albintomy.pythonanywhere.com/api/v1/auth/users/')
         .then((response) => {
           console.log("users",response.data);
           const transformedUserData = transformUserData(response.data)
@@ -633,7 +633,7 @@ function Admin() {
   const handleDisableProduct = (id)=>{
     console.log("Disable product id",id)
 
-    axios.post(`http://localhost:8000/api/v1/products/disable-or-enable/${id}/`)
+    axios.post(`https://albintomy.pythonanywhere.com/api/v1/products/disable-or-enable/${id}/`)
     .then((response)=>{
       console.log("response-dis",response)
       window.location.reload()
@@ -730,7 +730,7 @@ function Admin() {
 
   const   confirmDeleteOrder = () => {
     axios
-      .delete(`http://localhost:8000/api/v1/orders/delete/${selectedId}/`)
+      .delete(`https://albintomy.pythonanywhere.com/api/v1/orders/delete/${selectedId}/`)
       .then((response) => {
         console.log("delete res", response);
         setOpen(false);
@@ -747,7 +747,7 @@ function Admin() {
 
   const   confirmDeletStaff = () => {
     axios
-      .delete(`http://localhost:8000/api/v1/staffs/delete/${selectedId}/`)
+      .delete(`https://albintomy.pythonanywhere.com/api/v1/staffs/delete/${selectedId}/`)
       .then((response) => {
         console.log("delete res", response);
         setOpen(false);
@@ -765,7 +765,7 @@ function Admin() {
 
   const confirmDeleteUser = () => {
     axios
-      .delete(`http://localhost:8000/api/v1/auth/users/${selectedId}/delete/`)
+      .delete(`https://albintomy.pythonanywhere.com/api/v1/auth/users/${selectedId}/delete/`)
       .then((response) => {
         console.log("delete res", response);
         setOpen(false);

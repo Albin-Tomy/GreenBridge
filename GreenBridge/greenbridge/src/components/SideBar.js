@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FaHome, FaCog, FaUser, FaEnvelope, FaClipboardList, FaRecycle, FaUsers } from 'react-icons/fa';
-// import './Sidebar.css'; // Place the CSS code in a separate file to reuse the same styles
+import './Sidebar.css'; // Place the CSS code in a separate file to reuse the same styles
 
 const Sidebar = () => {
   const [isSidebarLocked, setIsSidebarLocked] = useState(false);

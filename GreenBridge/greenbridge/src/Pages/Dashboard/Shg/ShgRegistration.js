@@ -66,7 +66,7 @@ const ShgRegistration = () => {
         }
 
         try {
-            const response = await axios.post('http://localhost:8000/api/shg/register/', formData);
+            const response = await axios.post('https://albintomy.pythonanywhere.com/api/shg/register/', formData);
             setMessage(response.data.message);
             setError(null);
             // Clear form fields after successful registration
