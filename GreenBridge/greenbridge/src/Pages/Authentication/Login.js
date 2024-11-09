@@ -48,7 +48,7 @@ const Login = ({ setIslogin }) => {
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post('https://green-bridge-backend.onrender.com/api/v1/auth/login/', {
+      const response = await axios.post('https://green-bridge.onrender.com/api/v1/auth/login/', {
         email,
         password,
       });
@@ -101,7 +101,7 @@ const Login = ({ setIslogin }) => {
     const formData = new FormData();
     formData.append("email", email);
 
-    axios.post('https://green-bridge-backend.onrender.com/api/v1/auth/password-reset/', formData)
+    axios.post('https://green-bridge.onrender.com/api/v1/auth/password-reset/', formData)
       .then((response) => {
         if (response.status === 200) {
           alert('Reset password link sent to your email');

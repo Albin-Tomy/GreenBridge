@@ -24,7 +24,7 @@ const PendingRequestsPage = () => {
           return;
         }
 
-        const response = await axios.get('https://green-bridge-backend.onrender.com/api/shg/pending/');
+        const response = await axios.get('https://green-bridge.onrender.com/api/shg/pending/');
 
         if (response.data) {
           console.log("Fetched Pending Requests:", response.data);  // Debugging line
@@ -48,7 +48,7 @@ const PendingRequestsPage = () => {
         return;
       }
 
-      const response = await axios.post('https://green-bridge-backend.onrender.com/api/shg/approve/', 
+      const response = await axios.post('https://green-bridge.onrender.com/api/shg/approve/', 
         { shg_email: email, action }
       );
 

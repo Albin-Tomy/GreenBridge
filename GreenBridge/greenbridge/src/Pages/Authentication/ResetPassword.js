@@ -19,7 +19,7 @@ const ResetPassword = () => {
     }
 
     try {
-      const response = await axios.post(`https://green-bridge-backend.onrender.com/api/v1/auth/password-reset-confirm/${uidb64}/${token}/`, {
+      const response = await axios.post(`https://green-bridge.onrender.com/api/v1/auth/password-reset-confirm/${uidb64}/${token}/`, {
         new_password: newPassword,
         confirm_password: confirmPassword
       });

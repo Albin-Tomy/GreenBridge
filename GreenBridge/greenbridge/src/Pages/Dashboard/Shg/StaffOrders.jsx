@@ -155,7 +155,7 @@ function Admin() {
 
   const confirmDeleteOrder = () => {
     axios
-      .delete(`https://green-bridge-backend.onrender.com/api/v1/orders/delete/${selectedId}/`)
+      .delete(`https://green-bridge.onrender.com/api/v1/orders/delete/${selectedId}/`)
       .then((response) => {
         setOpen(false);
         setRows((prevRows) => prevRows.filter((row) => row.id !== selectedId));
