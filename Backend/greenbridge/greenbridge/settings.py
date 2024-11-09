@@ -30,7 +30,7 @@ SECRET_KEY = 'django-insecure-eeap$8gx1=wu_isec2$-jy@%vtdo1f_(+f%yv%3u_a1^qeek5%
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['https://greenbridge-7yhr.onrender.com']
+ALLOWED_HOSTS = ['greenbridge-7yhr.onrender.com']
 
 
 
@@ -163,6 +163,7 @@ WSGI_APPLICATION = 'greenbridge.wsgi.application'
 
 import os
 import dj_database_url
+load_dotenv() 
 
 DATABASES = {
     'default': dj_database_url.config(
