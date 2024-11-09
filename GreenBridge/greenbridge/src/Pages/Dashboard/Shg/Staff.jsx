@@ -189,7 +189,7 @@ function Admin() {
       setForm(<AddStaffForm onCancel={handleCloseForm}/>)
 
       axios
-        .get('https://albintomy.pythonanywhere.com/api/v1/staffs/list/')
+        .get('http://localhost:8000/api/v1/staffs/list/')
         .then((response) => {
           console.log("staffs",response.data);
           const transformedStaffData = transformStaffData(response.data)
@@ -208,7 +208,7 @@ function Admin() {
       setParentMenu("Users");
       setAddButtonLabel("Add User");
       axios
-        .get('https://albintomy.pythonanywhere.com/api/v1/auth/users/')
+        .get('http://localhost:8000/api/v1/auth/users/')
         .then((response) => {
           console.log("users",response.data);
           const transformedUserData = transformUserData(response.data)
@@ -385,7 +385,7 @@ function Admin() {
 
   const   confirmDeleteOrder = () => {
     axios
-      .delete(`https://albintomy.pythonanywhere.com/api/v1/orders/delete/${selectedId}/`)
+      .delete(`http://localhost:8000/api/v1/orders/delete/${selectedId}/`)
       .then((response) => {
         console.log("delete res", response);
         setOpen(false);
@@ -402,7 +402,7 @@ function Admin() {
 
   const   confirmDeletStaff = () => {
     axios
-      .delete(`https://albintomy.pythonanywhere.com/api/v1/staffs/delete/${selectedId}/`)
+      .delete(`http://localhost:8000/api/v1/staffs/delete/${selectedId}/`)
       .then((response) => {
         console.log("delete res", response);
         setOpen(false);

@@ -30,7 +30,7 @@ SECRET_KEY = 'django-insecure-eeap$8gx1=wu_isec2$-jy@%vtdo1f_(+f%yv%3u_a1^qeek5%
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['https://greenbridge-7yhr.onrender.com']
 
 
 
@@ -92,6 +92,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     
 ]
 
@@ -108,7 +109,7 @@ REST_FRAMEWORK = {
 
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
+    "https://greenbridge-7yhr.onrender.com",
     "http://127.0.0.1:3000" # Your React frontend URL
 ]
 
@@ -160,27 +161,26 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'greenbridge.wsgi.application'
 
-
-# Database
-# https://docs.djangoproject.com/en/4.1/ref/settings/#databases
-
-# DATABASES = {
-#        'default': {
-#            'ENGINE': 'djongo',
-#            'NAME': 'greenbridge',
-#        }
-#    }
+import os
+import dj_database_url
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'greenbridge',
-        'USER': 'postgres',
-        'PASSWORD': 'password',
-        'HOST': 'localhost',  # Or your database host
-        'PORT': '5432',       # Default PostgreSQL port
-    }
+    'default': dj_database_url.config(
+        default=os.getenv('DATABASE_URL')
+    )
 }
+
+
+# DATABASES = { 
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'greenbridge',
+#         'USER': 'postgres',
+#         'PASSWORD': 'password',
+#         'HOST': 'localhost',  # Or your database host
+#         'PORT': '5432',       # Default PostgreSQL port
+#     }
+# }
 
 # DATABASES = {
 #     'default': {
@@ -223,7 +223,12 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
-STATIC_URL = 'static/'
+# STATIC_URL = 'static/'
+
+# Static files (CSS, JavaScript, Images)
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
