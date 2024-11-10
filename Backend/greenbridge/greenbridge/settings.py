@@ -30,7 +30,7 @@ SECRET_KEY = 'django-insecure-eeap$8gx1=wu_isec2$-jy@%vtdo1f_(+f%yv%3u_a1^qeek5%
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['greenbridge-7yhr.onrender.com']
+ALLOWED_HOSTS = ["greenbridge-7yhr.onrender.com"]
 
 
 
@@ -110,7 +110,7 @@ REST_FRAMEWORK = {
 
 CORS_ALLOWED_ORIGINS = [
     "https://greenbridge-7yhr.onrender.com",
-    "http://127.0.0.1:3000" # Your React frontend URL
+    "https://greenbridge-7yhr.onrender.com" # Your React frontend URL
 ]
 
 
