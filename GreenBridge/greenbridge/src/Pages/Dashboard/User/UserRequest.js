@@ -13,7 +13,7 @@
 //     useEffect(() => {
 //         const fetchUserRequests = async () => {
 //             try {
-//                 const response = await axios.get('http://127.0.0.1:8000/api/v1/collection/requests/', {
+//                 const response = await axios.get('https://albintomy.pythonanywhere.com/api/v1/collection/requests/', {
 //                     headers: {
 //                         'Authorization': `Token ${localStorage.getItem('token')}`,
 //                     },
@@ -31,7 +31,7 @@
 
 //     const handleStatusUpdate = async (requestId) => {
 //         try {
-//             await axios.put(`http://127.0.0.1:8000/api/v1/collection/requests/${requestId}/update-status/`, {
+//             await axios.put(`https://albintomy.pythonanywhere.com/api/v1/collection/requests/${requestId}/update-status/`, {
 //                 collection_status: 'Completed',
 //             }, {
 //                 headers: {
@@ -126,15 +126,15 @@ const UserRequestView = () => {
         const fetchData = async () => {
             try {
                 // Fetch user requests
-                const requestsResponse = await axios.get('http://127.0.0.1:8000/api/v1/collection/requests/', {
+                const requestsResponse = await axios.get('https://albintomy.pythonanywhere.com/api/v1/collection/requests/', {
                     headers: { 'Authorization': `Token ${localStorage.getItem('token')}` }
                 });
                 
                 // Fetch categories, subcategories, and locations in parallel
                 const [categoriesRes, subcategoriesRes, locationsRes] = await Promise.all([
-                    axios.get('http://127.0.0.1:8000/api/v1/collection/waste-categories/'),
-                    axios.get('http://127.0.0.1:8000/api/v1/collection/waste-subcategories/'),
-                    axios.get('http://127.0.0.1:8000/api/v1/collection/locations/')
+                    axios.get('https://albintomy.pythonanywhere.com/api/v1/collection/waste-categories/'),
+                    axios.get('https://albintomy.pythonanywhere.com/api/v1/collection/waste-subcategories/'),
+                    axios.get('https://albintomy.pythonanywhere.com/api/v1/collection/locations/')
                 ]);
 
                 // Set requests and map lookups
@@ -154,7 +154,7 @@ const UserRequestView = () => {
 
     const handleStatusUpdate = async (requestId) => {
         try {
-            await axios.put(`http://127.0.0.1:8000/api/v1/collection/requests/${requestId}/update-status/`, {
+            await axios.put(`https://albintomy.pythonanywhere.com/api/v1/collection/requests/${requestId}/update-status/`, {
                 collection_status: 'Completed',
             }, {
                 headers: { 'Authorization': `Token ${localStorage.getItem('token')}` }

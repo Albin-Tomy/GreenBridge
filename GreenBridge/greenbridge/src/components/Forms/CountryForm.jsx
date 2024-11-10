@@ -27,7 +27,7 @@ const AddCountryForm = ({ onCancel, initialCountryData, isEdit }) => {
   const checkCountryExists = async (name) => {
     try {
       // Make an API call to check if the country name already exists
-      const response = await axios.get("http://127.0.0.1:8000/api/v1/products/country-list/");
+      const response = await axios.get("https://albintomy.pythonanywhere.com/api/v1/products/country-list/");
       const existingCountries = response.data.map((country) => country.name.toLowerCase());
       return existingCountries.includes(name.toLowerCase());
     } catch (error) {
@@ -54,10 +54,10 @@ const AddCountryForm = ({ onCancel, initialCountryData, isEdit }) => {
 
     const request = isEdit
       ? axios.put(
-          `http://127.0.0.1:8000/api/v1/products/country-update/${initialCountryData.country_id}/`,
+          `https://albintomy.pythonanywhere.com/api/v1/products/country-update/${initialCountryData.country_id}/`,
           formData
         )
-      : axios.post("http://127.0.0.1:8000/api/v1/products/country-create/", formData);
+      : axios.post("https://albintomy.pythonanywhere.com/api/v1/products/country-create/", formData);
 
     request
       .then((response) => {

@@ -92,7 +92,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
     
 ]
 
@@ -109,7 +108,7 @@ REST_FRAMEWORK = {
 
 
 CORS_ALLOWED_ORIGINS = [
-    "https://greenbridge-7yhr.onrender.com",
+    "http://localhost:3000",
     "http://127.0.0.1:3000" # Your React frontend URL
 ]
 
@@ -161,18 +160,18 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'greenbridge.wsgi.application'
 
-# import os
-# import dj_database_url
-# load_dotenv() 
+
+# Database
+# https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
 # DATABASES = {
-#     'default': dj_database_url.config(
-#         default=os.getenv('DATABASE_URL')
-#     )
-# }
+#        'default': {
+#            'ENGINE': 'djongo',
+#            'NAME': 'greenbridge',
+#        }
+#    }
 
-
-DATABASES = { 
+DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'greenbridge',
@@ -224,12 +223,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
-# STATIC_URL = 'static/'
-
-# Static files (CSS, JavaScript, Images)
-STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-
+STATIC_URL = 'static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field

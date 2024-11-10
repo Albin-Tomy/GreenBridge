@@ -48,7 +48,7 @@
 //   // Fetch functions with additional error handling
 //   const fetchCategories = async () => {
 //     try {
-//       const response = await axios.get(`http://127.0.0.1:8000/api/v1/collection/waste-categories/`);
+//       const response = await axios.get(`https://albintomy.pythonanywhere.com/api/v1/collection/waste-categories/`);
 //       setCategories(response.data || []);  // Default to empty array if data is undefined
 //     } catch (error) {
 //       console.log("Error fetching categories:", error);
@@ -57,7 +57,7 @@
 
 //   const fetchLocations = async () => {
 //     try {
-//       const response = await axios.get(`http://127.0.0.1:8000/api/v1/collection/locations/`);
+//       const response = await axios.get(`https://albintomy.pythonanywhere.com/api/v1/collection/locations/`);
 //       setLocations(response.data || []);  // Default to empty array if data is undefined
 //     } catch (error) {
 //       console.log("Error fetching locations:", error);
@@ -66,7 +66,7 @@
 
 //   const fetchSubcategories = async () => {
 //     try {
-//       const response = await axios.get(`http://127.0.0.1:8000/api/v1/collection/waste-subcategories/`);
+//       const response = await axios.get(`https://albintomy.pythonanywhere.com/api/v1/collection/waste-subcategories/`);
 //       setSubcategories(response.data || []);  // Default to empty array if data is undefined
 //     } catch (error) {
 //       console.log("Error fetching subcategories:", error);
@@ -96,7 +96,7 @@
 
 //   const confirmDelete = () => {
 //     axios
-//       .delete(`http://127.0.0.1:8000/api/v1/collection/${parentMenu.toLowerCase()}/delete/${selectedId}/`)
+//       .delete(`https://albintomy.pythonanywhere.com/api/v1/collection/${parentMenu.toLowerCase()}/delete/${selectedId}/`)
 //       .then(() => {
 //         setOpen(false);
 //         setRows((prevRows) => prevRows.filter((row) => row.id !== selectedId));
@@ -261,7 +261,7 @@
 //   // Fetch Waste Categories
 //   const fetchCategories = async () => {
 //     try {
-//       const response = await axios.get(`http://127.0.0.1:8000/api/v1/collection/waste-categories/`);
+//       const response = await axios.get(`https://albintomy.pythonanywhere.com/api/v1/collection/waste-categories/`);
 //       setCategories(response.data || []);
 //     } catch (error) {
 //       console.log("Error fetching categories:", error);
@@ -355,11 +355,11 @@
 //     try {
 //       if (isFormEdit) {
 //         // Update the existing category
-//         await axios.put(`http://127.0.0.1:8000/api/v1/collection/waste-categories/update/${categoryData.id}/`, categoryData);
+//         await axios.put(`https://albintomy.pythonanywhere.com/api/v1/collection/waste-categories/update/${categoryData.id}/`, categoryData);
 //         alert('Category updated successfully!');
 //       } else {
 //         // Add a new category
-//         await axios.post(`http://127.0.0.1:8000/api/v1/collection/waste-categories/create/`, categoryData);
+//         await axios.post(`https://albintomy.pythonanywhere.com/api/v1/collection/waste-categories/create/`, categoryData);
 //         alert('Category added successfully!');
 //       }
 //       fetchCategories(); // Refresh categories after adding or updating
@@ -376,7 +376,7 @@
 
 //   const confirmDeleteCategory = async () => {
 //     try {
-//       await axios.delete(`http://127.0.0.1:8000/api/v1/collection/waste-categories/${selectedId}/`);
+//       await axios.delete(`https://albintomy.pythonanywhere.com/api/v1/collection/waste-categories/${selectedId}/`);
 //       setRows((prevRows) => prevRows.filter((row) => row.id !== selectedId));
 //       alert("Category deleted successfully!");
 //       setOpen(false);
@@ -474,7 +474,7 @@ function Admin() {
 
   const fetchCategories = async () => {
     try {
-      const response = await axios.get(`http://127.0.0.1:8000/api/v1/collection/waste-categories/`);
+      const response = await axios.get(`https://albintomy.pythonanywhere.com/api/v1/collection/waste-categories/`);
       setCategories(response.data || []);
     } catch (error) {
       console.log("Error fetching categories:", error);
@@ -483,7 +483,7 @@ function Admin() {
 
   const fetchSubCategories = async () => {
     try {
-      const response = await axios.get(`http://127.0.0.1:8000/api/v1/collection/waste-subcategories/`);
+      const response = await axios.get(`https://albintomy.pythonanywhere.com/api/v1/collection/waste-subcategories/`);
       setSubCategories(response.data || []);
     } catch (error) {
       console.log("Error fetching subcategories:", error);
@@ -492,7 +492,7 @@ function Admin() {
 
   const fetchLocations = async () => {
     try {
-      const response = await axios.get(`http://127.0.0.1:8000/api/v1/collection/locations/`);
+      const response = await axios.get(`https://albintomy.pythonanywhere.com/api/v1/collection/locations/`);
       setLocations(response.data || []);
     } catch (error) {
       console.log("Error fetching locations:", error);
@@ -643,7 +643,7 @@ const handleEditSubCategory = (id) => {
 
   const confirmDelete = async () => {
     try {
-      await axios.delete(`http://127.0.0.1:8000/api/v1/collection/${menu.toLowerCase().replace(" ", "-")}/${selectedId}/`);
+      await axios.delete(`https://albintomy.pythonanywhere.com/api/v1/collection/${menu.toLowerCase().replace(" ", "-")}/${selectedId}/`);
       alert("Item deleted successfully!");
       setOpen(false);
       if (menu === "Waste Categories") fetchCategories();
