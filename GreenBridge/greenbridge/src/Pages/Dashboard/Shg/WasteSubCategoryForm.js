@@ -19,7 +19,7 @@ const WasteSubcategory = ({ onCancel, initialSubcategoryData, isEdit, onSave }) 
 
     const fetchSubcategories = async () => {
         try {
-            const response = await axios.get('https://albintomy.pythonanywhere.com/api/v1/collection/waste-subcategories/');
+            const response = await axios.get('http://127.0.0.1:8000/api/v1/collection/waste-subcategories/');
             setSubcategories(response.data);
         } catch (err) {
             console.error('Error fetching subcategories:', err);
@@ -28,7 +28,7 @@ const WasteSubcategory = ({ onCancel, initialSubcategoryData, isEdit, onSave }) 
 
     const fetchCategories = async () => {
         try {
-            const response = await axios.get('https://albintomy.pythonanywhere.com/api/v1/collection/waste-categories/');
+            const response = await axios.get('http://127.0.0.1:8000/api/v1/collection/waste-categories/');
             setCategories(response.data);
         } catch (err) {
             console.error('Error fetching categories:', err);
@@ -47,12 +47,12 @@ const WasteSubcategory = ({ onCancel, initialSubcategoryData, isEdit, onSave }) 
 
         try {
             if (isEdit) {
-                await axios.put(`https://albintomy.pythonanywhere.com/api/v1/collection/waste-subcategories/${formData.id}/`, formData, {
+                await axios.put(`http://127.0.0.1:8000/api/v1/collection/waste-subcategories/${formData.id}/`, formData, {
                     headers: { 'Authorization': `Token ${localStorage.getItem('token')}` },
                 });
                 alert('Subcategory updated successfully!');
             } else {
-                await axios.post('https://albintomy.pythonanywhere.com/api/v1/collection/waste-subcategories/', formData, {
+                await axios.post('http://127.0.0.1:8000/api/v1/collection/waste-subcategories/', formData, {
                     headers: { 'Authorization': `Token ${localStorage.getItem('token')}` },
                 });
                 alert('Subcategory created successfully!');

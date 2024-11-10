@@ -25,7 +25,7 @@ const UserProfile = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const response = await axios.get(`https://albintomy.pythonanywhere.com/api/v1/auth/user_profiles/${userId}/`, {
+        const response = await axios.get(`http://127.0.0.1:8000/api/v1/auth/user_profiles/${userId}/`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -122,7 +122,7 @@ const UserProfile = () => {
     }
 
     try {
-      const response = await axios.put(`https://albintomy.pythonanywhere.com/api/v1/auth/user_profiles/update/${userId}/`, profile, {
+      const response = await axios.put(`http://127.0.0.1:8000/api/v1/auth/user_profiles/update/${userId}/`, profile, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -133,7 +133,7 @@ const UserProfile = () => {
       if (error.response && error.response.status === 404) {
         // Profile does not exist, create a new one
         try {
-          await axios.post(`https://albintomy.pythonanywhere.com/api/v1/auth/user_profiles/`, {
+          await axios.post(`http://127.0.0.1:8000/api/v1/auth/user_profiles/`, {
             user: userId,
             ...profile
           }, {

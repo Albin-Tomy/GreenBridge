@@ -14,7 +14,7 @@ const WasteCategory = () => {
 
     const fetchCategories = async () => {
         try {
-            const response = await axios.get('https://albintomy.pythonanywhere.com/api/v1/collection/waste-categories/');
+            const response = await axios.get('http://127.0.0.1:8000/api/v1/collection/waste-categories/');
             setCategories(response.data);
         } catch (err) {
             console.error('Error fetching categories:', err);
@@ -32,7 +32,7 @@ const WasteCategory = () => {
         setSuccess(null);
 
         try {
-            await axios.post('https://albintomy.pythonanywhere.com/api/v1/collection/waste-categories/', formData, {
+            await axios.post('http://127.0.0.1:8000/api/v1/collection/waste-categories/', formData, {
                 headers: {
                     'Authorization': `Token ${localStorage.getItem('token')}`,
                 },

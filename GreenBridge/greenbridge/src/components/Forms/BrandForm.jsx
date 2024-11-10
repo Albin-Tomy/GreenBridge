@@ -34,7 +34,7 @@ const AddBrandForm = ({onCancel,initialBrandData,isEdit}) => {
       // Update 
       axios
         .put(
-          `https://albintomy.pythonanywhere.com/api/v1/products/brand-update/${initialBrandData.brand_id}/`,
+          `http://127.0.0.1:8000/api/v1/products/brand-update/${initialBrandData.brand_id}/`,
           formData,
           {}
         )
@@ -46,7 +46,7 @@ const AddBrandForm = ({onCancel,initialBrandData,isEdit}) => {
           console.error("Error updating Brand:", error.response.data);
         });
     } else {
-    axios.post("https://albintomy.pythonanywhere.com/api/v1/products/brand-create/",formData)
+    axios.post("http://127.0.0.1:8000/api/v1/products/brand-create/",formData)
     .then((res)=>{
       alert("Brand Added !")
       window.location.reload()
