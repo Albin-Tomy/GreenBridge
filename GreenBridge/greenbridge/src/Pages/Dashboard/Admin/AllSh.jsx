@@ -15,7 +15,7 @@ const AllSHGsPage = () => {
     // Fetch all SHGs when the component mounts
     const fetchAllShgs = async () => {
       try {
-        const response = await axios.get('https://green-bridge.onrender.com/api/shg/all/');
+        const response = await axios.get('https://albintomy.pythonanywhere.com/api/shg/all/');
         // Add a unique id to each SHG if not already present
         const shgsWithId = response.data.map((shg, index) => ({
           ...shg,

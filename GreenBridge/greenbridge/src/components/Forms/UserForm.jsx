@@ -25,7 +25,7 @@ const AddUserForm = ({onCancel}) => {
     Object.keys(userData).forEach((key) => {
       formData.append(key, userData[key]);
     });
-    axios.post("http://127.0.0.1:8000/api/v1/auth/users/",formData)
+    axios.post("https://albintomy.pythonanywhere.com/api/v1/auth/users/",formData)
     .then((res)=>{
       alert("User Added !")
       window.location.reload()

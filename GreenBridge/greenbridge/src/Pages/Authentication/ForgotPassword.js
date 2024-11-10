@@ -11,7 +11,7 @@ const ForgotPassword = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('https://green-bridge.onrender.com/api/v1/auth/password-reset/', { email });
+      const response = await axios.post('https://albintomy.pythonanywhere.com/api/v1/auth/password-reset/', { email });
       setMessage(response.data.message);
       setError('');
     } catch (err) {

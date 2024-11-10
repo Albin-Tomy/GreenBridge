@@ -20,7 +20,7 @@ const config = {
     deleteCountryApi:process.env.REACT_APP_DELETE_COUNTRIES_API,
     deleteBrandApi:process.env.REACT_APP_DELETE_BRANDS_API,
 
-    // googleAuthLoginApi: 'https://green-bridge.onrender.com/api/v1/auth/google-signin/'
+    // googleAuthLoginApi: 'https://albintomy.pythonanywhere.com/api/v1/auth/google-signin/'
 
   };
    

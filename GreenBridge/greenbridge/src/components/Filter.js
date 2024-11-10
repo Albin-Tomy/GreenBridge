@@ -4,7 +4,7 @@ import axios from 'axios';
 import './filter.css';
 
 const Filter = ({ category, setCategory, madeOf, setMadeOf, sortOrder, setSortOrder }) => {
-  const BASE_URL = 'http://127.0.0.1:8000';
+  const BASE_URL = 'https://albintomy.pythonanywhere.com';
   const [categories, setCategories] = useState([]);
   const [madeOfOptions, setMadeOfOptions] = useState([]);
 

@@ -11,7 +11,7 @@
 // //     useEffect(() => {
 // //         const fetchRequests = async () => {
 // //             try {
-// //                 const response = await axios.get('http://127.0.0.1:8000/api/v1/collection/requests/', {
+// //                 const response = await axios.get('https://albintomy.pythonanywhere.com/api/v1/collection/requests/', {
 // //                     headers: {
 // //                         'Authorization': `Token ${localStorage.getItem('token')}`,
 // //                     },
@@ -29,7 +29,7 @@
 
 // //     const handleApprove = async (requestId) => {
 // //         try {
-// //             await axios.put(`http://127.0.0.1:8000/api/v1/collection/requests/${requestId}/approve/`, {
+// //             await axios.put(`https://albintomy.pythonanywhere.com/api/v1/collection/requests/${requestId}/approve/`, {
 // //                 request_status: 'Approved',
 // //             }, {
 // //                 headers: {
@@ -46,7 +46,7 @@
 
 // //     const handleReject = async (requestId) => {
 // //         try {
-// //             await axios.put(`http://127.0.0.1:8000/api/v1/collection/requests/${requestId}/approve/`, {
+// //             await axios.put(`https://albintomy.pythonanywhere.com/api/v1/collection/requests/${requestId}/approve/`, {
 // //                 request_status: 'Rejected',
 // //             }, {
 // //                 headers: {
@@ -64,7 +64,7 @@
 // //     const handleCollectionStatusUpdate = async (requestId, newStatus) => {
 // //         try {
 // //             // Call the correct endpoint to update collection status
-// //             await axios.put(`http://127.0.0.1:8000/api/v1/collection/requests/${requestId}/update-status/`, {
+// //             await axios.put(`https://albintomy.pythonanywhere.com/api/v1/collection/requests/${requestId}/update-status/`, {
 // //                 collection_status: newStatus,
 // //             }, {
 // //                 headers: {
@@ -151,16 +151,16 @@ const SHGRequests = () => {
         const fetchData = async () => {
             try {
                 // Fetch collection requests
-                const requestsResponse = await axios.get('http://127.0.0.1:8000/api/v1/collection/requests/', {
+                const requestsResponse = await axios.get('https://albintomy.pythonanywhere.com/api/v1/collection/requests/', {
                     headers: { 'Authorization': `Token ${localStorage.getItem('token')}` }
                 });
                 setRequests(requestsResponse.data);
 
                 // Fetch categories, subcategories, and locations
                 const [categoriesRes, subcategoriesRes, locationsRes] = await Promise.all([
-                    axios.get('http://127.0.0.1:8000/api/v1/collection/waste-categories/'),
-                    axios.get('http://127.0.0.1:8000/api/v1/collection/waste-subcategories/'),
-                    axios.get('http://127.0.0.1:8000/api/v1/collection/locations/')
+                    axios.get('https://albintomy.pythonanywhere.com/api/v1/collection/waste-categories/'),
+                    axios.get('https://albintomy.pythonanywhere.com/api/v1/collection/waste-subcategories/'),
+                    axios.get('https://albintomy.pythonanywhere.com/api/v1/collection/locations/')
                 ]);
 
                 // Map the fetched data for easy lookup by ID
@@ -187,7 +187,7 @@ const SHGRequests = () => {
 
     const handleApprove = async (requestId) => {
         try {
-            await axios.put(`http://127.0.0.1:8000/api/v1/collection/requests/${requestId}/approve/`, {
+            await axios.put(`https://albintomy.pythonanywhere.com/api/v1/collection/requests/${requestId}/approve/`, {
                 request_status: 'Approved'
             }, {
                 headers: { 'Authorization': `Token ${localStorage.getItem('token')}` }
@@ -201,7 +201,7 @@ const SHGRequests = () => {
 
     const handleReject = async (requestId) => {
         try {
-            await axios.put(`http://127.0.0.1:8000/api/v1/collection/requests/${requestId}/approve/`, {
+            await axios.put(`https://albintomy.pythonanywhere.com/api/v1/collection/requests/${requestId}/approve/`, {
                 request_status: 'Rejected'
             }, {
                 headers: { 'Authorization': `Token ${localStorage.getItem('token')}` }
@@ -215,7 +215,7 @@ const SHGRequests = () => {
 
     const handleCollectionStatusUpdate = async (requestId, newStatus) => {
         try {
-            await axios.put(`http://127.0.0.1:8000/api/v1/collection/requests/${requestId}/update-status/`, {
+            await axios.put(`https://albintomy.pythonanywhere.com/api/v1/collection/requests/${requestId}/update-status/`, {
                 collection_status: newStatus
             }, {
                 headers: { 'Authorization': `Token ${localStorage.getItem('token')}` }
