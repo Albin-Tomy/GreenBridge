@@ -27,7 +27,7 @@ const WasteCategory = ({ onCancel, initialCategoryData, isEdit, onSave }) => {
         try {
             if (isEdit) {
                 // Update existing category
-                await axios.put(`https://albintomy.pythonanywhere.com/api/v1/collection/waste-categories/${formData.id}/`, formData, {
+                await axios.put(`http://127.0.0.1:8000/api/v1/collection/waste-categories/${formData.id}/`, formData, {
                     headers: {
                         'Authorization': `Token ${localStorage.getItem('token')}`,
                     },
@@ -35,7 +35,7 @@ const WasteCategory = ({ onCancel, initialCategoryData, isEdit, onSave }) => {
                 alert('Category updated successfully!');
             } else {
                 // Create a new category
-                await axios.post('https://albintomy.pythonanywhere.com/api/v1/collection/waste-categories/', formData, {
+                await axios.post('http://127.0.0.1:8000/api/v1/collection/waste-categories/', formData, {
                     headers: {
                         'Authorization': `Token ${localStorage.getItem('token')}`,
                     },

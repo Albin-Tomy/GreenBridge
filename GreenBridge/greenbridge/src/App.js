@@ -3,7 +3,6 @@ import React from 'react';
 import { BrowserRouter as Router,Routes,Route } from 'react-router-dom';
 import RegLogin from './Pages/Authentication/RegLogin';
 import Dashboard from './Pages/Dashboard/Admin/AdminDashboard';
-import Home from './Pages/Home/Home';
 import LandingPage from './Pages/Home/LandingPage';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import PendingRequestsPage from './Pages/Dashboard/Admin/PendingRequestPage';
@@ -15,7 +14,6 @@ import Profile from './Pages/Dashboard/User/Profile';
 import ForgotPassword from './Pages/Authentication/ForgotPassword'; 
 import ResetPassword from './Pages/Authentication/ResetPassword';
 import Staff from './Pages/Dashboard/Shg/Staff';
-import { GoogleOAuthProvider } from '@react-oauth/google';
 import ProductDetail from './Pages/Dashboard/Products/ProductDetail';
 import Admin from './Pages/Dashboard/Admin/Admin';
 import CartPage from './Pages/Dashboard/Products/CartPage';
@@ -42,44 +40,51 @@ import Shgwaste from './Pages/Dashboard/Shg/ShgWaste';
 import UserOrders from './Pages/Dashboard/Products/UserOrders';
 import Sidebar from './components/SideBar';
 import UserRequestView from './Pages/Dashboard/User/UserRequest';
+import ProtectedRoute from './Pages/Authentication/ProtectedRoute';
+import ShgProtectedRoute from './Pages/Authentication/ShgprotectedRoute';
+import AdminProtectedRoute from './Pages/Authentication/AdminProtectedRoute';
+import AdminOrder from './Pages/Dashboard/Admin/AdminOrder';
+
 
 function App() {
   return (
     
     <Router>
       <Routes>
+      
+
         
-        
-        <Route path="/admin/home" element={<Dashboard />}>
-        <Route path="admin/view-all-shgs" element={<AllSHGsPage />} />
-        <Route path="admin/pending-requests" element={<PendingRequestsPage />} />
-        </Route>
-        <Route path="/admin/admin" element={<Admin />} />
-        <Route path="/admin/pending-requests" element={<PendingRequestsPage />} />
+        <Route path="/admin/order" element={<AdminProtectedRoute element={<AdminOrder />} />}/>
+        <Route path="/admin/home" element={<AdminProtectedRoute element={<Dashboard />} />}/>
+        <Route path="admin/view-all-shgs" element={<AdminProtectedRoute element={<AllSHGsPage />}/>} />
+        <Route path="admin/pending-requests" element={< AdminProtectedRoute element={<PendingRequestsPage />}/>} />
+    
+        <Route path="/admin/admin" element={ < AdminProtectedRoute element={<Admin />}/>} />
+        <Route path="/admin/pending-requests" element={< AdminProtectedRoute element={<PendingRequestsPage />}/>} />
         <Route path="/admin/view-all-shgs" element={<AllSHGsPage />} />
         <Route path='/shgregister' element={<ShgRegistration />} />
         <Route path="/login" element={<RegLogin />} />
         <Route path="/signup" element={<RegLogin />} />
         <Route path="/" element={<LandingPage />} />
         {/* <Route path="/" element={<Home />} /> */}
-        <Route path='/shg' element={<Staff/>}/>
+        <Route path='/shg' element={< ShgProtectedRoute element={<Staff/>}/>}/>
         <Route path='/products' element={<ProductsPage/>}/>
         <Route path="/address-list" element={<AddressSelection />} />
         <Route path="/request" element={<WasteCollectionRequest />} />
-        <Route path="/category" element={<WasteCategory />} />
-        <Route path="/subcategory" element={<WasteSubcategory />} />
-        <Route path="/location" element={<LocationForm />} />
+        <Route path="/category" element={< ShgProtectedRoute element={<WasteCategory />}/>} />
+        <Route path="/subcategory" element={< ShgProtectedRoute element={<WasteSubcategory />}/>} />
+        <Route path="/location" element={< ShgProtectedRoute element={<LocationForm />}/>} />
         <Route path="/shgrequest" element={<SHGRequests />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/password-reset-confirm/:uidb64/:token" element={<ResetPassword />} />
-        <Route path='/staff' element={<Staff/>}/>
+        <Route path='/staff' element={< ShgProtectedRoute element={<Staff/>}/>}/>
         <Route path="/products/:id" element={<ProductDetail/>} />
         <Route path="/cart" element={<CartPage />} />
         <Route path="/wishlist" element={<Wishlist />} />
         {/* <Route path="/admindash" element={<AdminDash />} /> */}
-        <Route path="/stafforder" element={<StaffOrders />} />
+        <Route path="/stafforder" element={< ShgProtectedRoute element={<StaffOrders />}/>} />
 
-        <Route path="/shgwaste" element={<Shgwaste />} />
+        <Route path="/shgwaste" element={< ShgProtectedRoute element={<Shgwaste />}/>} />
         
         <Route path="/userorder" element={<UserOrders />} />
 
@@ -97,10 +102,6 @@ function App() {
           <Route path='profile' element={<Profile/>}/>
         </Route>
 
-        {/* <Route path="/shgadmin" element={<ShgAdmin />}>
-          <Route path="products" element={<Products />} />
-          <Route path="orders" element={<Orders />} />
-        </Route> */}
       </Routes>
     </Router>
   );

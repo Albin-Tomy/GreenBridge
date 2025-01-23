@@ -9,7 +9,7 @@
   .sidebar {
     position: fixed;
     left: -200px; /* Sidebar is initially hidden */
-    top: 4rem;
+    top: 6rem;
     height: 100vh; /* Full height */
     width: 200px;
     background-color: #05bf49;

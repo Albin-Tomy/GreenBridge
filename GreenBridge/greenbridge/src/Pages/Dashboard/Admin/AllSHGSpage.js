@@ -11,7 +11,7 @@ const AllSHGsPage = () => {
     // Fetch all SHGs when the component mounts
     const fetchAllShgs = async () => {
       try {
-        const response = await axios.get('https://albintomy.pythonanywhere.com/api/shg/all/');
+        const response = await axios.get('http://127.0.0.1:8000/api/shg/all/');
         setAllShgs(response.data);
       } catch (error) {
         console.error('Error fetching SHGs:', error);

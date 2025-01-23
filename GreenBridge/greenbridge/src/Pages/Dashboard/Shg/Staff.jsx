@@ -17,6 +17,8 @@ import AddOrderForm from "../../../components/Forms/OrderForm";
 import AddStaffForm from "../../../components/Forms/StaffsForm";
 import { getItemById } from "../Shg/helper";
 import { orderItemById } from "../Shg/helper";
+import Sidebar from "./ShgSidebar";
+
 
 function Admin() {
   const navigate = useNavigate();
@@ -189,7 +191,7 @@ function Admin() {
       setForm(<AddStaffForm onCancel={handleCloseForm}/>)
 
       axios
-        .get('https://albintomy.pythonanywhere.com/api/v1/staffs/list/')
+        .get('http://127.0.0.1:8000/api/v1/staffs/list/')
         .then((response) => {
           console.log("staffs",response.data);
           const transformedStaffData = transformStaffData(response.data)
@@ -208,7 +210,7 @@ function Admin() {
       setParentMenu("Users");
       setAddButtonLabel("Add User");
       axios
-        .get('https://albintomy.pythonanywhere.com/api/v1/auth/users/')
+        .get('http://127.0.0.1:8000/api/v1/auth/users/')
         .then((response) => {
           console.log("users",response.data);
           const transformedUserData = transformUserData(response.data)
@@ -385,7 +387,7 @@ function Admin() {
 
   const   confirmDeleteOrder = () => {
     axios
-      .delete(`https://albintomy.pythonanywhere.com/api/v1/orders/delete/${selectedId}/`)
+      .delete(`http://127.0.0.1:8000/api/v1/orders/delete/${selectedId}/`)
       .then((response) => {
         console.log("delete res", response);
         setOpen(false);
@@ -402,7 +404,7 @@ function Admin() {
 
   const   confirmDeletStaff = () => {
     axios
-      .delete(`https://albintomy.pythonanywhere.com/api/v1/staffs/delete/${selectedId}/`)
+      .delete(`http://127.0.0.1:8000/api/v1/staffs/delete/${selectedId}/`)
       .then((response) => {
         console.log("delete res", response);
         setOpen(false);
@@ -440,8 +442,9 @@ function Admin() {
   return (
     <div>
       <Navbar></Navbar>
-    <div className="container">
       
+    <div className="container">
+    <Sidebar></Sidebar>
       <div className="menu-container">
         <div className="menus">
           <Menubox
@@ -450,12 +453,12 @@ function Admin() {
             menu={menu}
             parentMenu={parentMenu}
           />
-          <Menubox
+          {/* <Menubox
             text={"Orders"}
             action={setMenu}
             menu={menu}
             parentMenu={parentMenu}
-          />
+          /> */}
           
         </div>
       </div>

@@ -14,6 +14,7 @@ from pathlib import Path
 import os
 from datetime import timedelta
 from dotenv import load_dotenv
+from corsheaders.defaults import default_headers
 
 
 
@@ -30,7 +31,7 @@ SECRET_KEY = 'django-insecure-eeap$8gx1=wu_isec2$-jy@%vtdo1f_(+f%yv%3u_a1^qeek5%
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["greenbridge.netlify.app","127.0.0.1:3000","localhost","127.0.0.1"]
 
 
 
@@ -85,13 +86,14 @@ DJ_REST_AUTH = {
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
+    
     
 ]
 
@@ -109,7 +111,9 @@ REST_FRAMEWORK = {
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
-    "http://127.0.0.1:3000" # Your React frontend URL
+    "http://127.0.0.1:3000",
+    "https://greenbridge.netlify.app",
+     # Your React frontend URL
 ]
 
 

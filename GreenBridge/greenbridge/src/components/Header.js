@@ -61,7 +61,7 @@ const Header = () => {
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
-        const response = await axios.get(`https://albintomy.pythonanywhere.com/api/v1/auth/user_profiles/${userId}/`, {
+        const response = await axios.get(`http://127.0.0.1:8000/api/v1/auth/user_profiles/${userId}/`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -205,7 +205,7 @@ const Header = () => {
       {/* Mobile Navigation Menu */}
       <nav className={`mobile-nav ${isMobileMenuOpen ? 'open' : 'closed'}`}>
         <ul>
-          <li><a href="/" onClick={toggleMobileMenu}>Home</a></li>
+          <li><a href="/userorder" onClick={toggleMobileMenu}>My Orders</a></li>
           <li><a href="/products" onClick={toggleMobileMenu}>Products</a></li>
           <li><a href="/profile" onClick={toggleMobileMenu}>User Profile</a></li>
           <li><a href="/request" onClick={toggleMobileMenu}>Waste collection Services</a></li>

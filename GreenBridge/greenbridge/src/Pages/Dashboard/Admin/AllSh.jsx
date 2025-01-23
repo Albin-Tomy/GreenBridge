@@ -7,6 +7,7 @@ import Navbar from '../../../components/Navbar';
 import { IconButton } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import Sidebar from '../../../components/SideBar';
 
 const AllSHGsPage = () => {
   const [allShgs, setAllShgs] = useState([]);
@@ -15,7 +16,7 @@ const AllSHGsPage = () => {
     // Fetch all SHGs when the component mounts
     const fetchAllShgs = async () => {
       try {
-        const response = await axios.get('https://albintomy.pythonanywhere.com/api/shg/all/');
+        const response = await axios.get('http://127.0.0.1:8000/api/shg/all/');
         // Add a unique id to each SHG if not already present
         const shgsWithId = response.data.map((shg, index) => ({
           ...shg,
@@ -65,6 +66,7 @@ const AllSHGsPage = () => {
 
   return (
     <div><Navbar />
+    <Sidebar/>
     <div className="all-shgs-page">
       
       <div className="all-shgs-container">

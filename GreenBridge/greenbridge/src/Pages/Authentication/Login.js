@@ -48,7 +48,7 @@ const Login = ({ setIslogin }) => {
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post('https://albintomy.pythonanywhere.com/api/v1/auth/login/', {
+      const response = await axios.post('http://127.0.0.1:8000/api/v1/auth/login/', {
         email,
         password,
       });
@@ -67,7 +67,7 @@ const Login = ({ setIslogin }) => {
       // Redirect based on role
       if (response.data.user.is_active) {
         if (response.data.user.is_superuser) {
-          navigate('/admin/home'); // Redirect to admin dashboard
+          navigate('/admin/admin'); // Redirect to admin dashboard
         } else if (response.data.user.is_shg) {
           navigate('/shg'); // Redirect to SHG dashboard
         } else {
@@ -101,7 +101,7 @@ const Login = ({ setIslogin }) => {
     const formData = new FormData();
     formData.append("email", email);
 
-    axios.post('https://albintomy.pythonanywhere.com/api/v1/auth/password-reset/', formData)
+    axios.post('http://127.0.0.1:8000/api/v1/auth/password-reset/', formData)
       .then((response) => {
         if (response.status === 200) {
           alert('Reset password link sent to your email');

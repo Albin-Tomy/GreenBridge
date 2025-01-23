@@ -13,7 +13,7 @@ import BasicModal from "../../../components/BasicModal";
 import { useNavigate } from "react-router-dom";
 
 import AddOrderForm from "../../../components/Forms/OrderForm";
-import Sidebar from "./ShgSidebar";
+import Sidebar from "../../../components/SideBar";
 
 function Admin() {
   const navigate = useNavigate();

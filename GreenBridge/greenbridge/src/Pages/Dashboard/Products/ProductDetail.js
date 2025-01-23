@@ -18,13 +18,13 @@ const ProductDetail = () => {
   const [countries, setCountries] = useState({});
   const [materials, setMaterials] = useState({});
   const [cartItems, setCartItems] = useState([]);
-  const BASE_URL = 'https://albintomy.pythonanywhere.com';
+  const BASE_URL = 'http://127.0.0.1:8000';
   const [quantity, setQuantity] = useState(1);
   const userId = localStorage.getItem('userId'); // Retrieve userId from localStorage
 
   useEffect(() => {
     // Fetch product details
-    axios.get(`https://albintomy.pythonanywhere.com/api/v1/products/details/${id}/`)
+    axios.get(`http://127.0.0.1:8000/api/v1/products/details/${id}/`)
       .then(response => {
         setProduct(response.data);
         setLoading(false);
@@ -36,7 +36,7 @@ const ProductDetail = () => {
 
     // Fetch cart items of the user
     if (userId) {
-      axios.get(`https://albintomy.pythonanywhere.com/api/v1/orders/cart-items/?user_id=${userId}`)
+      axios.get(`http://127.0.0.1:8000/api/v1/orders/cart-items/?user_id=${userId}`)
         .then(response => {
           setCartItems(response.data); // Store the cart items in state
         })
@@ -46,7 +46,7 @@ const ProductDetail = () => {
     }
 
     // Fetch additional data (categories, brands, countries, materials)...
-    axios.get('https://albintomy.pythonanywhere.com/api/v1/products/category-list/')
+    axios.get('http://127.0.0.1:8000/api/v1/products/category-list/')
       .then(response => {
         const categoryMap = response.data.reduce((acc, category) => {
           acc[category.id] = category.name;
@@ -55,7 +55,7 @@ const ProductDetail = () => {
         setCategories(categoryMap);
       });
 
-    axios.get('https://albintomy.pythonanywhere.com/api/v1/products/madeof-list/')
+    axios.get('http://127.0.0.1:8000/api/v1/products/madeof-list/')
       .then(response => {
         const materialMap = response.data.reduce((acc, material) => {
           acc[material.madeof_id] = material.name;
@@ -72,14 +72,14 @@ const ProductDetail = () => {
       return;
     }
 
-    axios.get(`https://albintomy.pythonanywhere.com/api/v1/orders/cart-list/?user_id=${userId}`)
+    axios.get(`http://127.0.0.1:8000/api/v1/orders/cart-list/?user_id=${userId}`)
       .then(response => {
         let cartId;
 
         if (response.data.length > 0) {
           cartId = response.data[0].cart_id; // Assuming first cart for the user
         } else {
-          return axios.post('https://albintomy.pythonanywhere.com/api/v1/orders/cart-list/', { user_id: userId })
+          return axios.post('http://127.0.0.1:8000/api/v1/orders/cart-list/', { user_id: userId })
             .then(response => {
               cartId = response.data.cart_id;
               return cartId;
@@ -95,7 +95,7 @@ const ProductDetail = () => {
           quantity: quantity
         };
 
-        return axios.post('https://albintomy.pythonanywhere.com/api/v1/orders/cart-items-create/', dataToSend);
+        return axios.post('http://127.0.0.1:8000/api/v1/orders/cart-items-create/', dataToSend);
       })
       .then(() => {
         toast.success('Product added to cart!');
@@ -111,14 +111,14 @@ const ProductDetail = () => {
       return;
     }
 
-    axios.get(`https://albintomy.pythonanywhere.com/api/v1/orders/wishlist-list/?user_id=${userId}`)
+    axios.get(`http://127.0.0.1:8000/api/v1/orders/wishlist-list/?user_id=${userId}`)
       .then(response => {
         let wishlistId;
 
         if (response.data.length > 0) {
           wishlistId = response.data[0].wishlist_id;
         } else {
-          return axios.post('https://albintomy.pythonanywhere.com/api/v1/orders/wishlist-list/', { user_id: userId })
+          return axios.post('http://127.0.0.1:8000/api/v1/orders/wishlist-list/', { user_id: userId })
             .then(response => {
               wishlistId = response.data.wishlist_id;
             });
@@ -127,7 +127,7 @@ const ProductDetail = () => {
         return wishlistId;
       })
       .then(wishlistId => {
-        return axios.post('https://albintomy.pythonanywhere.com/api/v1/orders/wishlist-items-create/', {
+        return axios.post('http://127.0.0.1:8000/api/v1/orders/wishlist-items-create/', {
           wishlist_id: wishlistId,
           product_id: productId
         });
