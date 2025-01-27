@@ -29,9 +29,8 @@ urlpatterns = [
     path('api/v1/products/',include('products.urls'),name='api/v1/products'),
     path('api/v1/orders/',include('orders.urls'),name='api/v1/orders'),
     path('api/v1/collection/',include('wastecollection.urls'),name='api/v1/collection'),
-    
-    
-
+    path('api/ngo/', include('NGOs.urls')),
+    path('api/volunteer/', include('volunters.urls')),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

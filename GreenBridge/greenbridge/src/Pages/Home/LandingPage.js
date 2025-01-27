@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Header from '../../components/Header'; // Import Header component
 import './LandingPage.css';
 import shg from '../../assets/shg.png';
@@ -11,15 +11,24 @@ import sweet from '../../assets/honey.jpg';
 import hanticraft from '../../assets/hanticraft.jpeg';
 import furniture from '../../assets/furniture.jpg';
 import utensils from '../../assets/utensils.jpeg'
-import { useNavigate } from 'react-router-dom';
 
 const LandingPage = () => {
   const navigate = useNavigate();
-
+  const isLoggedIn = localStorage.getItem('authToken');
 
   const goToProducts = () => {
     navigate('/products');
   };
+
+  const handleVolunteerClick = () => {
+    if (!isLoggedIn) {
+      alert('Please log in to register as a volunteer');
+      navigate('/login');
+      return;
+    }
+    navigate('/volunteer-registration');
+  };
+
   return (
     <div className="landing-page-body">
       {/* Header */}
@@ -59,6 +68,16 @@ const LandingPage = () => {
             <h3>Waste Collection Services</h3>
             <p>We contribute to environmental sustainability through our community-driven waste collection services.</p>
             <Link to="/waste-collection" className="waste-btn">Request Waste Collection</Link>
+          </div>
+          <div className="service-card">
+            <h3>Join as Volunteer</h3>
+            <p>Make a difference in your community by joining our volunteer program.</p>
+            <button 
+              onClick={handleVolunteerClick}
+              className="volunteer-btn"
+            >
+              Join as Volunteer
+            </button>
           </div>
         </div>
       </section>
@@ -107,7 +126,7 @@ const LandingPage = () => {
       {/* Contact Section */}
       <section id="contact" className="contact-section">
         <h2>Get in Touch</h2>
-        <p>We’d love to hear from you! Whether you're interested in partnering with us or have any questions, feel free to reach out.</p>
+        <p>We'd love to hear from you! Whether you're interested in partnering with us or have any questions, feel free to reach out.</p>
         <Link to="/contact" className="contact-btn">Contact Us</Link>
       </section>
 

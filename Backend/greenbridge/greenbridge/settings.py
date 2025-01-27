@@ -60,6 +60,8 @@ INSTALLED_APPS = [
     'products',
     'orders',
     'wastecollection',
+    'NGOs',
+    'volunters',
     
 
 ]

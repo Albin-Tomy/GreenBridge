@@ -44,7 +44,13 @@ import ProtectedRoute from './Pages/Authentication/ProtectedRoute';
 import ShgProtectedRoute from './Pages/Authentication/ShgprotectedRoute';
 import AdminProtectedRoute from './Pages/Authentication/AdminProtectedRoute';
 import AdminOrder from './Pages/Dashboard/Admin/AdminOrder';
-
+import NgoRegistration from './Pages/Dashboard/NGO/NgoRegistration';
+import PendingNgo from './Pages/Dashboard/Admin/PendingNGO';
+import AllNgo from './Pages/Dashboard/Admin/AllNGOsPage';
+import VolunteerRegistration from './Pages/Dashboard/Volunteer/VolunteerRegistration';
+import VolunteerDashboard from './Pages/Dashboard/Volunteer/VolunteerDashboard';
+import VolunteerProfile from './Pages/Dashboard/Volunteer/VolunteerProfile';
+import ServiceRequests from './Pages/Dashboard/Volunteer/ServiceRequests';
 
 function App() {
   return (
@@ -53,7 +59,8 @@ function App() {
       <Routes>
       
 
-        
+        <Route path="/admin/ngo" element={<AdminProtectedRoute element={<PendingNgo />} />} />
+        <Route path="/admin/allngo" element={<AdminProtectedRoute element={<AllNgo />} />} />
         <Route path="/admin/order" element={<AdminProtectedRoute element={<AdminOrder />} />}/>
         <Route path="/admin/home" element={<AdminProtectedRoute element={<Dashboard />} />}/>
         <Route path="admin/view-all-shgs" element={<AdminProtectedRoute element={<AllSHGsPage />}/>} />
@@ -91,6 +98,7 @@ function App() {
         <Route path="/sidebar" element={<Sidebar />} />
 
         <Route path="/userview" element={<UserRequestView />} />
+        <Route path="/ngoregister" element={<NgoRegistration />} />
 
         <Route path="/allsh" element={<AllSh />} />
         <Route path="/pendingshg" element={<PendingShg />} />
@@ -100,6 +108,13 @@ function App() {
         <Route path="/homepage" element={<HomePage />} />
         <Route path="/dashboard" element={<DashboardLayout />}>
           <Route path='profile' element={<Profile/>}/>
+        </Route>
+
+        <Route path="/volunteer-registration" element={<VolunteerRegistration />} />
+
+        <Route path="/volunteer" element={<VolunteerDashboard />}>
+          <Route path="profile" element={<VolunteerProfile />} />
+          <Route path="notifications" element={<ServiceRequests />} />
         </Route>
 
       </Routes>

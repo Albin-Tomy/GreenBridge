@@ -30,6 +30,7 @@ class User(AbstractBaseUser,PermissionsMixin):
     last_login=models.DateTimeField(null=True)
     updated_at=models.DateTimeField(auto_now=True)
     created_at=models.DateTimeField(auto_now_add=True)
+    is_ngo = models.BooleanField(default=False)
 
     USERNAME_FIELD='email'
     # REQUIRED_FIELDS=['email']
