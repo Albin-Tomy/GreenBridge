@@ -14,7 +14,7 @@ header {
     left: 0;
     width: 100%;
     height: 100px;
-    background: #448a42;
+    background: #70c19b;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -449,19 +449,19 @@ header {
     right: -100%;
     width: 250px;
     height: 100%;
-    background-color: rgb(28, 185, 247);
+    background-color: rgb(255, 255, 255);
     color: #fff;
     transition: right 0.3s ease;
     z-index: 1000;
-    padding-top: 60px; /* Space for header height */
-  }
+    padding-top: 60px;
+}
   
   .mobile-nav.open {
-    right: 0; /* Slide in when open */
+    right: 0;
   }
   
   .mobile-nav.closed {
-    right: -100%; /* Slide out when closed */
+    right: -100%;
   }
   
   .mobile-nav ul {
@@ -471,15 +471,112 @@ header {
   }
   
   .mobile-nav li {
-    padding: 10px 20px;
-    border-bottom: 1px solid #444;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   }
   
-  .mobile-nav a {
+  .mobile-nav li:last-child {
+    border-bottom: none;
+  }
+  
+  /* Style for all navigation links */
+  .mobile-nav li a {
+    display: flex;
+    align-items: center;
     color: #fff;
     text-decoration: none;
+    padding: 12px 20px;
+    border-radius: 4px;
+    margin: 5px 15px;
+    background-color: rgba(172, 75, 75, 0.1);
+    transition: all 0.3s ease;
   }
   
-  .mobile-nav a:hover {
-    text-decoration: underline;
+  .mobile-nav li a:hover {
+    background-color: rgba(71, 160, 255, 0.847);
+    text-decoration: none;
+    transform: translateX(5px);
   }
+  
+  /* Special style for Service Request */
+  .mobile-nav li a[href="/service-request"] {
+    background-color: #359aed;
+  }
+  
+  .mobile-nav li a[href="/service-request"]:hover {
+    background-color: #1f81e2;
+  }
+  
+  /* Special style for My Orders */
+  .mobile-nav li a[href="/userorder"] {
+    background-color: #359aed;
+  }
+  
+  .mobile-nav li a[href="/userorder"]:hover {
+    background-color: #1f81e2;
+  }
+  
+  /* Special style for Products */
+  .mobile-nav li a[href="/products"] {
+    background-color: #359aed;
+  }
+  
+  .mobile-nav li a[href="/products"]:hover {
+    background-color: #1f81e2;
+  }
+  
+  /* Special style for User Profile */
+  .mobile-nav li a[href="/profile"] {
+    background-color: #359aed;
+  }
+  
+  .mobile-nav li a[href="/profile"]:hover {
+    background-color: #1f81e2;
+  }
+  
+  /* Special style for View Request */
+  .mobile-nav li a[href="/userview"] {
+    background-color: #359aed;
+  }
+  
+  .mobile-nav li a[href="/userview"]:hover {
+    background-color: #1f81e2;
+  }
+
+.nav-links ul li a {
+    color: #fff;
+    text-decoration: none;
+    padding: 8px 15px;
+    transition: all 0.3s ease;
+}
+
+.nav-links ul li a:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+/* Add styles for the Request Service link */
+.nav-links ul li a[href="/service-request"] {
+    background-color: #359aed;
+    border-radius: 4px;
+    padding: 8px 15px;
+}
+
+.nav-links ul li a[href="/service-request"]:hover {
+    background-color: #1f81e2
+}
+
+.mobile-nav li a[href="/service-request"] {
+    display: flex;
+    align-items: center;
+    color: #fff;
+    background-color: #359aed;
+    padding: 12px 20px;
+    border-radius: 4px;
+    margin: 5px 15px;
+}
+
+.mobile-nav li a[href="/service-request"]:hover {
+    background-color: #1f81e2;
+    text-decoration: none;
+}

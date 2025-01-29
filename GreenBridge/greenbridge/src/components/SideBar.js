@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FaHome, FaCog,FaBox, FaUser, FaEnvelope, FaClipboardList, FaRecycle, FaUsers } from 'react-icons/fa';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import './bar.css'; // Place the CSS code in a separate file to reuse the same styles
 import { useNavigate } from 'react-router-dom';
 
@@ -52,6 +53,44 @@ const Sidebar = () => {
     navigate('/admin/pending-requests');
   }
 
+  const userMenuItems = [
+    {
+      title: "Dashboard",
+      path: "/dashboard",
+      icon: <FaHome />
+    },
+    {
+      title: "Service Request",
+      path: "/service-request",
+      icon: <AddCircleOutlineIcon />
+    },
+    {
+      title: "Profile",
+      path: "/profile",
+      icon: <FaUser />
+    },
+    {
+      title: "All SHG",
+      path: "/allsh",
+      icon: <FaUsers />
+    },
+    {
+      title: "Orders",
+      path: "/admin/order",
+      icon: <FaClipboardList />
+    },
+    {
+      title: "Products",
+      path: "/admin/admin",
+      icon: <FaBox />
+    },
+    {
+      title: "Pending Requests",
+      path: "/admin/pending-requests",
+      icon: <FaUser />
+    }
+  ];
+
   return (
     <div>
       {/* Sidebar */}
@@ -61,23 +100,14 @@ const Sidebar = () => {
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
-      
-        <a href="#about">
-          <div className="icon-container" onClick={gotoRequests}><FaUser /></div>
-          <span>Pending Requests</span>
-        </a>
-        <a href="#staff">
-          <div className="icon-container" onClick={gotoShg}><FaUsers /></div>
-          <span>All SHG</span>
-        </a>
-        <a href="#orders">
-          <div className="icon-container" onClick={gotoOrders}><FaClipboardList /></div>
-          <span>Orders</span>
-        </a>
-        <a href="#waste">
-          <div className="icon-container" onClick={gotoProducts}><FaBox /></div>
-          <span>Products</span>
-        </a>
+        {userMenuItems.map((item, index) => (
+          <a key={index} href={item.path}>
+            <div className="icon-container">
+              {item.icon}
+            </div>
+            <span>{item.title}</span>
+          </a>
+        ))}
       </div>
     </div>
   );

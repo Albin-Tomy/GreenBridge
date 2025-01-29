@@ -1,0 +1,74 @@
+.common-request-container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 2rem;
+    position: relative;
+    top: 60px;
+}
+
+.common-request-container h2 {
+    text-align: center;
+    color: #2c3e50;
+    margin-bottom: 2rem;
+}
+
+.request-type-cards {
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
+}
+
+.request-card {
+    flex: 1;
+    max-width: 400px;
+    padding: 2rem;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.request-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.request-card.selected {
+    border: 2px solid #4CAF50;
+}
+
+.request-card h3 {
+    color: #2c3e50;
+    margin-bottom: 1rem;
+}
+
+.request-card p {
+    color: #666;
+    margin-bottom: 1.5rem;
+}
+
+.request-card ul {
+    list-style: none;
+    padding: 0;
+}
+
+.request-card ul li {
+    padding: 0.5rem 0;
+    color: #666;
+    border-bottom: 1px solid #eee;
+}
+
+.request-card ul li:last-child {
+    border-bottom: none;
+}
+
+@media (max-width: 768px) {
+    .request-type-cards {
+        flex-direction: column;
+    }
+    
+    .request-card {
+        max-width: 100%;
+    }
+} 

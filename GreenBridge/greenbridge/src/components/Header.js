@@ -208,8 +208,8 @@ const Header = () => {
           <li><a href="/userorder" onClick={toggleMobileMenu}>My Orders</a></li>
           <li><a href="/products" onClick={toggleMobileMenu}>Products</a></li>
           <li><a href="/profile" onClick={toggleMobileMenu}>User Profile</a></li>
-          <li><a href="/request" onClick={toggleMobileMenu}>Waste collection Services</a></li>
-          <li><a href="/userview" onClick={toggleMobileMenu}>View Request </a></li>
+          <li><a href="/service-request" onClick={toggleMobileMenu}>Service Request</a></li>
+          <li><a href="/userview" onClick={toggleMobileMenu}>View Request</a></li>
         </ul>
       </nav>
       </header>

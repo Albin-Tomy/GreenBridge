@@ -50,6 +50,8 @@ import AllNgo from './Pages/Dashboard/Admin/AllNGOsPage';
 import VolunteerRegistration from './Pages/Dashboard/Volunteer/VolunteerRegistration';
 import VolunteerProfile from './Pages/Dashboard/Volunteer/VolunteerProfile';
 import BlockchainExplorer from './Pages/Dashboard/Volunteer/BlockchainExplorer';
+import CommonRequestForm from './Pages/Dashboard/User/CommonRequestForm';
+import FoodRequestForm from './Pages/Dashboard/User/FoodRequestForm';
 
 function App() {
   return (
@@ -113,6 +115,9 @@ function App() {
         <Route path="/volunteer-registration" element={<VolunteerRegistration />} />
 
         <Route path="/volunteer/blockchain" element={<BlockchainExplorer />} />
+
+        <Route path="/service-request" element={<CommonRequestForm />} />
+        <Route path="/food-request" element={<FoodRequestForm />} />
 
       </Routes>
     </Router>
