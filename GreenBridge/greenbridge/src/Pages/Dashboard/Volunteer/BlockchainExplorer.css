@@ -1,0 +1,156 @@
+
+.blockchain-explorer {
+    margin: 2rem 2rem 2rem; /* Adjust top, right, and bottom margins */
+    margin-top: 7rem; /* Increased space from the top */
+    padding: 2rem;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+
+.blockchain-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #e9ecef;
+}
+
+.blockchain-info {
+    display: flex;
+    gap: 2rem;
+}
+
+.info-box {
+    background-color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.info-box label {
+    font-weight: 500;
+    color: #6c757d;
+    margin-right: 0.5rem;
+}
+
+.status {
+    padding: 0.25rem 0.75rem;
+    border-radius: 4px;
+    font-weight: 500;
+}
+
+.status.valid {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.status.invalid {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.blockchain-visualization {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.block-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.block {
+    background-color: white;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 400px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.block:hover {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+.block.selected {
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.block-title {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.block-title h3 {
+    margin: 0;
+    color: #2c3e50;
+}
+
+.timestamp {
+    color: #6c757d;
+    font-size: 0.875rem;
+}
+
+.block-action {
+    background-color: #e9ecef;
+    padding: 0.25rem 0.75rem;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    color: #495057;
+}
+
+.block-details {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #dee2e6;
+}
+
+.block-field {
+    margin-bottom: 1.5rem;
+}
+
+.block-field label {
+    display: block;
+    font-weight: 500;
+    color: #6c757d;
+    margin-bottom: 0.5rem;
+}
+
+.block-field code,
+.block-field pre {
+    display: block;
+    background-color: #f8f9fa;
+    padding: 1rem;
+    border-radius: 4px;
+    font-family: 'Monaco', 'Consolas', monospace;
+    font-size: 0.875rem;
+    overflow-x: auto;
+}
+
+.data-content {
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.block-arrow {
+    color: #6c757d;
+    font-size: 2rem;
+}
+
+.error-message {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 1rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+} 

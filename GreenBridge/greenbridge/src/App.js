@@ -48,9 +48,8 @@ import NgoRegistration from './Pages/Dashboard/NGO/NgoRegistration';
 import PendingNgo from './Pages/Dashboard/Admin/PendingNGO';
 import AllNgo from './Pages/Dashboard/Admin/AllNGOsPage';
 import VolunteerRegistration from './Pages/Dashboard/Volunteer/VolunteerRegistration';
-import VolunteerDashboard from './Pages/Dashboard/Volunteer/VolunteerDashboard';
 import VolunteerProfile from './Pages/Dashboard/Volunteer/VolunteerProfile';
-import ServiceRequests from './Pages/Dashboard/Volunteer/ServiceRequests';
+import BlockchainExplorer from './Pages/Dashboard/Volunteer/BlockchainExplorer';
 
 function App() {
   return (
@@ -60,6 +59,7 @@ function App() {
       
 
         <Route path="/admin/ngo" element={<AdminProtectedRoute element={<PendingNgo />} />} />
+        <Route path="/volunteer/profile" element={<VolunteerProfile />} />
         <Route path="/admin/allngo" element={<AdminProtectedRoute element={<AllNgo />} />} />
         <Route path="/admin/order" element={<AdminProtectedRoute element={<AdminOrder />} />}/>
         <Route path="/admin/home" element={<AdminProtectedRoute element={<Dashboard />} />}/>
@@ -112,10 +112,7 @@ function App() {
 
         <Route path="/volunteer-registration" element={<VolunteerRegistration />} />
 
-        <Route path="/volunteer" element={<VolunteerDashboard />}>
-          <Route path="profile" element={<VolunteerProfile />} />
-          <Route path="notifications" element={<ServiceRequests />} />
-        </Route>
+        <Route path="/volunteer/blockchain" element={<BlockchainExplorer />} />
 
       </Routes>
     </Router>

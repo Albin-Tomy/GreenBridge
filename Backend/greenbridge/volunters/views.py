@@ -3,11 +3,22 @@ from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from .models import VolunteerRegistration, VolunteerRequest
-from .serializers import VolunteerRegistrationSerializer, VolunteerDashboardSerializer, VolunteerRequestSerializer
+from .models import VolunteerRegistration
+from .serializers import VolunteerRegistrationSerializer
 from authentication.models import User_profile
+from .blockchain import VolunteerBlockchain
+from django.core.cache import cache
+from time import time
 
 # Create your views here.
+
+# Initialize blockchain
+def get_blockchain():
+    blockchain = cache.get('volunteer_blockchain')
+    if blockchain is None:
+        blockchain = VolunteerBlockchain()
+        cache.set('volunteer_blockchain', blockchain)
+    return blockchain
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -44,6 +55,20 @@ def register_volunteer(request):
             preferred_location=request.data.get('preferred_location', '')
         )
 
+        # Add to blockchain
+        blockchain = get_blockchain()
+        blockchain.add_block({
+            'volunteer_id': volunteer.id,
+            'action': 'REGISTRATION',
+            'details': {
+                'user_id': request.user.id,
+                'interested_services': volunteer.interested_services,
+                'availability': volunteer.availability,
+                'timestamp': str(volunteer.created_at)
+            }
+        })
+        cache.set('volunteer_blockchain', blockchain)
+
         serializer = VolunteerRegistrationSerializer(volunteer)
         return Response({
             'message': 'Volunteer registration successful',
@@ -75,7 +100,20 @@ def update_volunteer_profile(request):
         volunteer = VolunteerRegistration.objects.get(user=request.user)
         serializer = VolunteerRegistrationSerializer(volunteer, data=request.data, partial=True)
         if serializer.is_valid():
-            serializer.save()
+            volunteer = serializer.save()
+            
+            # Record update in blockchain
+            blockchain = get_blockchain()
+            blockchain.add_block({
+                'volunteer_id': volunteer.id,
+                'action': 'PROFILE_UPDATE',
+                'details': {
+                    'updated_fields': request.data,
+                    'timestamp': str(volunteer.updated_at)
+                }
+            })
+            cache.set('volunteer_blockchain', blockchain)
+            
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     except VolunteerRegistration.DoesNotExist:
@@ -85,11 +123,15 @@ def update_volunteer_profile(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def volunteer_dashboard(request):
+def get_volunteer_history(request):
     try:
         volunteer = VolunteerRegistration.objects.get(user=request.user)
-        serializer = VolunteerDashboardSerializer(volunteer)
-        return Response(serializer.data)
+        blockchain = get_blockchain()
+        history = blockchain.get_volunteer_history(volunteer.id)
+        return Response({
+            'volunteer_id': volunteer.id,
+            'history': history
+        })
     except VolunteerRegistration.DoesNotExist:
         return Response({
             'error': 'Volunteer profile not found'
@@ -97,14 +139,26 @@ def volunteer_dashboard(request):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def quit_volunteering(request):
+def quit_volunteer(request):
     try:
         volunteer = VolunteerRegistration.objects.get(user=request.user)
-        volunteer.status = 'Inactive'
-        volunteer.save()
-        return Response({
-            'message': 'Successfully quit volunteering service'
+        
+        # Record quit action in blockchain
+        blockchain = get_blockchain()
+        blockchain.add_block({
+            'volunteer_id': volunteer.id,
+            'action': 'QUIT',
+            'details': {
+                'reason': request.data.get('reason', ''),
+                'timestamp': str(time())
+            }
         })
+        cache.set('volunteer_blockchain', blockchain)
+        
+        volunteer.delete()
+        return Response({
+            'message': 'Successfully removed from volunteer service'
+        }, status=status.HTTP_200_OK)
     except VolunteerRegistration.DoesNotExist:
         return Response({
             'error': 'Volunteer profile not found'
@@ -112,36 +166,27 @@ def quit_volunteering(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_volunteer_requests(request):
+def get_blockchain_details(request):
     try:
-        volunteer = VolunteerRegistration.objects.get(user=request.user)
-        requests = VolunteerRequest.objects.filter(volunteer=volunteer)
-        serializer = VolunteerRequestSerializer(requests, many=True)
-        return Response(serializer.data)
-    except VolunteerRegistration.DoesNotExist:
+        blockchain = get_blockchain()
+        chain_data = []
+        
+        for block in blockchain.chain:
+            block_data = {
+                'index': block.index,
+                'timestamp': block.timestamp,
+                'data': block.data,
+                'hash': block.hash,
+                'previous_hash': block.previous_hash
+            }
+            chain_data.append(block_data)
+            
         return Response({
-            'error': 'Volunteer profile not found'
-        }, status=status.HTTP_404_NOT_FOUND)
-
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def respond_to_request(request, request_id):
-    try:
-        volunteer_request = VolunteerRequest.objects.get(id=request_id)
-        action = request.data.get('action')
-        
-        if action not in ['accept', 'reject']:
-            return Response({
-                'error': 'Invalid action'
-            }, status=status.HTTP_400_BAD_REQUEST)
-        
-        volunteer_request.status = 'accepted' if action == 'accept' else 'rejected'
-        volunteer_request.save()
-        
-        return Response({
-            'message': f'Request {volunteer_request.status} successfully'
+            'chain': chain_data,
+            'length': len(blockchain.chain),
+            'is_valid': blockchain.is_chain_valid()
         })
-    except VolunteerRequest.DoesNotExist:
+    except Exception as e:
         return Response({
-            'error': 'Request not found'
-        }, status=status.HTTP_404_NOT_FOUND)
+            'error': str(e)
+        }, status=status.HTTP_400_BAD_REQUEST)
