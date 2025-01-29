@@ -1,5 +1,3 @@
-
-
 /* Admin Dashboard Page */
 .admin-dashboard-page {
   display: flex;
@@ -125,4 +123,48 @@ button:hover {
 h1, h2, h3 {
   color: #333;
   margin-bottom: 20px;
+}
+
+.admin-dashboard-container {
+    min-height: 100vh;
+    background-color: #f5f6fa;
+}
+
+.MuiDataGrid-root {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.MuiDataGrid-columnHeaders {
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #e9ecef;
+}
+
+.MuiButton-contained {
+    background-color: #359aed !important;
+}
+
+.MuiButton-contained:hover {
+    background-color: #1f81e2 !important;
+}
+
+.MuiIconButton-root {
+    color: #359aed !important;
+}
+
+.MuiIconButton-root:hover {
+    background-color: rgba(53, 154, 237, 0.1) !important;
+}
+
+.MuiPaper-root {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 960px) {
+    .MuiContainer-root {
+        padding-left: 16px !important;
+        padding-right: 16px !important;
+    }
 }
