@@ -1,6 +1,6 @@
 import React from 'react';
 // import './App.css';
-import { BrowserRouter as Router,Routes,Route } from 'react-router-dom';
+import { BrowserRouter as Router,Routes,Route, Navigate } from 'react-router-dom';
 import RegLogin from './Pages/Authentication/RegLogin';
 import Dashboard from './Pages/Dashboard/Admin/AdminDashboard';
 import LandingPage from './Pages/Home/LandingPage';
@@ -53,6 +53,7 @@ import BlockchainExplorer from './Pages/Dashboard/Volunteer/BlockchainExplorer';
 import CommonRequestForm from './Pages/Dashboard/User/CommonRequestForm';
 import FoodRequestForm from './Pages/Dashboard/User/FoodRequestForm';
 import FoodRequestsView from './Pages/Dashboard/NGO/FoodRequestsView';
+
 
 function App() {
   return (
@@ -120,7 +121,9 @@ function App() {
         <Route path="/service-request" element={<CommonRequestForm />} />
         <Route path="/food-request" element={<FoodRequestForm />} />
 
-        <Route path="/ngo/food-requests" element={<FoodRequestsView />} />
+        <Route path="/ngo/requests" element={<FoodRequestsView />} />
+
+
 
       </Routes>
     </Router>
