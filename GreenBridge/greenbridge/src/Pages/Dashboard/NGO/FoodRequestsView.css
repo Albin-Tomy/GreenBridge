@@ -1,0 +1,77 @@
+.request-card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    height: 100%;
+}
+
+.request-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.MuiChip-root {
+    font-weight: 500;
+}
+
+.MuiButton-contained {
+    background-color: #359aed;
+}
+
+.MuiButton-contained:hover {
+    background-color: #1f81e2;
+}
+
+.request-card .MuiCardContent-root {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.request-card .MuiTypography-root {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.request-card .MuiSvgIcon-root {
+    color: #666;
+}
+
+.request-card .action-buttons {
+    display: flex;
+    gap: 8px;
+    margin-top: auto;
+}
+
+/* Status-specific colors */
+.MuiChip-root.MuiChip-colorSuccess {
+    background-color: #4caf50;
+}
+
+.MuiChip-root.MuiChip-colorWarning {
+    background-color: #ff9800;
+}
+
+.MuiChip-root.MuiChip-colorError {
+    background-color: #f44336;
+}
+
+.MuiChip-root.MuiChip-colorInfo {
+    background-color: #2196f3;
+}
+
+/* Filter button group */
+.filter-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+@media (max-width: 600px) {
+    .MuiContainer-root {
+        padding: 8px;
+    }
+    .filter-buttons {
+        justify-content: center;
+    }
+} 

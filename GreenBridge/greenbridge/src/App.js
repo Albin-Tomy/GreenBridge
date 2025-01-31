@@ -52,6 +52,7 @@ import VolunteerProfile from './Pages/Dashboard/Volunteer/VolunteerProfile';
 import BlockchainExplorer from './Pages/Dashboard/Volunteer/BlockchainExplorer';
 import CommonRequestForm from './Pages/Dashboard/User/CommonRequestForm';
 import FoodRequestForm from './Pages/Dashboard/User/FoodRequestForm';
+import FoodRequestsView from './Pages/Dashboard/NGO/FoodRequestsView';
 
 function App() {
   return (
@@ -118,6 +119,8 @@ function App() {
 
         <Route path="/service-request" element={<CommonRequestForm />} />
         <Route path="/food-request" element={<FoodRequestForm />} />
+
+        <Route path="/ngo/food-requests" element={<FoodRequestsView />} />
 
       </Routes>
     </Router>
