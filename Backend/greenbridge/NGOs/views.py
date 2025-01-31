@@ -6,6 +6,7 @@ from .models import NGORegistration, NGOProfile
 from .serializers import NGORegistrationSerializer
 from authentication.models import User
 from django.contrib.auth.hashers import make_password
+from .permissions import IsAdmin
 
 @api_view(['POST'])
 def register_ngo(request):
@@ -48,7 +49,7 @@ def register_ngo(request):
         return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
-@permission_classes([IsAdminUser])
+@permission_classes([IsAdmin])
 def approve_ngo(request):
     try:
         ngo_id = request.data.get('ngo_email')
@@ -99,7 +100,7 @@ def approve_ngo(request):
         }, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
-@permission_classes([IsAdminUser])
+@permission_classes([IsAdmin])
 def get_pending_ngo_requests(request):
     try:
         pending_ngos = NGORegistration.objects.filter(status='Pending')
@@ -111,7 +112,7 @@ def get_pending_ngo_requests(request):
         }, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
-@permission_classes([IsAdminUser])
+@permission_classes([IsAdmin])
 def get_all_ngos(request):
     try:
         all_ngos = NGORegistration.objects.all()

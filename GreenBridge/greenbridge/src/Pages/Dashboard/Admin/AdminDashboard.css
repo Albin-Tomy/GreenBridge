@@ -168,3 +168,155 @@ h1, h2, h3 {
         padding-right: 16px !important;
     }
 }
+
+.stat-card {
+  background: linear-gradient(145deg, #ffffff 0%, #f5f5f5 100%);
+  border-radius: 15px !important;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  height: 100%;
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1) !important;
+}
+
+.stat-card .MuiCardContent-root {
+  padding: 24px !important;
+}
+
+.stat-card .MuiTypography-h4 {
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.stat-card .MuiTypography-subtitle1 {
+  font-size: 1rem;
+  color: #7f8c8d;
+}
+
+.stat-card .MuiSvgIcon-root {
+  opacity: 0.9;
+  transition: transform 0.3s ease;
+}
+
+.stat-card:hover .MuiSvgIcon-root {
+  transform: scale(1.1);
+}
+
+.MuiTableContainer-root {
+  margin-top: 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;
+}
+
+.MuiTableHead-root {
+  background-color: #f5f5f5;
+}
+
+.MuiTableHead-root .MuiTableCell-root {
+  font-weight: bold;
+  color: #333;
+}
+
+.MuiButton-contained {
+  background-color: #4CAF50 !important;
+}
+
+.MuiButton-contained:hover {
+  background-color: #45a049 !important;
+}
+
+.MuiIconButton-root {
+  padding: 8px !important;
+}
+
+.MuiIconButton-root:hover {
+  background-color: rgba(76, 175, 80, 0.1) !important;
+}
+
+.MuiTabs-root {
+  background-color: #fff;
+  border-radius: 8px 8px 0 0;
+}
+
+.MuiTab-root {
+  min-width: 120px !important;
+  font-weight: 600 !important;
+}
+
+.MuiTab-root.Mui-selected {
+  color: #4CAF50 !important;
+}
+
+.dialog-title {
+  background-color: #4CAF50;
+  color: white;
+  padding: 16px 24px;
+}
+
+.dialog-content {
+  padding: 24px;
+}
+
+.form-container {
+  padding: 20px;
+}
+
+.table-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.status-chip {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.status-active {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.status-inactive {
+  background-color: #ffebee;
+  color: #c62828;
+}
+
+/* Add these styles */
+.recharts-wrapper {
+  margin: 0 auto;
+  max-width: 100%;
+}
+
+.chart-container {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.MuiPaper-root {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.chart-title {
+  margin-bottom: 1rem !important;
+}
+
+.chart-content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+}
+
+@media (max-width: 1200px) {
+  .recharts-wrapper {
+    transform: scale(0.9);
+    transform-origin: left;
+  }
+}

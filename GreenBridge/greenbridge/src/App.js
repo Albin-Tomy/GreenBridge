@@ -53,7 +53,7 @@ import BlockchainExplorer from './Pages/Dashboard/Volunteer/BlockchainExplorer';
 import CommonRequestForm from './Pages/Dashboard/User/CommonRequestForm';
 import FoodRequestForm from './Pages/Dashboard/User/FoodRequestForm';
 import FoodRequestsView from './Pages/Dashboard/NGO/FoodRequestsView';
-
+import AdminDashboard from './Pages/Dashboard/Admin/AdminDashboard';
 
 function App() {
   return (
@@ -61,7 +61,7 @@ function App() {
     <Router>
       <Routes>
       
-
+        <Route path="/admin/dashboard" element={<AdminProtectedRoute element={<AdminDashboard />} />} />
         <Route path="/admin/ngo" element={<AdminProtectedRoute element={<PendingNgo />} />} />
         <Route path="/volunteer/profile" element={<VolunteerProfile />} />
         <Route path="/admin/allngo" element={<AdminProtectedRoute element={<AllNgo />} />} />
