@@ -5,13 +5,17 @@ import {
   Table, TableBody, TableCell, TableContainer, TableHead,
   TableRow, Paper, Button, IconButton, CircularProgress,
   Drawer, List, ListItem, ListItemIcon, ListItemText, Divider,
-  Dialog, DialogContent, Chip
+  Dialog, DialogContent, Chip, Switch
 } from '@mui/material';
 import {
   Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon,
   Dashboard, ShoppingCart, People, Store, Business,
   Handshake, Assignment, LocalShipping, Assessment,
-  Home, Fastfood
+  Home, Fastfood, KeyboardArrowDown, KeyboardArrowUp,
+  DeleteForever as DeleteForeverIcon,
+  Groups as VolunteerIcon,
+  Category as CategoryIcon,
+  RecyclingRounded as WasteIcon,
 } from '@mui/icons-material';
 import axios from 'axios';
 import ProductForm from '../../../components/Forms/ProductForm';
@@ -50,6 +54,13 @@ function AdminDashboard() {
     orderStatus: [],
     revenueByCategory: []
   });
+  const [expandedMenu, setExpandedMenu] = useState('');
+  const [allSHGs, setAllSHGs] = useState([]);
+  const [allNGOs, setAllNGOs] = useState([]);
+  const [wasteRequests, setWasteRequests] = useState([]);
+  const [volunteers, setVolunteers] = useState([]);
+  const [wasteCategories, setWasteCategories] = useState([]);
+  const [wasteSubCategories, setWasteSubCategories] = useState([]);
 
   useEffect(() => {
     fetchData();
@@ -94,6 +105,48 @@ function AdminDashboard() {
         case 'food-requests':
           const foodRes = await axios.get('http://127.0.0.1:8000/api/v1/food/all/', getAuthHeader());
           setFoodRequests(foodRes.data);
+          break;
+        case 'all-shgs':
+          axios.get('http://127.0.0.1:8000/api/adminpanel/all/', getAuthHeader())
+            .then(response => {
+              setAllSHGs(response.data);
+            })
+            .catch(error => console.error('Error fetching SHGs:', error));
+          break;
+        case 'all-ngos':
+          axios.get('http://127.0.0.1:8000/api/ngo/all/', getAuthHeader())
+            .then(response => {
+              setAllNGOs(response.data);
+            })
+            .catch(error => console.error('Error fetching NGOs:', error));
+          break;
+        case 'waste-requests':
+          axios.get('http://127.0.0.1:8000/api/v1/waste/requests/', getAuthHeader())
+            .then(response => {
+              setWasteRequests(response.data);
+            })
+            .catch(error => console.error('Error fetching waste requests:', error));
+          break;
+        case 'waste-categories':
+          axios.get('http://127.0.0.1:8000/api/v1/waste/categories/', getAuthHeader())
+            .then(response => {
+              setWasteCategories(response.data);
+            })
+            .catch(error => console.error('Error fetching waste categories:', error));
+          break;
+        case 'waste-subcategories':
+          axios.get('http://127.0.0.1:8000/api/v1/waste/subcategories/', getAuthHeader())
+            .then(response => {
+              setWasteSubCategories(response.data);
+            })
+            .catch(error => console.error('Error fetching waste subcategories:', error));
+          break;
+        case 'volunteers':
+          axios.get('http://127.0.0.1:8000/api/v1/volunteers/', getAuthHeader())
+            .then(response => {
+              setVolunteers(response.data);
+            })
+            .catch(error => console.error('Error fetching volunteers:', error));
           break;
         default:
           break;
@@ -277,15 +330,78 @@ function AdminDashboard() {
     }
   };
 
+  const handleWasteRequestStatus = async (requestId, newStatus) => {
+    try {
+      await axios.put(
+        `http://127.0.0.1:8000/api/v1/waste/request/${requestId}/update-status/`,
+        { status: newStatus },
+        getAuthHeader()
+      );
+      fetchData();
+    } catch (error) {
+      console.error('Error updating waste request status:', error);
+    }
+  };
+
+  const handleStatusToggle = async (id, type) => {
+    try {
+      const endpoint = `http://127.0.0.1:8000/api/v1/${type}/toggle-status/${id}/`;
+      await axios.post(endpoint, {}, getAuthHeader());
+      fetchData();
+    } catch (error) {
+      console.error('Error toggling status:', error);
+    }
+  };
+
   const sidebarItems = [
     { text: 'Home', icon: <Home />, section: 'home' },
     { text: 'Dashboard', icon: <Dashboard />, section: 'dashboard' },
-    { text: 'Products', icon: <Store />, section: 'products' },
+    { 
+      text: 'Products', 
+      icon: <Store />, 
+      section: 'products',
+      subItems: [
+        { text: 'All Products', section: 'products' },
+        { text: 'Categories', section: 'categories' },
+        { text: 'Material', section: 'material' }
+      ]
+    },
     { text: 'Orders', icon: <LocalShipping />, section: 'orders' },
     { text: 'Users', icon: <People />, section: 'users' },
-    { text: 'Pending SHGs', icon: <Business />, section: 'pending-shgs' },
-    { text: 'Pending NGOs', icon: <Handshake />, section: 'pending-ngos' },
-    { text: 'Food Requests', icon: <Fastfood />, section: 'food-requests' }
+    { 
+      text: 'SHGs', 
+      icon: <Business />, 
+      section: 'shgs',
+      subItems: [
+        { text: 'All SHGs', section: 'all-shgs' },
+        { text: 'Pending SHGs', section: 'pending-shgs' }
+      ]
+    },
+    { 
+      text: 'NGOs', 
+      icon: <Handshake />, 
+      section: 'ngos',
+      subItems: [
+        { text: 'All NGOs', section: 'all-ngos' },
+        { text: 'Pending NGOs', section: 'pending-ngos' }
+      ]
+    },
+    { text: 'Food Requests', icon: <Fastfood />, section: 'food-requests' },
+    { text: 'Waste Management', icon: <WasteIcon />, section: 'waste', subItems: [
+      { text: 'Waste Requests', section: 'waste-requests' },
+      { text: 'Categories', section: 'waste-categories' },
+      { text: 'Sub Categories', section: 'waste-subcategories' },
+      { text: 'Collection Areas', section: 'collection-areas' }
+    ] },
+    { 
+      text: 'Volunteers', 
+      icon: <VolunteerIcon />, 
+      section: 'volunteers',
+      subItems: [
+        { text: 'All Volunteers', section: 'all-volunteers' },
+        { text: 'Pending Volunteers', section: 'pending-volunteers' }
+      ]
+    },
   ];
 
   const renderContent = () => {
@@ -311,8 +427,18 @@ function AdminDashboard() {
         return renderPendingSHGs();
       case 'pending-ngos':
         return renderPendingNGOs();
+      case 'all-shgs':
+        return renderAllSHGs();
+      case 'all-ngos':
+        return renderAllNGOs();
       case 'food-requests':
         return renderFoodRequests();
+      case 'waste-requests':
+        return renderWasteRequests();
+      case 'waste-categories':
+        return renderWasteCategories();
+      case 'volunteers':
+        return renderVolunteers();
       default:
         return null;
     }
@@ -343,6 +469,9 @@ function AdminDashboard() {
             break;
           case 'user':
             endpoint = `http://127.0.0.1:8000/api/v1/auth/users/delete/${id}/`;
+            break;
+          case 'waste-category':
+            endpoint = `http://127.0.0.1:8000/api/v1/waste/categories/delete/${id}/`;
             break;
           default:
             return;
@@ -591,25 +720,35 @@ function AdminDashboard() {
       <Table>
         <TableHead>
           <TableRow>
-            <TableCell>ID</TableCell>
             <TableCell>Name</TableCell>
+            <TableCell>Category</TableCell>
+            <TableCell>Quantity</TableCell>
             <TableCell>Price</TableCell>
             <TableCell>Stock</TableCell>
+            <TableCell>Status</TableCell>
             <TableCell>Actions</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {products.map((product) => (
-            <TableRow key={product.product_id}>
-              <TableCell>{product.product_id}</TableCell>
+            <TableRow key={product.id}>
               <TableCell>{product.name}</TableCell>
-              <TableCell>${product.price}</TableCell>
-              <TableCell>{product.stock_quantity}</TableCell>
+              <TableCell>{product.category}</TableCell>
+              <TableCell>{product.quantity}</TableCell>
+              <TableCell>{product.price}</TableCell>
+              <TableCell>{product.stock}</TableCell>
+              <TableCell>
+                <Switch
+                  checked={product.is_active}
+                  onChange={() => handleStatusToggle(product.id, 'product')}
+                  color="primary"
+                />
+              </TableCell>
               <TableCell>
                 <IconButton onClick={() => handleEdit(product, 'product')}>
                   <EditIcon />
                 </IconButton>
-                <IconButton onClick={() => handleDelete(product.product_id, 'product')}>
+                <IconButton onClick={() => handleDelete(product.id, 'product')}>
                   <DeleteIcon />
                 </IconButton>
               </TableCell>
@@ -770,6 +909,76 @@ function AdminDashboard() {
     </TableContainer>
   );
 
+  const renderAllSHGs = () => (
+    <TableContainer component={Paper}>
+      <Box p={2}>
+        <Typography variant="h6">All SHGs</Typography>
+      </Box>
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>Name</TableCell>
+            <TableCell>Email</TableCell>
+            <TableCell>Status</TableCell>
+            <TableCell>Actions</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {allSHGs.map((shg) => (
+            <TableRow key={shg.id}>
+              <TableCell>{shg.name}</TableCell>
+              <TableCell>{shg.email}</TableCell>
+              <TableCell>{shg.is_active ? 'Active' : 'Inactive'}</TableCell>
+              <TableCell>
+                <IconButton onClick={() => handleEdit(shg.id, 'shg')}>
+                  <EditIcon />
+                </IconButton>
+                <IconButton onClick={() => handleDelete(shg.id, 'shg')}>
+                  <DeleteIcon />
+                </IconButton>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
+  );
+
+  const renderAllNGOs = () => (
+    <TableContainer component={Paper}>
+      <Box p={2}>
+        <Typography variant="h6">All NGOs</Typography>
+      </Box>
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>Name</TableCell>
+            <TableCell>Email</TableCell>
+            <TableCell>Status</TableCell>
+            <TableCell>Actions</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {allNGOs.map((ngo) => (
+            <TableRow key={ngo.id}>
+              <TableCell>{ngo.name}</TableCell>
+              <TableCell>{ngo.email}</TableCell>
+              <TableCell>{ngo.is_active ? 'Active' : 'Inactive'}</TableCell>
+              <TableCell>
+                <IconButton onClick={() => handleEdit(ngo.id, 'ngo')}>
+                  <EditIcon />
+                </IconButton>
+                <IconButton onClick={() => handleDelete(ngo.id, 'ngo')}>
+                  <DeleteIcon />
+                </IconButton>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
+  );
+
   const renderFoodRequests = () => (
     <TableContainer component={Paper}>
       <Box p={2} display="flex" justifyContent="space-between" alignItems="center">
@@ -832,6 +1041,157 @@ function AdminDashboard() {
     </TableContainer>
   );
 
+  const renderWasteRequests = () => (
+    <TableContainer component={Paper}>
+      <Box p={2}>
+        <Typography variant="h6">Waste Collection Requests</Typography>
+      </Box>
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>User</TableCell>
+            <TableCell>Waste Type</TableCell>
+            <TableCell>Quantity</TableCell>
+            <TableCell>Status</TableCell>
+            <TableCell>Location</TableCell>
+            <TableCell>Actions</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {wasteRequests.map((request) => (
+            <TableRow key={request.id}>
+              <TableCell>{request.user_email}</TableCell>
+              <TableCell>{request.waste_type}</TableCell>
+              <TableCell>{request.quantity} kg</TableCell>
+              <TableCell>
+                <Chip 
+                  label={request.status}
+                  color={
+                    request.status === 'pending' ? 'warning' :
+                    request.status === 'approved' ? 'success' :
+                    request.status === 'completed' ? 'info' : 'error'
+                  }
+                />
+              </TableCell>
+              <TableCell>{request.location}</TableCell>
+              <TableCell>
+                {request.status === 'pending' && (
+                  <>
+                    <Button
+                      color="success"
+                      size="small"
+                      onClick={() => handleWasteRequestStatus(request.id, 'approved')}
+                    >
+                      Approve
+                    </Button>
+                    <Button
+                      color="error"
+                      size="small"
+                      onClick={() => handleWasteRequestStatus(request.id, 'rejected')}
+                    >
+                      Reject
+                    </Button>
+                  </>
+                )}
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
+  );
+
+  const renderWasteCategories = () => (
+    <TableContainer component={Paper}>
+      <Box p={2} display="flex" justifyContent="space-between" alignItems="center">
+        <Typography variant="h6">Waste Categories</Typography>
+        <Button
+          variant="contained"
+          startIcon={<AddIcon />}
+          onClick={() => handleAdd('waste-category')}
+        >
+          Add Category
+        </Button>
+      </Box>
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>Name</TableCell>
+            <TableCell>Description</TableCell>
+            <TableCell>Status</TableCell>
+            <TableCell>Actions</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {wasteCategories.map((category) => (
+            <TableRow key={category.id}>
+              <TableCell>{category.name}</TableCell>
+              <TableCell>{category.description}</TableCell>
+              <TableCell>
+                <Switch
+                  checked={category.is_active}
+                  onChange={() => handleStatusToggle(category.id, 'waste-category')}
+                  color="primary"
+                />
+              </TableCell>
+              <TableCell>
+                <IconButton onClick={() => handleEdit(category, 'waste-category')}>
+                  <EditIcon />
+                </IconButton>
+                <IconButton onClick={() => handleDelete(category.id, 'waste-category')}>
+                  <DeleteIcon />
+                </IconButton>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
+  );
+
+  const renderVolunteers = () => (
+    <TableContainer component={Paper}>
+      <Box p={2} display="flex" justifyContent="space-between" alignItems="center">
+        <Typography variant="h6">Volunteers</Typography>
+      </Box>
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>Name</TableCell>
+            <TableCell>Email</TableCell>
+            <TableCell>Area</TableCell>
+            <TableCell>Status</TableCell>
+            <TableCell>Actions</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {volunteers.map((volunteer) => (
+            <TableRow key={volunteer.id}>
+              <TableCell>{volunteer.name}</TableCell>
+              <TableCell>{volunteer.email}</TableCell>
+              <TableCell>{volunteer.area}</TableCell>
+              <TableCell>
+                <Switch
+                  checked={volunteer.is_active}
+                  onChange={() => handleStatusToggle(volunteer.id, 'volunteer')}
+                  color="primary"
+                />
+              </TableCell>
+              <TableCell>
+                <IconButton onClick={() => handleEdit(volunteer, 'volunteer')}>
+                  <EditIcon />
+                </IconButton>
+                <IconButton onClick={() => handleDelete(volunteer.id, 'volunteer')}>
+                  <DeleteIcon />
+                </IconButton>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
+  );
+
   return (
     <div className="admin-dashboard-container">
       <Drawer
@@ -847,15 +1207,39 @@ function AdminDashboard() {
         <Divider />
         <List>
           {sidebarItems.map((item) => (
-            <ListItem
-              button
-              key={item.section}
-              onClick={() => setActiveSection(item.section)}
-              selected={activeSection === item.section}
-            >
-              <ListItemIcon>{item.icon}</ListItemIcon>
-              <ListItemText primary={item.text} />
-            </ListItem>
+            <React.Fragment key={item.section}>
+              <ListItem
+                button
+                onClick={() => {
+                  if (item.subItems) {
+                    setExpandedMenu(expandedMenu === item.section ? '' : item.section);
+                  } else {
+                    setActiveSection(item.section);
+                  }
+                }}
+              >
+                <ListItemIcon>{item.icon}</ListItemIcon>
+                <ListItemText primary={item.text} />
+                {item.subItems && (
+                  expandedMenu === item.section ? <KeyboardArrowUp /> : <KeyboardArrowDown />
+                )}
+              </ListItem>
+              {item.subItems && expandedMenu === item.section && (
+                <List component="div" disablePadding>
+                  {item.subItems.map((subItem) => (
+                    <ListItem
+                      button
+                      key={subItem.section}
+                      sx={{ pl: 4 }}
+                      onClick={() => setActiveSection(subItem.section)}
+                      selected={activeSection === subItem.section}
+                    >
+                      <ListItemText primary={subItem.text} />
+                    </ListItem>
+                  ))}
+                </List>
+              )}
+            </React.Fragment>
           ))}
         </List>
       </Drawer>
