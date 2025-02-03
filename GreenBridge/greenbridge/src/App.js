@@ -55,6 +55,8 @@ import FoodRequestForm from './Pages/Dashboard/User/FoodRequestForm';
 import FoodRequestsView from './Pages/Dashboard/NGO/FoodRequestsView';
 import AdminDashboard from './Pages/Dashboard/Admin/AdminDashboard';
 import NGODashboard from './Pages/Dashboard/NGO/NGODashboard';
+import VolunteerDashboard from './Pages/Dashboard/Volunteer/VolunteerDashboard';
+
 function App() {
   return (
     
@@ -62,7 +64,7 @@ function App() {
       <Routes>
       
         <Route path="/admin/dashboard" element={<AdminProtectedRoute element={<AdminDashboard />} />} />
-        <Route path="/ngo/dashboard" element={<AdminProtectedRoute element={<NGODashboard />} />} />
+        <Route path="/ngo/dashboard" element={<ProtectedRoute element={<NGODashboard />} allowedRoles={['is_ngo']} />} />
         <Route path="/admin/ngo" element={<AdminProtectedRoute element={<PendingNgo />} />} />
         <Route path="/volunteer/profile" element={<VolunteerProfile />} />
         <Route path="/admin/allngo" element={<AdminProtectedRoute element={<AllNgo />} />} />
@@ -124,7 +126,7 @@ function App() {
 
         <Route path="/ngo/requests" element={<FoodRequestsView />} />
 
-
+        <Route path="/volunteer/dashboard" element={<VolunteerDashboard />} />
 
       </Routes>
     </Router>
