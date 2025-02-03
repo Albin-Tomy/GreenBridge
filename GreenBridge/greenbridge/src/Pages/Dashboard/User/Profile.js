@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './Profile.css';
-import Header from '../../../components/Header'; // Ensure you have CSS for styling the profile page
+import Header from '../../../components/Header';
+import { useNavigate } from 'react-router-dom';
 
 const UserProfile = () => {
+  const navigate = useNavigate();
   const [profile, setProfile] = useState({
     first_name: '',
     last_name: '',
@@ -14,41 +16,66 @@ const UserProfile = () => {
     default_state: '',
     default_pincode: ''
   });
-  const [isEditable, setIsEditable] = useState(false); // Toggle between view and edit mode
+  const [isEditable, setIsEditable] = useState(true); // Set to true by default for incomplete profiles
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(true); // Loading state
+  const [loading, setLoading] = useState(true);
   const [successMessage, setSuccessMessage] = useState('');
+  const [isProfileComplete, setIsProfileComplete] = useState(false);
 
-  const userId = localStorage.getItem('userId'); // Retrieve user ID from localStorage
+  const userId = localStorage.getItem('userId');
   const token = localStorage.getItem('authToken');
+  const user = JSON.parse(localStorage.getItem('user'));
 
   useEffect(() => {
+    let isMounted = true;  // Add mounted flag
+
     const fetchProfile = async () => {
+      if (!userId || !token) return;  // Add guard clause
+      
       try {
         const response = await axios.get(`http://127.0.0.1:8000/api/v1/auth/user_profiles/${userId}/`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
         });
-        setProfile(response.data);
+        
+        if (isMounted) {  // Only update state if component is mounted
+          setProfile(response.data);
+          const isComplete = response.data.is_profile_completed;
+          setIsProfileComplete(isComplete);
+          setIsEditable(!isComplete);
+          setLoading(false);
+        }
       } catch (error) {
+        if (!isMounted) return;  // Don't update state if unmounted
+        
         if (error.response && error.response.status === 404) {
-          console.log('Profile not found, ready to create one.');
+          setIsEditable(true);
+          if (user?.email) {
+            setProfile(prev => ({ ...prev, email: user.email }));
+          }
         } else {
           console.error('Error fetching profile:', error);
           setError('Error fetching profile.');
         }
-      } finally {
-        setLoading(false); // Set loading to false after fetching
+        setLoading(false);
       }
     };
 
     fetchProfile();
-  }, [userId, token]);
+
+    // Cleanup function
+    return () => {
+      isMounted = false;
+    };
+  }, [userId, token]); // Only depend on userId and token
 
   const validateName = (name) => /^[A-Za-z]+$/.test(name); // Ensure the name contains only letters
   const validatePhone = (phone) => /^[0-9]{10}$/.test(phone); // Ensure the phone number is a 10-digit number
-  const validatePincode = (pincode) => /^[0-9]{6}$/.test(pincode); // Ensure pincode is a 6-digit number
+  const validatePincode = (pincode) => {
+    const pincodeStr = pincode.toString();
+    return /^[0-9]{6}$/.test(pincodeStr);
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -94,14 +121,10 @@ const UserProfile = () => {
     ]
   };
 
-  const handleEditToggle = () => {
-    setIsEditable(!isEditable); // Toggle edit mode
-    setError(''); // Reset error message when toggling
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setSuccessMessage(''); // Reset success message
+    setSuccessMessage('');
+    setError('');
 
     // Validation checks
     if (!validateName(profile.first_name)) {
@@ -122,44 +145,67 @@ const UserProfile = () => {
     }
 
     try {
-      const response = await axios.put(`http://127.0.0.1:8000/api/v1/auth/user_profiles/update/${userId}/`, profile, {
-        headers: {
-          Authorization: `Bearer ${token}`
+      const response = await axios.put(
+        `http://127.0.0.1:8000/api/v1/auth/user_profiles/update/${userId}/`,
+        {
+          first_name: profile.first_name,
+          last_name: profile.last_name,
+          phone: profile.phone,
+          default_address: profile.default_address,
+          default_city: profile.default_city,
+          default_state: profile.default_state,
+          default_pincode: profile.default_pincode.toString() // Convert to string
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
         }
-      });
-      setSuccessMessage('Profile updated successfully!'); // Show success message
-      setIsEditable(false); // Disable edit mode after saving
-    } catch (error) {
-      if (error.response && error.response.status === 404) {
-        // Profile does not exist, create a new one
-        try {
-          await axios.post(`http://127.0.0.1:8000/api/v1/auth/user_profiles/`, {
-            user: userId,
-            ...profile
-          }, {
-            headers: {
-              Authorization: `Bearer ${token}`
-            }
-          });
-          setSuccessMessage('Profile created successfully!'); // Show success message for creation
-        } catch (creationError) {
-          console.error('Error creating profile:', creationError);
-          setError('Error creating profile.'); // Show error for creation failure
+      );
+
+      setSuccessMessage('Profile updated successfully!');
+      setIsProfileComplete(true);
+      setIsEditable(false);
+
+      // Redirect based on user role after profile completion
+      if (user) {
+        if (user.is_superuser) {
+          navigate('/admin/admin');
+        } else if (user.is_shg) {
+          navigate('/shg');
+        } else if (user.is_ngo) {
+          navigate('/ngo/dashboard');
+        } else {
+          navigate('/');
         }
-      } else {
-        console.error('Error updating profile:', error);
-        setError('Error updating profile.'); // Show error for update failure
       }
+    } catch (error) {
+      console.error('Error updating profile:', error.response?.data || error);
+      setError(error.response?.data?.error || 'Error updating profile. Please try again.');
     }
   };
 
-  if (loading) return <p>Loading...</p>; // Show loading message while fetching
+  if (loading) {
+    return (
+      <div className="profile-page">
+        <p>Loading profile...</p>
+      </div>
+    );
+  }
 
   return (
     <div>
-
+      <Header />
       <div className="profile-page">
-        <h2 className="profile-heading">User Profile</h2>
+        <h2 className="profile-heading">
+          {!isProfileComplete ? 'Complete Your Profile' : 'User Profile'}
+        </h2>
+        {!isProfileComplete && (
+          <p className="profile-message">
+            Please complete your profile information to continue
+          </p>
+        )}
+        
         <div className="profile-details">
           <p className="profile-item">
             <strong>First Name:</strong> 
@@ -246,42 +292,27 @@ const UserProfile = () => {
             )}
           </p>
 
-          {/* <p className="profile-item">
+          <p className="profile-item">
             <strong>State:</strong> 
             {isEditable ? (
-              <input
-                type="text"
+              <select
                 name="default_state"
                 value={profile.default_state}
                 onChange={handleInputChange}
                 required
                 className="profile-input"
-              />
+              >
+                <option value="">Select State</option>
+                {countryOptions.India.map((state) => (
+                  <option key={state} value={state}>
+                    {state}
+                  </option>
+                ))}
+              </select>
             ) : (
               <span className="profile-value">{profile.default_state}</span>
             )}
-          </p> */}
-          <p className="profile-item">
-    <strong>State:</strong> 
-    {isEditable ? (
-      <select
-        name="default_state"
-        value={profile.default_state}
-        onChange={handleInputChange}
-        required
-        className="profile-input"
-      >
-        <option value="">Select State</option>
-        {countryOptions.India.map((state) => (
-          <option key={state} value={state}>
-            {state}
-          </option>
-        ))}
-      </select>
-    ) : (
-      <span className="profile-value">{profile.default_state}</span>
-    )}
-  </p>
+          </p>
 
           <p className="profile-item">
             <strong>Pincode:</strong> 
@@ -303,12 +334,21 @@ const UserProfile = () => {
         {error && <p className="form-error">{error}</p>}
         {successMessage && <p className="form-success">{successMessage}</p>}
 
-        <button type="button" onClick={handleEditToggle} className="edit-btn">
-          {isEditable ? 'Cancel' : 'Edit Profile'}
-        </button>
-
-        {isEditable && (
-          <button type="submit" onClick={handleSubmit} className="save-btn">Update Profile</button>
+        {!isProfileComplete ? (
+          <button type="submit" onClick={handleSubmit} className="save-btn">
+            Complete Profile
+          </button>
+        ) : (
+          <>
+            <button type="button" onClick={() => setIsEditable(!isEditable)} className="edit-btn">
+              {isEditable ? 'Cancel' : 'Edit Profile'}
+            </button>
+            {isEditable && (
+              <button type="submit" onClick={handleSubmit} className="save-btn">
+                Update Profile
+              </button>
+            )}
+          </>
         )}
       </div>
     </div>

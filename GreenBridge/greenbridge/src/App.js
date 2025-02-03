@@ -56,80 +56,86 @@ import FoodRequestsView from './Pages/Dashboard/NGO/FoodRequestsView';
 import AdminDashboard from './Pages/Dashboard/Admin/AdminDashboard';
 import NGODashboard from './Pages/Dashboard/NGO/NGODashboard';
 import VolunteerDashboard from './Pages/Dashboard/Volunteer/VolunteerDashboard';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
 function App() {
   return (
+    <GoogleOAuthProvider 
+      clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}
+    >
+      <Router>
+        <Routes>
+          <Route path="/admin/dashboard" element={<AdminProtectedRoute element={<AdminDashboard />} />} />
+          <Route path="/ngo/dashboard" element={<ProtectedRoute element={<NGODashboard />} allowedRoles={['is_ngo']} />} />
+          <Route path="/admin/ngo" element={<AdminProtectedRoute element={<PendingNgo />} />} />
+          <Route path="/volunteer/profile" element={<VolunteerProfile />} />
+          <Route path="/admin/allngo" element={<AdminProtectedRoute element={<AllNgo />} />} />
+          <Route path="/admin/order" element={<AdminProtectedRoute element={<AdminOrder />} />}/>
+          <Route path="/admin/home" element={<AdminProtectedRoute element={<Dashboard />} />}/>
+          <Route path="admin/view-all-shgs" element={<AdminProtectedRoute element={<AllSHGsPage />}/>} />
+          <Route path="admin/pending-requests" element={< AdminProtectedRoute element={<PendingRequestsPage />}/>} />
     
-    <Router>
-      <Routes>
-      
-        <Route path="/admin/dashboard" element={<AdminProtectedRoute element={<AdminDashboard />} />} />
-        <Route path="/ngo/dashboard" element={<ProtectedRoute element={<NGODashboard />} allowedRoles={['is_ngo']} />} />
-        <Route path="/admin/ngo" element={<AdminProtectedRoute element={<PendingNgo />} />} />
-        <Route path="/volunteer/profile" element={<VolunteerProfile />} />
-        <Route path="/admin/allngo" element={<AdminProtectedRoute element={<AllNgo />} />} />
-        <Route path="/admin/order" element={<AdminProtectedRoute element={<AdminOrder />} />}/>
-        <Route path="/admin/home" element={<AdminProtectedRoute element={<Dashboard />} />}/>
-        <Route path="admin/view-all-shgs" element={<AdminProtectedRoute element={<AllSHGsPage />}/>} />
-        <Route path="admin/pending-requests" element={< AdminProtectedRoute element={<PendingRequestsPage />}/>} />
-    
-        <Route path="/admin/admin" element={ < AdminProtectedRoute element={<Admin />}/>} />
-        <Route path="/admin/pending-requests" element={< AdminProtectedRoute element={<PendingRequestsPage />}/>} />
-        <Route path="/admin/view-all-shgs" element={<AllSHGsPage />} />
-        <Route path='/shgregister' element={<ShgRegistration />} />
-        <Route path="/login" element={<RegLogin />} />
-        <Route path="/signup" element={<RegLogin />} />
-        <Route path="/" element={<LandingPage />} />
-        {/* <Route path="/" element={<Home />} /> */}
-        <Route path='/shg' element={< ShgProtectedRoute element={<Staff/>}/>}/>
-        <Route path='/products' element={<ProductsPage/>}/>
-        <Route path="/address-list" element={<AddressSelection />} />
-        <Route path="/request" element={<WasteCollectionRequest />} />
-        <Route path="/category" element={< ShgProtectedRoute element={<WasteCategory />}/>} />
-        <Route path="/subcategory" element={< ShgProtectedRoute element={<WasteSubcategory />}/>} />
-        <Route path="/location" element={< ShgProtectedRoute element={<LocationForm />}/>} />
-        <Route path="/shgrequest" element={<SHGRequests />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/password-reset-confirm/:uidb64/:token" element={<ResetPassword />} />
-        <Route path='/staff' element={< ShgProtectedRoute element={<Staff/>}/>}/>
-        <Route path="/products/:id" element={<ProductDetail/>} />
-        <Route path="/cart" element={<CartPage />} />
-        <Route path="/wishlist" element={<Wishlist />} />
-        {/* <Route path="/admindash" element={<AdminDash />} /> */}
-        <Route path="/stafforder" element={< ShgProtectedRoute element={<StaffOrders />}/>} />
+          <Route path="/admin/admin" element={ < AdminProtectedRoute element={<Admin />}/>} />
+          <Route path="/admin/pending-requests" element={< AdminProtectedRoute element={<PendingRequestsPage />}/>} />
+          <Route path="/admin/view-all-shgs" element={<AllSHGsPage />} />
+          <Route path='/shgregister' element={<ShgRegistration />} />
+          <Route path="/login" element={<RegLogin />} />
+          <Route path="/signup" element={<RegLogin />} />
+          <Route path="/" element={<LandingPage />} />
+          {/* <Route path="/" element={<Home />} /> */}
+          <Route path='/shg' element={< ShgProtectedRoute element={<Staff/>}/>}/>
+          <Route path='/products' element={<ProductsPage/>}/>
+          <Route path="/address-list" element={<AddressSelection />} />
+          <Route path="/request" element={<WasteCollectionRequest />} />
+          <Route path="/category" element={< ShgProtectedRoute element={<WasteCategory />}/>} />
+          <Route path="/subcategory" element={< ShgProtectedRoute element={<WasteSubcategory />}/>} />
+          <Route path="/location" element={< ShgProtectedRoute element={<LocationForm />}/>} />
+          <Route path="/shgrequest" element={<SHGRequests />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/password-reset-confirm/:uidb64/:token" element={<ResetPassword />} />
+          <Route path='/staff' element={< ShgProtectedRoute element={<Staff/>}/>}/>
+          <Route path="/products/:id" element={<ProductDetail/>} />
+          <Route path="/cart" element={<CartPage />} />
+          <Route path="/wishlist" element={<Wishlist />} />
+          {/* <Route path="/admindash" element={<AdminDash />} /> */}
+          <Route path="/stafforder" element={< ShgProtectedRoute element={<StaffOrders />}/>} />
 
-        <Route path="/shgwaste" element={< ShgProtectedRoute element={<Shgwaste />}/>} />
-        
-        <Route path="/userorder" element={<UserOrders />} />
+          <Route path="/shgwaste" element={< ShgProtectedRoute element={<Shgwaste />}/>} />
+          
+          <Route path="/userorder" element={<UserOrders />} />
 
-        <Route path="/sidebar" element={<Sidebar />} />
+          <Route path="/sidebar" element={<Sidebar />} />
 
-        <Route path="/userview" element={<UserRequestView />} />
-        <Route path="/ngoregister" element={<NgoRegistration />} />
+          <Route path="/userview" element={<UserRequestView />} />
+          <Route path="/ngoregister" element={<NgoRegistration />} />
 
-        <Route path="/allsh" element={<AllSh />} />
-        <Route path="/pendingshg" element={<PendingShg />} />
+          <Route path="/allsh" element={<AllSh />} />
+          <Route path="/pendingshg" element={<PendingShg />} />
 
-        <Route path="/payment" element={<Payment />} />
-        <Route path="/landing" element={<LandingPages />} />
-        <Route path="/homepage" element={<HomePage />} />
-        <Route path="/dashboard" element={<DashboardLayout />}>
-          <Route path='profile' element={<Profile/>}/>
-        </Route>
+          <Route path="/payment" element={<Payment />} />
+          <Route path="/landing" element={<LandingPages />} />
+          <Route path="/homepage" element={<HomePage />} />
+          <Route path="/dashboard" element={<DashboardLayout />}>
+            <Route path='profile' element={<Profile/>}/>
+          </Route>
 
-        <Route path="/volunteer-registration" element={<VolunteerRegistration />} />
+          <Route path="/volunteer-registration" element={<VolunteerRegistration />} />
 
-        <Route path="/volunteer/blockchain" element={<BlockchainExplorer />} />
+          <Route path="/volunteer/blockchain" element={<BlockchainExplorer />} />
 
-        <Route path="/service-request" element={<CommonRequestForm />} />
-        <Route path="/food-request" element={<FoodRequestForm />} />
+          <Route path="/service-request" element={<CommonRequestForm />} />
+          <Route path="/food-request" element={<FoodRequestForm />} />
 
-        <Route path="/ngo/requests" element={<FoodRequestsView />} />
+          <Route path="/ngo/requests" element={<FoodRequestsView />} />
 
-        <Route path="/volunteer/dashboard" element={<VolunteerDashboard />} />
+          <Route path="/volunteer/dashboard" element={<VolunteerDashboard />} />
 
-      </Routes>
-    </Router>
+          <Route path="/dashboard/profile" element={<Profile />} />
+          <Route path="/profile" element={<Profile />} />
+
+        </Routes>
+      </Router>
+    </GoogleOAuthProvider>
   );
 }
 

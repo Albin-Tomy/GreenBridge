@@ -56,22 +56,20 @@ const Login = ({ setIslogin }) => {
       const { access, user_id } = response.data;
   
       // Store token and user data in localStorage
-      localStorage.setItem('authToken', access);  // Store access token
-      localStorage.setItem('user', JSON.stringify(response.data.user));  // Store user object
-      localStorage.setItem('userId', user_id);  // Store user ID
+      localStorage.setItem('authToken', access);  
+      localStorage.setItem('user', JSON.stringify(response.data.user));  
+      localStorage.setItem('userId', user_id);  
 
-      console.log(localStorage.getItem('userId'));
-
-      console.log('User logged in:', response.data);
-
-      // Redirect based on role
+      // Redirect based on user role
       if (response.data.user.is_active) {
         if (response.data.user.is_superuser) {
-          navigate('/admin/admin'); // Redirect to admin dashboard
+          navigate('/admin/admin'); 
         } else if (response.data.user.is_shg) {
-          navigate('/shg'); // Redirect to SHG dashboard
+          navigate('/shg'); 
+        } else if (response.data.user.is_ngo) { // Add check for NGO role
+          navigate('/ngo/dashboard'); // Redirect to NGO dashboard
         } else {
-          navigate('/'); // Redirect to general user dashboard
+          navigate('/'); 
         }
       } else {
         alert('User is not activated/approved. Please try again later.');
@@ -112,6 +110,69 @@ const Login = ({ setIslogin }) => {
         setError(error.response?.data?.error || 'Failed to send reset password link.');
       });
   };
+
+  const googleLogin = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      try {
+        const response = await axios.post('http://127.0.0.1:8000/api/v1/auth/google-signin/', {
+          token: tokenResponse.access_token
+        });
+
+        const { access, user } = response.data;
+
+        // Store token and user data
+        localStorage.setItem('authToken', access);
+        localStorage.setItem('user', JSON.stringify(user));
+        localStorage.setItem('userId', user.id);
+
+        // Try to get user profile
+        try {
+          await axios.get(`http://127.0.0.1:8000/api/v1/auth/user_profiles/${user.id}/`, {
+            headers: { Authorization: `Bearer ${access}` }
+          });
+        } catch (profileError) {
+          // Create a basic profile if it doesn't exist
+          if (profileError.response?.status === 404) {
+            try {
+              await axios.post(
+                'http://127.0.0.1:8000/api/v1/auth/user_profiles/',
+                {
+                  user: user.id,
+                  email: user.email,
+                  first_name: '',
+                  last_name: ''
+                },
+                {
+                  headers: { Authorization: `Bearer ${access}` }
+                }
+              );
+            } catch (createError) {
+              console.error('Error creating profile:', createError);
+            }
+          }
+        }
+
+        // Redirect based on user role
+        if (user.is_active) {
+          if (user.is_superuser) {
+            navigate('/admin/admin');
+          } else if (user.is_shg) {
+            navigate('/shg');
+          } else if (user.is_ngo) {
+            navigate('/ngo/dashboard');
+          } else {
+            navigate('/'); // Direct to home page for regular users
+          }
+        }
+      } catch (error) {
+        console.error('Google login error:', error);
+        setError('Google login failed. Please try again.');
+      }
+    },
+    onError: () => {
+      setError('Google login failed. Please try again.');
+    }
+  });
 
   return (
     <div className="login-page">
@@ -171,8 +232,13 @@ const Login = ({ setIslogin }) => {
 
             <div className="or-divider">or</div>
 
-            <button type="button" className="google-btn" >
+            <button 
+              type="button" 
+              className="google-btn"
+              onClick={() => googleLogin()}
+            >
               <img src={google} alt="Google Logo" />
+              <span>Sign in with Google</span>
             </button>
           </form>
         ) : (

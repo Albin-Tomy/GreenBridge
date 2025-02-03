@@ -130,12 +130,39 @@ def create_user_profile(request):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
-# @permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated])
 def user_profile_detail(request, id):
     try:
-        user_profile = get_object_or_404(User_profile, user_id=id)
-        serializer = UserProfileSerializer(user_profile)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        # Try to get existing profile or create a basic one
+        profile, created = User_profile.objects.get_or_create(
+            user_id=id,
+            defaults={
+                'first_name': '',
+                'last_name': '',
+                'email': request.user.email,
+                'phone': '',
+                'default_address': '',
+                'default_city': '',
+                'default_state': '',
+                'default_pincode': ''
+            }
+        )
+
+        # Check if profile is complete
+        is_complete = all([
+            profile.first_name,
+            profile.last_name,
+            profile.phone,
+            profile.default_address,
+            profile.default_city,
+            profile.default_state,
+            profile.default_pincode
+        ])
+        
+        serializer = UserProfileSerializer(profile)
+        data = serializer.data
+        data['is_profile_completed'] = is_complete
+        return Response(data, status=status.HTTP_200_OK)
     except Exception as e:
         return Response({"error": str(e)}, status=status.HTTP_404_NOT_FOUND)
 
@@ -150,14 +177,31 @@ def user_profile_update(request, id):
         if 'email' in request.data:
             request.data.pop('email')
         
+        # Convert pincode to string if it's a number
+        if 'default_pincode' in request.data:
+            request.data['default_pincode'] = str(request.data['default_pincode'])
+        
         serializer = UserProfileSerializer(user_profile, data=request.data, partial=True)
         if serializer.is_valid():
-            serializer.save()
+            profile = serializer.save()
+            
+            # Check if all required fields are filled
+            is_complete = all([
+                profile.first_name,
+                profile.last_name,
+                profile.phone,
+                profile.default_address,
+                profile.default_city,
+                profile.default_state,
+                profile.default_pincode
+            ])
+            
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
-        return Response({"error": str(e)}, status=status.HTTP_404_NOT_FOUND)
+        print(f"Error updating profile: {str(e)}")  # Add debug logging
+        return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
     
 
     
@@ -418,28 +462,51 @@ def google_sign_in(request):
     if not access_token:
         return Response({'error': 'Token is required'}, status=status.HTTP_400_BAD_REQUEST)
 
-    google_response = requests.get(
-        f"https://www.googleapis.com/oauth2/v1/userinfo?access_token={access_token}"
-    )
+    try:
+        google_response = requests.get(
+            f"https://www.googleapis.com/oauth2/v1/userinfo?access_token={access_token}"
+        )
 
-    if google_response.status_code != 200:
-        return Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
+        if google_response.status_code != 200:
+            return Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
 
-    google_data = google_response.json()
-    email = google_data.get('email')
+        google_data = google_response.json()
+        email = google_data.get('email')
 
-    # Create or get the user
-    user, created = User.objects.get_or_create(email=email)
+        # Get or create user
+        user, created = User.objects.get_or_create(
+            email=email,
+            defaults={
+                'is_active': True,
+            }
+        )
 
-    # Generate JWT tokens
-    refresh = RefreshToken.for_user(user)
-    access_token = str(refresh.access_token)
+        # Create a basic profile if it doesn't exist
+        try:
+            profile = User_profile.objects.get(user=user)
+        except User_profile.DoesNotExist:
+            profile = User_profile.objects.create(
+                user=user,
+                first_name=google_data.get('given_name', ''),
+                last_name=google_data.get('family_name', ''),
+                email=email,
+            )
 
-    return Response({
-        'access_token': access_token,
-        'refresh_token': str(refresh),
-        'user': {
-            'id': user.id,
-            'email': user.email,
-        }
-    }, status=status.HTTP_200_OK)
+        # Generate JWT token
+        refresh = RefreshToken.for_user(user)
+        access_token = str(refresh.access_token)
+
+        return Response({
+            'access': access_token,
+            'user': {
+                'id': user.id,
+                'email': user.email,
+                'is_superuser': user.is_superuser,
+                'is_shg': user.is_shg,
+                'is_ngo': user.is_ngo,
+                'is_active': user.is_active,
+            }
+        })
+
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)

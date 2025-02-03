@@ -41,7 +41,8 @@ const Dropdown = ({ isOpen, toggleDropdown, handleLogout, displayName, isLoggedI
           <>
             <Link to="/login">Login</Link>
             <Link to="/signup">Register</Link>
-            <Link to="/shgregister">Join the Community</Link>
+            <Link to="/shgregister">Join as SHG</Link>
+            <Link to="/ngoregister">Join as NGO</Link>
           </>
         )}
       </div>

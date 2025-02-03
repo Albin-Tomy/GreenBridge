@@ -79,7 +79,11 @@ const PendingNGOPage = () => {
 
       const response = await axios.post(
         'http://127.0.0.1:8000/api/ngo/approve/',
-        { ngo_email: email, action },
+        { 
+          ngo_email: email, 
+          action,
+          is_ngo: action === 'approve' ? true : false
+        },
         config
       );
 
