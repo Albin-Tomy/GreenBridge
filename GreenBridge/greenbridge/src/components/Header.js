@@ -32,7 +32,7 @@ const Dropdown = ({ isOpen, toggleDropdown, handleLogout, displayName, isLoggedI
         {isLoggedIn ? (
           <>
             <p className="dropdown-username">{displayName}</p>
-            <Link to="/dashboard">Edit Profile</Link>
+            <Link to="/user">Profile</Link>
             <button onClick={handleLogout} className="logout-btn">
               Logout
             </button>

@@ -69,7 +69,7 @@ const Login = ({ setIslogin }) => {
         } else if (response.data.user.is_ngo) { // Add check for NGO role
           navigate('/ngo/dashboard'); // Redirect to NGO dashboard
         } else {
-          navigate('/'); 
+          navigate('/'); // Redirect to user dashboard profile page
         }
       } else {
         alert('User is not activated/approved. Please try again later.');
@@ -161,7 +161,7 @@ const Login = ({ setIslogin }) => {
           } else if (user.is_ngo) {
             navigate('/ngo/dashboard');
           } else {
-            navigate('/'); // Direct to home page for regular users
+            navigate('/'); // Redirect to user dashboard profile page
           }
         }
       } catch (error) {

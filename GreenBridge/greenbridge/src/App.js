@@ -57,6 +57,7 @@ import AdminDashboard from './Pages/Dashboard/Admin/AdminDashboard';
 import NGODashboard from './Pages/Dashboard/NGO/NGODashboard';
 import VolunteerDashboard from './Pages/Dashboard/Volunteer/VolunteerDashboard';
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import UserDashboard from './Pages/Dashboard/User/UserDashboard';
 
 function App() {
   return (
@@ -132,6 +133,13 @@ function App() {
 
           <Route path="/dashboard/profile" element={<Profile />} />
           <Route path="/profile" element={<Profile />} />
+
+          <Route path="/user" element={<UserDashboard />}>
+            <Route path="profile" element={<Profile />} />
+            <Route path="volunteer-registration" element={<VolunteerRegistration />} />
+            <Route path="volunteer-profile" element={<VolunteerProfile />} />
+            <Route path="requests" element={<UserRequestView />} />
+          </Route>
 
         </Routes>
       </Router>
