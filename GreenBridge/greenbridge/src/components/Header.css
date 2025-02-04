@@ -445,15 +445,15 @@ header {
   /* Mobile Navigation Styles */
   .mobile-nav {
     position: fixed;
-    top: 6.4rem;
+    top: 6.3rem;  /* Reduced from 6.3rem */
     right: -100%;
-    width: 250px;
+    width: 300px;  /* Increased from 250px */
     height: 100%;
     background-color: rgb(255, 255, 255);
     color: #fff;
     transition: right 0.3s ease;
     z-index: 1000;
-    padding-top: 60px;
+    padding-top: 20px;  /* Reduced from 60px */
 }
   
   .mobile-nav.open {
@@ -485,9 +485,9 @@ header {
     align-items: center;
     color: #fff;
     text-decoration: none;
-    padding: 12px 20px;
+    padding: 12px 25px;  /* Increased horizontal padding */
     border-radius: 4px;
-    margin: 5px 15px;
+    margin: 5px 20px;  /* Increased horizontal margin */
     background-color: rgba(172, 75, 75, 0.1);
     transition: all 0.3s ease;
   }

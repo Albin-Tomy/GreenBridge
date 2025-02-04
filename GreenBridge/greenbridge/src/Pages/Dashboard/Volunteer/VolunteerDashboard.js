@@ -22,7 +22,7 @@ import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import RestaurantIcon from '@mui/icons-material/Restaurant';
 import ShoppingBasketIcon from '@mui/icons-material/ShoppingBasket';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
-import Header from '../../../components/Navbar';
+import Header from '../../../components/Header';
 import axios from 'axios';
 import { format } from 'date-fns';
 
