@@ -114,9 +114,25 @@ const Login = ({ setIslogin }) => {
   const googleLogin = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
       try {
+        // Add detailed logging of the token response
+        console.log('Full Google token response:', {
+          access_token: tokenResponse.access_token,
+          token_type: tokenResponse.token_type,
+          expires_in: tokenResponse.expires_in,
+          scope: tokenResponse.scope,
+          full: tokenResponse
+        });
+        
+        // Log the request being sent
+        console.log('Sending request to backend with data:', {
+          token: tokenResponse.access_token
+        });
+
         const response = await axios.post('http://127.0.0.1:8000/api/v1/auth/google-signin/', {
           token: tokenResponse.access_token
         });
+
+        console.log('Backend response:', response.data);
 
         const { access, user } = response.data;
 
@@ -124,33 +140,6 @@ const Login = ({ setIslogin }) => {
         localStorage.setItem('authToken', access);
         localStorage.setItem('user', JSON.stringify(user));
         localStorage.setItem('userId', user.id);
-
-        // Try to get user profile
-        try {
-          await axios.get(`http://127.0.0.1:8000/api/v1/auth/user_profiles/${user.id}/`, {
-            headers: { Authorization: `Bearer ${access}` }
-          });
-        } catch (profileError) {
-          // Create a basic profile if it doesn't exist
-          if (profileError.response?.status === 404) {
-            try {
-              await axios.post(
-                'http://127.0.0.1:8000/api/v1/auth/user_profiles/',
-                {
-                  user: user.id,
-                  email: user.email,
-                  first_name: '',
-                  last_name: ''
-                },
-                {
-                  headers: { Authorization: `Bearer ${access}` }
-                }
-              );
-            } catch (createError) {
-              console.error('Error creating profile:', createError);
-            }
-          }
-        }
 
         // Redirect based on user role
         if (user.is_active) {
@@ -161,17 +150,27 @@ const Login = ({ setIslogin }) => {
           } else if (user.is_ngo) {
             navigate('/ngo/dashboard');
           } else {
-            navigate('/'); // Redirect to user dashboard profile page
+            navigate('/');
           }
+        } else {
+          setError('Account is not activated. Please check your email.');
         }
       } catch (error) {
-        console.error('Google login error:', error);
-        setError('Google login failed. Please try again.');
+        // Enhanced error logging
+        console.error('Google login error details:', {
+          response: error.response?.data,
+          status: error.response?.status,
+          headers: error.response?.headers,
+          fullError: error
+        });
+        setError(error.response?.data?.error || 'Google login failed. Please try again.');
       }
     },
-    onError: () => {
-      setError('Google login failed. Please try again.');
-    }
+    onError: (error) => {
+      console.error('Google OAuth error:', error);
+      setError('Failed to connect to Google. Please try again.');
+    },
+    scope: 'email profile', // Add specific scopes
   });
 
   return (

@@ -458,55 +458,114 @@ def verify_email(request, uidb64, token):
 
 @api_view(['POST'])
 def google_sign_in(request):
-    access_token = request.data.get('token')
-    if not access_token:
-        return Response({'error': 'Token is required'}, status=status.HTTP_400_BAD_REQUEST)
-
     try:
-        google_response = requests.get(
-            f"https://www.googleapis.com/oauth2/v1/userinfo?access_token={access_token}"
-        )
+        # Log the incoming request data
+        print("Received request data:", request.data)
+        access_token = request.data.get('token')
+        print("Extracted access token:", access_token)
+
+        if not access_token:
+            return Response({
+                'error': 'Token is required',
+                'received_data': request.data
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Log the request we're about to make to Google
+        print("Making request to Google with token:", access_token[:10] + "...")
+
+        try:
+            google_response = requests.get(
+                'https://www.googleapis.com/oauth2/v3/userinfo',
+                headers={'Authorization': f'Bearer {access_token}'}
+            )
+            print("Google API response status:", google_response.status_code)
+            print("Google API response:", google_response.text)
+
+        except requests.exceptions.RequestException as e:
+            print("Error making request to Google:", str(e))
+            return Response({
+                'error': 'Failed to communicate with Google',
+                'details': str(e)
+            }, status=status.HTTP_400_BAD_REQUEST)
 
         if google_response.status_code != 200:
-            return Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({
+                'error': 'Failed to verify Google token',
+                'google_status': google_response.status_code,
+                'google_response': google_response.text
+            }, status=status.HTTP_400_BAD_REQUEST)
 
-        google_data = google_response.json()
-        email = google_data.get('email')
-
-        # Get or create user
-        user, created = User.objects.get_or_create(
-            email=email,
-            defaults={
-                'is_active': True,
-            }
-        )
-
-        # Create a basic profile if it doesn't exist
         try:
-            profile = User_profile.objects.get(user=user)
-        except User_profile.DoesNotExist:
-            profile = User_profile.objects.create(
-                user=user,
-                first_name=google_data.get('given_name', ''),
-                last_name=google_data.get('family_name', ''),
+            google_data = google_response.json()
+            print("Parsed Google data:", google_data)
+        except ValueError as e:
+            print("Error parsing Google response:", str(e))
+            return Response({
+                'error': 'Invalid response from Google',
+                'details': str(e)
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        email = google_data.get('email')
+        if not email:
+            return Response({
+                'error': 'Email not provided by Google',
+                'google_data': google_data
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            # Get or create user
+            user, created = User.objects.get_or_create(
                 email=email,
+                defaults={
+                    'is_active': True,
+                    'password': make_password(None)
+                }
             )
+            print(f"User {'created' if created else 'retrieved'}: {email}")
 
-        # Generate JWT token
-        refresh = RefreshToken.for_user(user)
-        access_token = str(refresh.access_token)
+            # Create or update user profile - removed email field
+            profile, profile_created = User_profile.objects.get_or_create(
+                user=user,
+                defaults={
+                    'first_name': google_data.get('given_name', ''),
+                    'last_name': google_data.get('family_name', ''),
+                    'phone': '',  # Add required fields with default values
+                    'default_address': '',
+                    'default_city': '',
+                    'default_state': '',
+                    'default_pincode': ''
+                }
+            )
+            print(f"Profile {'created' if profile_created else 'retrieved'} for {email}")
 
-        return Response({
-            'access': access_token,
-            'user': {
-                'id': user.id,
-                'email': user.email,
-                'is_superuser': user.is_superuser,
-                'is_shg': user.is_shg,
-                'is_ngo': user.is_ngo,
-                'is_active': user.is_active,
+            # Generate JWT token
+            refresh = RefreshToken.for_user(user)
+            access_token = str(refresh.access_token)
+
+            response_data = {
+                'access': access_token,
+                'user': {
+                    'id': user.id,
+                    'email': user.email,
+                    'is_superuser': user.is_superuser,
+                    'is_shg': user.is_shg,
+                    'is_ngo': user.is_ngo,
+                    'is_active': user.is_active
+                }
             }
-        })
+            print("Sending response:", response_data)
+            return Response(response_data, status=status.HTTP_200_OK)
+
+        except Exception as db_error:
+            print("Database error:", str(db_error))
+            return Response({
+                'error': 'Database error',
+                'details': str(db_error)
+            }, status=status.HTTP_400_BAD_REQUEST)
 
     except Exception as e:
-        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        print("Unexpected error:", str(e))
+        return Response({
+            'error': 'Server error during Google sign-in',
+            'details': str(e)
+        }, status=status.HTTP_400_BAD_REQUEST)
