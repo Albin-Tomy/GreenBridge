@@ -17,10 +17,21 @@ const CommonRequestForm = () => {
 
     const handleRequestTypeChange = (type) => {
         setRequestType(type);
-        if (type === 'food') {
-            navigate('/food-request');
-        } else if (type === 'waste') {
-            navigate('/request');
+        switch(type) {
+            case 'food':
+                navigate('/food-request');
+                break;
+            case 'grocery':
+                navigate('/grocery-request');
+                break;
+            case 'book':
+                navigate('/book-request');
+                break;
+            case 'waste':
+                navigate('/request');
+                break;
+            default:
+                break;
         }
     };
 
@@ -41,6 +52,34 @@ const CommonRequestForm = () => {
                             <li>Raw Food</li>
                             <li>Packaged Food</li>
                             <li>Beverages</li>
+                        </ul>
+                    </div>
+
+                    <div 
+                        className={`request-card ${requestType === 'grocery' ? 'selected' : ''}`}
+                        onClick={() => handleRequestTypeChange('grocery')}
+                    >
+                        <h3>Grocery Distribution</h3>
+                        <p>Request pickup for grocery items to be distributed</p>
+                        <ul>
+                            <li>Grains & Cereals</li>
+                            <li>Pulses & Lentils</li>
+                            <li>Spices & Condiments</li>
+                            <li>Cooking Oils</li>
+                        </ul>
+                    </div>
+
+                    <div 
+                        className={`request-card ${requestType === 'book' ? 'selected' : ''}`}
+                        onClick={() => handleRequestTypeChange('book')}
+                    >
+                        <h3>Book Distribution</h3>
+                        <p>Request pickup for educational books and materials</p>
+                        <ul>
+                            <li>School Textbooks</li>
+                            <li>College Textbooks</li>
+                            <li>Reference Books</li>
+                            <li>Study Materials</li>
                         </ul>
                     </div>
 

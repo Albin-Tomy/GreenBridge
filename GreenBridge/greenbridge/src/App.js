@@ -58,6 +58,8 @@ import NGODashboard from './Pages/Dashboard/NGO/NGODashboard';
 import VolunteerDashboard from './Pages/Dashboard/Volunteer/VolunteerDashboard';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import UserDashboard from './Pages/Dashboard/User/UserDashboard';
+import BookRequestForm from './Pages/Dashboard/User/BookRequestForm';
+import GroceryRequestForm from './Pages/Dashboard/User/GroceryRequestForm';
 
 function App() {
   return (
@@ -140,6 +142,9 @@ function App() {
             <Route path="volunteer-profile" element={<VolunteerProfile />} />
             <Route path="requests" element={<UserRequestView />} />
           </Route>
+
+          <Route path="/book-request" element={<BookRequestForm />} />
+          <Route path="/grocery-request" element={<GroceryRequestForm />} />
 
         </Routes>
       </Router>

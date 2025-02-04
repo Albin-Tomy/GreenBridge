@@ -63,6 +63,8 @@ INSTALLED_APPS = [
     'NGOs',
     'volunters',
     'fooddistribution',
+    'grocerydistribution',
+    'bookdistribution',
     
 
 ]

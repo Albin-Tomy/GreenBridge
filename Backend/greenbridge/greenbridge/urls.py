@@ -32,6 +32,8 @@ urlpatterns = [
     path('api/ngo/', include('NGOs.urls')),
     path('api/volunteer/', include('volunters.urls')),
     path('api/v1/food/', include('fooddistribution.urls')),
+    path('api/v1/book/', include('bookdistribution.urls')),
+    path('api/v1/grocery/', include('grocerydistribution.urls')),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
