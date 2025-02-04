@@ -580,3 +580,32 @@ header {
     background-color: #1f81e2;
     text-decoration: none;
 }
+
+/* Add these styles after the existing special styles */
+
+/* Special style for Volunteer Registration */
+.mobile-nav li a[href="/volunteer-registration"] {
+    background-color: #359aed;
+}
+
+.mobile-nav li a[href="/volunteer-registration"]:hover {
+    background-color: #1f81e2;
+}
+
+/* Special style for Volunteer Profile */
+.mobile-nav li a[href="/volunteer/profile"] {
+    background-color: #359aed;
+}
+
+.mobile-nav li a[href="/volunteer/profile"]:hover {
+    background-color: #1f81e2;
+}
+
+/* Special style for Volunteer Dashboard */
+.mobile-nav li a[href="/volunteer/dashboard"] {
+    background-color: #359aed;
+}
+
+.mobile-nav li a[href="/volunteer/dashboard"]:hover {
+    background-color: #1f81e2;
+}

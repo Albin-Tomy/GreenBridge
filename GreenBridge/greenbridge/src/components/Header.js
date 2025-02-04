@@ -210,6 +210,9 @@ const Header = () => {
           <li><a href="/products" onClick={toggleMobileMenu}>Products</a></li>
           <li><a href="/profile" onClick={toggleMobileMenu}>User Profile</a></li>
           <li><a href="/service-request" onClick={toggleMobileMenu}>Service Request</a></li>
+          <li><a href="/volunteer-registration" onClick={toggleMobileMenu}>Volunteer Registration</a></li>
+          <li><a href="/volunteer/profile" onClick={toggleMobileMenu}>Volunteer Profile</a></li>
+          <li><a href="/volunteer/dashboard" onClick={toggleMobileMenu}>Volunteer Dashboard</a></li>
           <li><a href="/userview" onClick={toggleMobileMenu}>View Request</a></li>
         </ul>
       </nav>
