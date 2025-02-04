@@ -18,17 +18,22 @@ import {
     List,
     ListItem,
     ListItemText,
-    Divider
+    Divider,
+    Tabs,
+    Tab
 } from '@mui/material';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import RestaurantIcon from '@mui/icons-material/Restaurant';
+import ShoppingBasketIcon from '@mui/icons-material/ShoppingBasket';
+import MenuBookIcon from '@mui/icons-material/MenuBook';
 import Header from '../../../components/Navbar';
 import axios from 'axios';
 import { format } from 'date-fns';
 
 const NGODashboard = () => {
+    const [activeTab, setActiveTab] = useState(0);
     const [requests, setRequests] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedRequest, setSelectedRequest] = useState(null);
@@ -36,20 +41,35 @@ const NGODashboard = () => {
     const [filter, setFilter] = useState('all');
 
     useEffect(() => {
-        fetchFoodRequests();
-    }, [filter]);
+        fetchRequests();
+    }, [filter, activeTab]);
 
-    const fetchFoodRequests = async () => {
+    const fetchRequests = async () => {
         try {
             const token = localStorage.getItem('authToken');
-            const response = await axios.get('http://127.0.0.1:8000/api/v1/food/all/', {
+            let endpoint;
+            switch(activeTab) {
+                case 0:
+                    endpoint = 'food';
+                    break;
+                case 1:
+                    endpoint = 'grocery';
+                    break;
+                case 2:
+                    endpoint = 'book';
+                    break;
+                default:
+                    endpoint = 'food';
+            }
+            
+            const response = await axios.get(`http://127.0.0.1:8000/api/v1/${endpoint}/all/`, {
                 headers: { Authorization: `Bearer ${token}` },
                 params: { status: filter !== 'all' ? filter : null }
             });
             setRequests(response.data);
             setLoading(false);
         } catch (error) {
-            console.error('Error fetching food requests:', error);
+            console.error('Error fetching requests:', error);
             setLoading(false);
         }
     };
@@ -57,14 +77,15 @@ const NGODashboard = () => {
     const handleStatusUpdate = async (id, newStatus) => {
         try {
             const token = localStorage.getItem('authToken');
+            const endpoint = activeTab === 0 ? 'food' : activeTab === 1 ? 'grocery' : 'book';
             await axios.put(
-                `http://127.0.0.1:8000/api/v1/food/request/${id}/update-status/`,
+                `http://127.0.0.1:8000/api/v1/${endpoint}/request/${id}/update-status/`,
                 { status: newStatus },
                 {
                     headers: { Authorization: `Bearer ${token}` }
                 }
             );
-            fetchFoodRequests();
+            fetchRequests();
             setOpenDialog(false);
         } catch (error) {
             console.error('Error updating request status:', error);
@@ -119,14 +140,80 @@ const NGODashboard = () => {
         );
     };
 
-    const filterButtons = [
-        { value: 'all', label: 'All' },
-        { value: 'pending', label: 'Pending' },
-        { value: 'approved', label: 'Approved' },
-        { value: 'collected', label: 'Collected' },
-        { value: 'distributed', label: 'Distributed' },
-        { value: 'cancelled', label: 'Cancelled' }
-    ];
+    const renderRequestDetails = (request) => {
+        if (!request) return null;
+
+        switch(activeTab) {
+            case 0: // Food
+                return request.food_type ? (
+                    <>
+                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                            <RestaurantIcon sx={{ mr: 1 }} />
+                            <Typography>
+                                {request.food_type.charAt(0).toUpperCase() + request.food_type.slice(1)} - {request.quantity} kg/L
+                            </Typography>
+                        </Box>
+                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                            <AccessTimeIcon sx={{ mr: 1 }} />
+                            <Typography>
+                                Best Before: {format(new Date(request.expiry_time), 'dd/MM/yyyy HH:mm')}
+                            </Typography>
+                        </Box>
+                    </>
+                ) : null;
+
+            case 1: // Grocery
+                return request.grocery_type ? (
+                    <>
+                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                            <ShoppingBasketIcon sx={{ mr: 1 }} />
+                            <Typography>
+                                {request.grocery_type.charAt(0).toUpperCase() + request.grocery_type.slice(1)} - {request.quantity} kg
+                            </Typography>
+                        </Box>
+                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                            <AccessTimeIcon sx={{ mr: 1 }} />
+                            <Typography>
+                                Expiry Date: {format(new Date(request.expiry_date), 'dd/MM/yyyy')}
+                            </Typography>
+                        </Box>
+                    </>
+                ) : null;
+
+            case 2: // Book
+                return request.book_type ? (
+                    <>
+                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                            <MenuBookIcon sx={{ mr: 1 }} />
+                            <Typography>
+                                {request.book_type.charAt(0).toUpperCase() + request.book_type.slice(1)} - {request.quantity} books
+                            </Typography>
+                        </Box>
+                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                            <Typography>
+                                Subject: {request.subject} ({request.education_level})
+                            </Typography>
+                        </Box>
+                    </>
+                ) : null;
+
+            default:
+                return null;
+        }
+    };
+
+    const getRequestTypeTitle = () => {
+        switch(activeTab) {
+            case 0:
+                return "Food Distribution Requests";
+            case 1:
+                return "Grocery Distribution Requests";
+            case 2:
+                return "Book Distribution Requests";
+            default:
+                return "Distribution Requests";
+        }
+    };
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
@@ -161,19 +248,37 @@ const NGODashboard = () => {
                     }}
                 >
                     <Box sx={{ width: 240 }}>
-                        <Typography variant="h6" sx={{ p: 2 }}>Filter Requests</Typography>
+                        <Typography variant="h6" sx={{ p: 2 }}>Filter Status</Typography>
                         <Divider />
                         <List>
-                            {filterButtons.map((button) => (
-                                <ListItem 
-                                    button 
-                                    key={button.value} 
-                                    onClick={() => setFilter(button.value)}
-                                    selected={filter === button.value}
-                                >
-                                    <ListItemText primary={button.label} />
-                                </ListItem>
-                            ))}
+                            <ListItem 
+                                button 
+                                selected={filter === 'all'}
+                                onClick={() => setFilter('all')}
+                            >
+                                <ListItemText primary="All Requests" />
+                            </ListItem>
+                            <ListItem 
+                                button 
+                                selected={filter === 'pending'}
+                                onClick={() => setFilter('pending')}
+                            >
+                                <ListItemText primary="Pending" />
+                            </ListItem>
+                            <ListItem 
+                                button 
+                                selected={filter === 'approved'}
+                                onClick={() => setFilter('approved')}
+                            >
+                                <ListItemText primary="Approved" />
+                            </ListItem>
+                            <ListItem 
+                                button 
+                                selected={filter === 'completed'}
+                                onClick={() => setFilter('completed')}
+                            >
+                                <ListItemText primary="Completed" />
+                            </ListItem>
                         </List>
                     </Box>
                 </Drawer>
@@ -189,7 +294,31 @@ const NGODashboard = () => {
                         width: { sm: `calc(100% - 240px)` }
                     }}
                 >
-                    <Typography variant="h4" gutterBottom sx={{ mb: 3 }}>Food Distribution Requests</Typography>
+                    <Tabs 
+                        value={activeTab} 
+                        onChange={(e, newValue) => setActiveTab(newValue)}
+                        sx={{ mb: 3 }}
+                    >
+                        <Tab 
+                            icon={<RestaurantIcon />} 
+                            label="Food Requests" 
+                            iconPosition="start"
+                        />
+                        <Tab 
+                            icon={<ShoppingBasketIcon />} 
+                            label="Grocery Requests" 
+                            iconPosition="start"
+                        />
+                        <Tab 
+                            icon={<MenuBookIcon />} 
+                            label="Book Requests" 
+                            iconPosition="start"
+                        />
+                    </Tabs>
+
+                    <Typography variant="h4" gutterBottom sx={{ mb: 3 }}>
+                        {getRequestTypeTitle()}
+                    </Typography>
                     
                     {loading ? (
                         <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
@@ -215,12 +344,7 @@ const NGODashboard = () => {
                                                     {getStatusChip(request.status)}
                                                 </Box>
                                                 
-                                                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                                                    <RestaurantIcon sx={{ mr: 1 }} />
-                                                    <Typography>
-                                                        {request.food_type.charAt(0).toUpperCase() + request.food_type.slice(1)} - {request.quantity} kg/L
-                                                    </Typography>
-                                                </Box>
+                                                {renderRequestDetails(request)}
 
                                                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                                                     <LocationOnIcon sx={{ mr: 1 }} />
@@ -229,34 +353,27 @@ const NGODashboard = () => {
                                                     </Typography>
                                                 </Box>
 
-                                                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                                                    <AccessTimeIcon sx={{ mr: 1 }} />
-                                                    <Typography>
-                                                        Best Before: {format(new Date(request.expiry_time), 'dd/MM/yyyy HH:mm')}
-                                                    </Typography>
+                                                <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
+                                                    <Button
+                                                        variant="outlined"
+                                                        startIcon={<VisibilityIcon />}
+                                                        onClick={() => {
+                                                            setSelectedRequest(request);
+                                                            setOpenDialog(true);
+                                                        }}
+                                                        size="small"
+                                                    >
+                                                        View Details
+                                                    </Button>
+                                                    {getActionButtons(request)}
                                                 </Box>
-
-                                            <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
-                                                <Button
-                                                    variant="outlined"
-                                                    startIcon={<VisibilityIcon />}
-                                                    onClick={() => {
-                                                        setSelectedRequest(request);
-                                                        setOpenDialog(true);
-                                                    }}
-                                                    size="small"
-                                                >
-                                                    View Details
-                                                </Button>
-                                                {getActionButtons(request)}
-                                            </Box>
-                                        </CardContent>
-                                    </Card>
-                                </Grid>
-                            ))
-                        )}
-                    </Grid>
-                )}
+                                            </CardContent>
+                                        </Card>
+                                    </Grid>
+                                ))
+                            )}
+                        </Grid>
+                    )}
                 </Box>
             </Box>
 
@@ -272,9 +389,7 @@ const NGODashboard = () => {
                             <Box sx={{ display: 'grid', gap: 2, gridTemplateColumns: 'repeat(2, 1fr)' }}>
                                 <Typography><strong>Donor:</strong> {selectedRequest.user.name || selectedRequest.user.email}</Typography>
                                 <Typography><strong>Status:</strong> {getStatusChip(selectedRequest.status)}</Typography>
-                                <Typography><strong>Food Type:</strong> {selectedRequest.food_type}</Typography>
-                                <Typography><strong>Quantity:</strong> {selectedRequest.quantity} kg/L</Typography>
-                                <Typography><strong>Best Before:</strong> {format(new Date(selectedRequest.expiry_time), 'dd/MM/yyyy HH:mm')}</Typography>
+                                {renderRequestDetails(selectedRequest)}
                                 <Typography><strong>Contact:</strong> {selectedRequest.contact_number}</Typography>
                                 <Typography sx={{ gridColumn: 'span 2' }}><strong>Pickup Address:</strong> {selectedRequest.pickup_address}</Typography>
                                 {selectedRequest.additional_notes && (
@@ -286,6 +401,7 @@ const NGODashboard = () => {
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setOpenDialog(false)}>Close</Button>
+                    {selectedRequest && getActionButtons(selectedRequest)}
                 </DialogActions>
             </Dialog>
         </Box>
