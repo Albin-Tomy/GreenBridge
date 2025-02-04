@@ -5,8 +5,8 @@ class GroceryRequest(models.Model):
     STATUS_CHOICES = [
         ('pending', 'Pending'),
         ('approved', 'Approved'),
-        ('completed', 'Completed'),
-        ('rejected', 'Rejected')
+        ('rejected', 'Rejected'),
+        ('collected', 'Collected')
     ]
 
     GROCERY_TYPE_CHOICES = [

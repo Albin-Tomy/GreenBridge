@@ -6,6 +6,7 @@ import './Header.css';
 import logo from '../assets/logo.png';
 import axios from 'axios';
 import { MdAccountCircle } from 'react-icons/md';
+import Notifications from './Notifications';
 
 // Configure Axios interceptor for automatic logout on token expiration
 axios.interceptors.response.use(
@@ -185,6 +186,7 @@ const Header = () => {
                 </button>
               </>
             )}
+            {isLoggedIn && <Notifications />}
           </div>
         </div>
 

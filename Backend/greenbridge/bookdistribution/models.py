@@ -5,8 +5,8 @@ class BookRequest(models.Model):
     STATUS_CHOICES = [
         ('pending', 'Pending'),
         ('approved', 'Approved'),
-        ('completed', 'Completed'),
-        ('rejected', 'Rejected')
+        ('rejected', 'Rejected'),
+        ('collected', 'Collected')
     ]
 
     BOOK_TYPE_CHOICES = [
@@ -35,7 +35,11 @@ class BookRequest(models.Model):
     pickup_address = models.TextField()
     contact_number = models.CharField(max_length=15)
     additional_notes = models.TextField(blank=True)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='pending'
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

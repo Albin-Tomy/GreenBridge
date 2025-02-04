@@ -30,7 +30,7 @@ urlpatterns = [
     path('api/v1/orders/',include('orders.urls'),name='api/v1/orders'),
     path('api/v1/collection/',include('wastecollection.urls'),name='api/v1/collection'),
     path('api/ngo/', include('NGOs.urls')),
-    path('api/volunteer/', include('volunters.urls')),
+    path('api/volunteer/', include('volunteer.urls')),
     path('api/v1/food/', include('fooddistribution.urls')),
     path('api/v1/book/', include('bookdistribution.urls')),
     path('api/v1/grocery/', include('grocerydistribution.urls')),

@@ -5,6 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from .models import GroceryRequest, GroceryDistribution
 from .serializers import GroceryRequestSerializer, GroceryDistributionSerializer
+from volunteer.views import award_points
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -47,14 +48,25 @@ def update_grocery_request_status(request, pk):
         grocery_request = get_object_or_404(GroceryRequest, pk=pk)
         new_status = request.data.get('status')
         
-        if new_status not in [choice[0] for choice in GroceryRequest.STATUS_CHOICES]:
+        # Validate the status value
+        valid_statuses = ['pending', 'approved', 'rejected', 'collected']
+        if new_status not in valid_statuses:
             return Response(
-                {'error': 'Invalid status value'}, 
+                {'error': f'Invalid status. Must be one of: {", ".join(valid_statuses)}'}, 
                 status=status.HTTP_400_BAD_REQUEST
             )
         
+        # Update the status
         grocery_request.status = new_status
         grocery_request.save()
+        
+        # Award points if the request is marked as collected
+        if new_status == 'collected':
+            award_points(
+                request.user,
+                10,  # Points awarded for collection
+                f'Collected grocery donation #{grocery_request.id}'
+            )
         
         serializer = GroceryRequestSerializer(grocery_request)
         return Response(serializer.data)

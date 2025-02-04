@@ -25,6 +25,7 @@ import MenuBookIcon from '@mui/icons-material/MenuBook';
 import Header from '../../../components/Header';
 import axios from 'axios';
 import { format } from 'date-fns';
+import VolunteerPoints from './VolunteerPoints';
 
 const VolunteerDashboard = () => {
     const [activeTab, setActiveTab] = useState(0);
@@ -71,17 +72,34 @@ const VolunteerDashboard = () => {
         try {
             const token = localStorage.getItem('authToken');
             const endpoint = activeTab === 0 ? 'food' : activeTab === 1 ? 'grocery' : 'book';
-            await axios.put(
-                `http://127.0.0.1:8000/api/v1/${endpoint}/request/${id}/update-status/`,
-                { status: 'collected' },
-                {
-                    headers: { Authorization: `Bearer ${token}` }
+            
+            const url = `http://127.0.0.1:8000/api/v1/${endpoint}/request/${id}/update-status/`;
+            const data = { status: 'collected' };
+            
+            console.log('Making request to:', url);
+            console.log('With data:', data);
+            console.log('Headers:', {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            });
+            
+            const response = await axios.put(url, data, {
+                headers: { 
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json'
                 }
-            );
+            });
+            
+            console.log('Response:', response.data);
             fetchApprovedRequests();
             setOpenDialog(false);
         } catch (error) {
-            console.error('Error updating request status:', error);
+            console.error('Error details:', {
+                message: error.message,
+                response: error.response?.data,
+                status: error.response?.status
+            });
+            alert('Error updating request status. Please try again.');
         }
     };
 
@@ -189,6 +207,10 @@ const VolunteerDashboard = () => {
                     px: { xs: 2, sm: 4, md: 6 }
                 }}
             >
+                <Box sx={{ mb: 4 }}>
+                    <VolunteerPoints />
+                </Box>
+
                 <Tabs 
                     value={activeTab} 
                     onChange={(e, newValue) => setActiveTab(newValue)}

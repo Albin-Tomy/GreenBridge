@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from .models import FoodRequest, FoodDistribution
 from .serializers import FoodRequestSerializer, FoodDistributionSerializer
 from authentication.models import User
+from volunteer.views import award_points
 
 # Create your views here.
 
@@ -60,6 +61,13 @@ def update_food_request_status(request, pk):
         
         food_request.status = new_status
         food_request.save()
+        
+        if new_status == 'collected':
+            award_points(
+                request.user,
+                10,  # Points awarded for collection
+                f'Collected food donation #{food_request.id}'
+            )
         
         serializer = FoodRequestSerializer(food_request)
         return Response(serializer.data)
