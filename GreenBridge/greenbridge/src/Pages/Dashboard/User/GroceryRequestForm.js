@@ -14,7 +14,14 @@ const GroceryRequestForm = () => {
         contact_number: '',
         additional_notes: ''
     });
-    const [error, setError] = useState('');
+    const [errors, setErrors] = useState({
+        grocery_type: '',
+        quantity: '',
+        expiry_date: '',
+        pickup_address: '',
+        contact_number: '',
+        additional_notes: ''
+    });
     const [success, setSuccess] = useState('');
 
     const handleChange = (e) => {
@@ -23,19 +30,97 @@ const GroceryRequestForm = () => {
             ...prevState,
             [name]: value
         }));
+        
+        // Add immediate validation for quantity
+        if (name === 'quantity') {
+            if (value <= 0) {
+                setErrors(prevErrors => ({
+                    ...prevErrors,
+                    quantity: 'Quantity must be greater than 0'
+                }));
+            } else {
+                setErrors(prevErrors => ({
+                    ...prevErrors,
+                    quantity: ''
+                }));
+            }
+        } else {
+            // Clear error for other fields being edited
+            setErrors(prevErrors => ({
+                ...prevErrors,
+                [name]: ''
+            }));
+        }
+    };
+
+    const validateForm = () => {
+        // Get current date
+        const now = new Date();
+        now.setHours(0, 0, 0, 0);
+        const expiryDate = new Date(formData.expiry_date);
+
+        if (expiryDate < now) {
+            setErrors(prevErrors => ({
+                ...prevErrors,
+                expiry_date: 'Expiry date cannot be in the past'
+            }));
+            return false;
+        }
+
+        if (formData.grocery_type.trim() === '') {
+            setErrors(prevErrors => ({
+                ...prevErrors,
+                grocery_type: 'Please select a grocery type'
+            }));
+            return false;
+        }
+
+        if (formData.quantity <= 0) {
+            setErrors(prevErrors => ({
+                ...prevErrors,
+                quantity: 'Quantity must be greater than 0'
+            }));
+            return false;
+        }
+
+        if (formData.pickup_address.trim().length < 10) {
+            setErrors(prevErrors => ({
+                ...prevErrors,
+                pickup_address: 'Please provide a detailed pickup address (minimum 10 characters)'
+            }));
+            return false;
+        }
+
+        const phoneRegex = /^[0-9]{10}$/;
+        if (!phoneRegex.test(formData.contact_number)) {
+            setErrors(prevErrors => ({
+                ...prevErrors,
+                contact_number: 'Please enter a valid 10-digit contact number'
+            }));
+            return false;
+        }
+
+        return true;
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError('');
+        setErrors({});
         setSuccess('');
+
+        if (!validateForm()) {
+            return;
+        }
 
         try {
             const token = localStorage.getItem('authToken');
             const userId = localStorage.getItem('userId');
 
             if (!token) {
-                setError('Please login to submit a request');
+                setErrors(prevErrors => ({
+                    ...prevErrors,
+                    general: 'Please login to submit a request'
+                }));
                 return;
             }
 
@@ -69,10 +154,16 @@ const GroceryRequestForm = () => {
         } catch (error) {
             console.error('Error details:', error);
             if (error.response?.status === 401) {
-                setError('Authentication failed. Please login again.');
+                setErrors(prevErrors => ({
+                    ...prevErrors,
+                    general: 'Authentication failed. Please login again.'
+                }));
                 setTimeout(() => navigate('/login'), 2000);
             } else {
-                setError(error.response?.data?.message || 'Failed to submit request. Please try again.');
+                setErrors(prevErrors => ({
+                    ...prevErrors,
+                    general: error.response?.data?.message || 'Failed to submit request. Please try again.'
+                }));
             }
         }
     };
@@ -83,7 +174,7 @@ const GroceryRequestForm = () => {
             <div className="grocery-request-container">
                 <h2>Grocery Distribution Request</h2>
                 <form onSubmit={handleSubmit} className="grocery-request-form">
-                    {error && <div className="error-message">{error}</div>}
+                    {errors.general && <div className="error-message">{errors.general}</div>}
                     {success && <div className="success-message">{success}</div>}
                     
                     <div className="form-group">
@@ -103,6 +194,7 @@ const GroceryRequestForm = () => {
                             <option value="dry_fruits">Dry Fruits & Nuts</option>
                             <option value="others">Others</option>
                         </select>
+                        {errors.grocery_type && <div className="error-text">{errors.grocery_type}</div>}
                     </div>
 
                     <div className="form-group">
@@ -115,7 +207,9 @@ const GroceryRequestForm = () => {
                             onChange={handleChange}
                             required
                             min="1"
+                            className={errors.quantity ? 'error-input' : ''}
                         />
+                        {errors.quantity && <div className="error-text">{errors.quantity}</div>}
                     </div>
 
                     <div className="form-group">
@@ -128,6 +222,7 @@ const GroceryRequestForm = () => {
                             onChange={handleChange}
                             required
                         />
+                        {errors.expiry_date && <div className="error-text">{errors.expiry_date}</div>}
                     </div>
 
                     <div className="form-group">
@@ -139,6 +234,7 @@ const GroceryRequestForm = () => {
                             onChange={handleChange}
                             required
                         />
+                        {errors.pickup_address && <div className="error-text">{errors.pickup_address}</div>}
                     </div>
 
                     <div className="form-group">
@@ -153,6 +249,7 @@ const GroceryRequestForm = () => {
                             pattern="[0-9]{10}"
                             title="Please enter a valid 10-digit phone number"
                         />
+                        {errors.contact_number && <div className="error-text">{errors.contact_number}</div>}
                     </div>
 
                     <div className="form-group">
@@ -163,6 +260,7 @@ const GroceryRequestForm = () => {
                             value={formData.additional_notes}
                             onChange={handleChange}
                         />
+                        {errors.additional_notes && <div className="error-text">{errors.additional_notes}</div>}
                     </div>
 
                     <div className="button-group">

@@ -14,8 +14,16 @@ const FoodRequestForm = () => {
         contact_number: '',
         additional_notes: ''
     });
-    const [error, setError] = useState('');
+    const [errors, setErrors] = useState({
+        food_type: '',
+        quantity: '',
+        expiry_time: '',
+        pickup_address: '',
+        contact_number: '',
+        additional_notes: ''
+    });
     const [success, setSuccess] = useState('');
+    const [generalError, setGeneralError] = useState('');
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -23,24 +31,87 @@ const FoodRequestForm = () => {
             ...prevState,
             [name]: value
         }));
+        
+        // Add immediate validation for quantity
+        if (name === 'quantity') {
+            if (value <= 0) {
+                setErrors(prevErrors => ({
+                    ...prevErrors,
+                    quantity: 'Quantity must be greater than 0'
+                }));
+            } else {
+                setErrors(prevErrors => ({
+                    ...prevErrors,
+                    quantity: ''
+                }));
+            }
+        } else {
+            // Clear error for other fields being edited
+            setErrors(prevErrors => ({
+                ...prevErrors,
+                [name]: ''
+            }));
+        }
+    };
+
+    const validateForm = () => {
+        let tempErrors = {};
+        let isValid = true;
+
+        // Get current date and time
+        const now = new Date();
+        const expiryTime = new Date(formData.expiry_time);
+
+        if (expiryTime < now) {
+            tempErrors.expiry_time = 'Best before time must be in the future';
+            isValid = false;
+        }
+
+        if (formData.food_type.trim() === '') {
+            tempErrors.food_type = 'Please select a food type';
+            isValid = false;
+        }
+
+        if (formData.quantity <= 0) {
+            tempErrors.quantity = 'Quantity must be greater than 0';
+            isValid = false;
+        }
+
+        if (formData.pickup_address.trim().length < 10) {
+            tempErrors.pickup_address = 'Please provide a detailed pickup address (minimum 10 characters)';
+            isValid = false;
+        }
+
+        const phoneRegex = /^[0-9]{10}$/;
+        if (!phoneRegex.test(formData.contact_number)) {
+            tempErrors.contact_number = 'Please enter a valid 10-digit contact number';
+            isValid = false;
+        }
+
+        setErrors(tempErrors);
+        return isValid;
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError('');
+        setGeneralError('');
         setSuccess('');
+
+        if (!validateForm()) {
+            return;
+        }
 
         try {
             const token = localStorage.getItem('authToken');
             const userId = localStorage.getItem('userId');
 
             if (!token) {
-                setError('Please login to submit a request');
+                setGeneralError('Please login to submit a request');
                 return;
             }
 
             if (!userId) {
-                setError('User information not found. Please login again.');
+                setGeneralError('User information not found. Please login again.');
                 return;
             }
 
@@ -86,14 +157,14 @@ const FoodRequestForm = () => {
                 const errorMessage = typeof error.response.data === 'object' 
                     ? Object.entries(error.response.data).map(([key, value]) => `${key}: ${value}`).join(', ')
                     : JSON.stringify(error.response.data);
-                setError(`Validation error: ${errorMessage}`);
+                setGeneralError(`Validation error: ${errorMessage}`);
             } else if (error.response?.status === 401) {
-                setError('Authentication failed. Please login again.');
+                setGeneralError('Authentication failed. Please login again.');
                 setTimeout(() => navigate('/login'), 2000);
             } else if (error.response?.status === 403) {
-                setError('You do not have permission to make this request.');
+                setGeneralError('You do not have permission to make this request.');
             } else {
-                setError(error.response?.data?.message || 'Failed to submit food request. Please try again.');
+                setGeneralError(error.response?.data?.message || 'Failed to submit food request. Please try again.');
             }
         }
     };
@@ -104,7 +175,7 @@ const FoodRequestForm = () => {
             <div className="food-request-container">
                 <h2>Food Redistribution Request</h2>
                 <form onSubmit={handleSubmit} className="food-request-form">
-                    {error && <div className="error-message">{error}</div>}
+                    {generalError && <div className="error-message">{generalError}</div>}
                     {success && <div className="success-message">{success}</div>}
                     
                     <div className="form-group">
@@ -115,6 +186,7 @@ const FoodRequestForm = () => {
                             value={formData.food_type}
                             onChange={handleChange}
                             required
+                            className={errors.food_type ? 'error-input' : ''}
                         >
                             <option value="">Select Food Type</option>
                             <option value="cooked">Cooked Food</option>
@@ -122,6 +194,7 @@ const FoodRequestForm = () => {
                             <option value="packaged">Packaged Food</option>
                             <option value="beverages">Beverages</option>
                         </select>
+                        {errors.food_type && <div className="error-text">{errors.food_type}</div>}
                     </div>
 
                     <div className="form-group">
@@ -134,7 +207,9 @@ const FoodRequestForm = () => {
                             onChange={handleChange}
                             required
                             min="1"
+                            className={errors.quantity ? 'error-input' : ''}
                         />
+                        {errors.quantity && <div className="error-text">{errors.quantity}</div>}
                     </div>
 
                     <div className="form-group">
@@ -146,7 +221,9 @@ const FoodRequestForm = () => {
                             value={formData.expiry_time}
                             onChange={handleChange}
                             required
+                            className={errors.expiry_time ? 'error-input' : ''}
                         />
+                        {errors.expiry_time && <div className="error-text">{errors.expiry_time}</div>}
                     </div>
 
                     <div className="form-group">
@@ -157,7 +234,9 @@ const FoodRequestForm = () => {
                             value={formData.pickup_address}
                             onChange={handleChange}
                             required
+                            className={errors.pickup_address ? 'error-input' : ''}
                         />
+                        {errors.pickup_address && <div className="error-text">{errors.pickup_address}</div>}
                     </div>
 
                     <div className="form-group">
@@ -171,7 +250,9 @@ const FoodRequestForm = () => {
                             required
                             pattern="[0-9]{10}"
                             title="Please enter a valid 10-digit phone number"
+                            className={errors.contact_number ? 'error-input' : ''}
                         />
+                        {errors.contact_number && <div className="error-text">{errors.contact_number}</div>}
                     </div>
 
                     <div className="form-group">
@@ -181,7 +262,9 @@ const FoodRequestForm = () => {
                             name="additional_notes"
                             value={formData.additional_notes}
                             onChange={handleChange}
+                            className={errors.additional_notes ? 'error-input' : ''}
                         />
+                        {errors.additional_notes && <div className="error-text">{errors.additional_notes}</div>}
                     </div>
 
                     <div className="button-group">

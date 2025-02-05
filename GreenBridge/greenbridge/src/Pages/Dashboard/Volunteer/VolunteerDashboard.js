@@ -78,10 +78,6 @@ const VolunteerDashboard = () => {
             
             console.log('Making request to:', url);
             console.log('With data:', data);
-            console.log('Headers:', {
-                Authorization: `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            });
             
             const response = await axios.put(url, data, {
                 headers: { 
