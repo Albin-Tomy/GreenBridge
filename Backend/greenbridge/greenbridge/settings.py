@@ -66,6 +66,7 @@ INSTALLED_APPS = [
     'grocerydistribution',
     'bookdistribution',
     'volunteer',
+    'food_distributions',
 ]
 SITE_ID = 1
 

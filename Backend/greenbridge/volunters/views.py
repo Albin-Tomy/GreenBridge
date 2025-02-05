@@ -1,24 +1,22 @@
 from django.shortcuts import render
 from rest_framework import status
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, parser_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from .models import VolunteerRegistration
+from .models import VolunteerRegistration, FoodQualityReport
 from .serializers import VolunteerRegistrationSerializer
 from authentication.models import User_profile
 from .blockchain import VolunteerBlockchain
 from django.core.cache import cache
 from time import time
+from django.utils import timezone
+from rest_framework.parsers import MultiPartParser, FormParser
 
 # Create your views here.
 
 # Initialize blockchain
 def get_blockchain():
-    blockchain = cache.get('volunteer_blockchain')
-    if blockchain is None:
-        blockchain = VolunteerBlockchain()
-        cache.set('volunteer_blockchain', blockchain)
-    return blockchain
+    return VolunteerBlockchain()
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -60,7 +58,6 @@ def register_volunteer(request):
                 'timestamp': str(time())
             }
         })
-        cache.set('volunteer_blockchain', blockchain)
 
         serializer = VolunteerRegistrationSerializer(volunteer)
         return Response({
@@ -105,7 +102,6 @@ def update_volunteer_profile(request):
                     'timestamp': str(time())
                 }
             })
-            cache.set('volunteer_blockchain', blockchain)
             
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -146,7 +142,6 @@ def quit_volunteer(request):
                 'timestamp': str(time())
             }
         })
-        cache.set('volunteer_blockchain', blockchain)
         
         volunteer.delete()
         return Response({
@@ -178,6 +173,80 @@ def get_blockchain_details(request):
             'chain': chain_data,
             'length': len(blockchain.chain),
             'is_valid': blockchain.is_chain_valid()
+        })
+    except Exception as e:
+        return Response({
+            'error': str(e)
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+@parser_classes([MultiPartParser, FormParser])
+def report_food_quality(request):
+    try:
+        volunteer = VolunteerRegistration.objects.get(user=request.user)
+        
+        # Create quality report
+        report = FoodQualityReport.objects.create(
+            volunteer=volunteer,
+            distribution_request_id=request.data.get('distribution_id'),
+            issue_type=request.data.get('issue_type'),
+            description=request.data.get('description'),
+            temperature=request.data.get('temperature')
+        )
+
+        # Handle image uploads
+        if 'images' in request.FILES:
+            image_urls = []
+            for image in request.FILES.getlist('images'):
+                # Save image and get URL
+                # You'll need to implement image storage logic here
+                image_urls.append(image_url)
+            report.images = image_urls
+            report.save()
+
+        # Add to blockchain
+        blockchain = get_blockchain()
+        blockchain.add_block({
+            'volunteer_id': volunteer.id,
+            'action': 'QUALITY_REPORT',
+            'details': {
+                'report_id': report.id,
+                'distribution_id': report.distribution_request_id,
+                'issue_type': report.issue_type,
+                'timestamp': str(timezone.now())
+            }
+        })
+
+        return Response({
+            'message': 'Quality report submitted successfully',
+            'report_id': report.id
+        }, status=status.HTTP_201_CREATED)
+
+    except Exception as e:
+        return Response({
+            'error': str(e)
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_quality_reports(request):
+    try:
+        volunteer = VolunteerRegistration.objects.get(user=request.user)
+        reports = FoodQualityReport.objects.filter(volunteer=volunteer)
+        
+        return Response({
+            'reports': [{
+                'id': report.id,
+                'distribution_id': report.distribution_request_id,
+                'issue_type': report.issue_type,
+                'description': report.description,
+                'status': report.status,
+                'reported_at': report.reported_at,
+                'images': report.images,
+                'temperature': report.temperature,
+                'admin_notes': report.admin_notes
+            } for report in reports]
         })
     except Exception as e:
         return Response({

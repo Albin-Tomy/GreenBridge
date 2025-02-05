@@ -22,10 +22,12 @@ import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import RestaurantIcon from '@mui/icons-material/Restaurant';
 import ShoppingBasketIcon from '@mui/icons-material/ShoppingBasket';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
+import ErrorIcon from '@mui/icons-material/Error';
 import Header from '../../../components/Header';
 import axios from 'axios';
 import { format } from 'date-fns';
 import VolunteerPoints from './VolunteerPoints';
+import { useNavigate } from 'react-router-dom';
 
 const VolunteerDashboard = () => {
     const [activeTab, setActiveTab] = useState(0);
@@ -33,6 +35,7 @@ const VolunteerDashboard = () => {
     const [loading, setLoading] = useState(true);
     const [selectedRequest, setSelectedRequest] = useState(null);
     const [openDialog, setOpenDialog] = useState(false);
+    const navigate = useNavigate();
 
     useEffect(() => {
         fetchApprovedRequests();
@@ -97,6 +100,10 @@ const VolunteerDashboard = () => {
             });
             alert('Error updating request status. Please try again.');
         }
+    };
+
+    const handleQualityIssue = (requestId) => {
+        navigate(`/volunteer/quality-report/${requestId}`);
     };
 
     const getStatusChip = () => {
@@ -274,7 +281,7 @@ const VolunteerDashboard = () => {
                                                 </Typography>
                                             </Box>
 
-                                            <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
+                                            <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2, gap: 1 }}>
                                                 <Button
                                                     variant="outlined"
                                                     startIcon={<VisibilityIcon />}
@@ -286,14 +293,25 @@ const VolunteerDashboard = () => {
                                                 >
                                                     View Details
                                                 </Button>
-                                                <Button
-                                                    variant="contained"
-                                                    color="success"
-                                                    onClick={() => handleMarkAsCollected(request.id)}
-                                                    size="small"
-                                                >
-                                                    Mark as Collected
-                                                </Button>
+                                                <Box sx={{ display: 'flex', gap: 1 }}>
+                                                    <Button
+                                                        variant="outlined"
+                                                        color="error"
+                                                        startIcon={<ErrorIcon />}
+                                                        onClick={() => handleQualityIssue(request.id)}
+                                                        size="small"
+                                                    >
+                                                        Report Quality
+                                                    </Button>
+                                                    <Button
+                                                        variant="contained"
+                                                        color="success"
+                                                        onClick={() => handleMarkAsCollected(request.id)}
+                                                        size="small"
+                                                    >
+                                                        Mark as Collected
+                                                    </Button>
+                                                </Box>
                                             </Box>
                                         </CardContent>
                                     </Card>
@@ -328,6 +346,17 @@ const VolunteerDashboard = () => {
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setOpenDialog(false)}>Close</Button>
+                    <Button
+                        variant="outlined"
+                        color="error"
+                        startIcon={<ErrorIcon />}
+                        onClick={() => {
+                            setOpenDialog(false);
+                            handleQualityIssue(selectedRequest.id);
+                        }}
+                    >
+                        Report Quality Issue
+                    </Button>
                     <Button 
                         variant="contained" 
                         color="success"

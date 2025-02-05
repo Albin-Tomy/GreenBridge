@@ -1,0 +1,17 @@
+.distribution-card {
+    transition: transform 0.2s;
+}
+
+.distribution-card:hover {
+    transform: translateY(-4px);
+}
+
+.status-chip {
+    margin-bottom: 16px;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+} 

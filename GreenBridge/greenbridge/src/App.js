@@ -60,6 +60,7 @@ import { GoogleOAuthProvider } from '@react-oauth/google';
 import UserDashboard from './Pages/Dashboard/User/UserDashboard';
 import BookRequestForm from './Pages/Dashboard/User/BookRequestForm';
 import GroceryRequestForm from './Pages/Dashboard/User/GroceryRequestForm';
+import FoodQualityReport from './Pages/Dashboard/Volunteer/FoodQualityReport';
 
 function App() {
   return (
@@ -145,6 +146,8 @@ function App() {
 
           <Route path="/book-request" element={<BookRequestForm />} />
           <Route path="/grocery-request" element={<GroceryRequestForm />} />
+
+          <Route path="/volunteer/quality-report/:distributionId" element={<FoodQualityReport />} />
 
         </Routes>
       </Router>
