@@ -17,6 +17,7 @@ import {
     Drawer,
     List,
     ListItem,
+    ListItemButton,
     ListItemText,
     Divider,
     Tabs,
@@ -31,6 +32,8 @@ import MenuBookIcon from '@mui/icons-material/MenuBook';
 import Header from '../../../components/Navbar';
 import axios from 'axios';
 import { format } from 'date-fns';
+
+const drawerWidth = 240;
 
 const NGODashboard = () => {
     const [activeTab, setActiveTab] = useState(0);
@@ -98,11 +101,7 @@ const NGODashboard = () => {
             { label: 'Cancel', action: 'cancelled', color: 'error' }
         ],
         approved: [
-            { label: 'Mark Collected', action: 'collected', color: 'success' },
             { label: 'Cancel', action: 'cancelled', color: 'error' }
-        ],
-        collected: [
-            { label: 'Mark Distributed', action: 'distributed', color: 'success' }
         ]
     };
 
@@ -215,6 +214,15 @@ const NGODashboard = () => {
         }
     };
 
+    const filterButtons = [
+        { value: 'all', label: 'All' },
+        { value: 'pending', label: 'Pending' },
+        { value: 'approved', label: 'Approved' },
+        { value: 'collected', label: 'Collected' },
+        { value: 'distributed', label: 'Distributed' },
+        { value: 'cancelled', label: 'Cancelled' }
+    ];
+
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
             <Box sx={{ 
@@ -226,72 +234,77 @@ const NGODashboard = () => {
                 <Header />
             </Box>
 
+            <Drawer
+                variant="permanent"
+                sx={{
+                    width: drawerWidth,
+                    flexShrink: 0,
+                    '& .MuiDrawer-paper': {
+                        width: drawerWidth,
+                        boxSizing: 'border-box',
+                        mt: '64px',
+                        pt: 2,
+                        backgroundColor: (theme) => theme.palette.background.default
+                    },
+                }}
+            >
+                <Box sx={{ px: 2 }}>
+                    <Typography variant="h6" sx={{ mb: 2 }}>
+                        Filter by Status
+                    </Typography>
+                    <Divider sx={{ mb: 2 }} />
+                    <List>
+                        {filterButtons.map((btn) => (
+                            <ListItem 
+                                key={btn.value}
+                                disablePadding
+                                sx={{ mb: 1 }}
+                            >
+                                <ListItemButton
+                                    selected={filter === btn.value}
+                                    onClick={() => setFilter(btn.value)}
+                                    sx={{
+                                        borderRadius: 1,
+                                        '&.Mui-selected': {
+                                            backgroundColor: (theme) => theme.palette.action.selected
+                                        }
+                                    }}
+                                >
+                                    <ListItemText 
+                                        primary={btn.label}
+                                        primaryTypographyProps={{
+                                            color: filter === btn.value ? 'primary' : 'textPrimary'
+                                        }}
+                                    />
+                                    <Chip 
+                                        size="small"
+                                        label={requests.filter(r => 
+                                            btn.value === 'all' ? true : r.status === btn.value
+                                        ).length}
+                                        color={filter === btn.value ? 'primary' : 'default'}
+                                    />
+                                </ListItemButton>
+                            </ListItem>
+                        ))}
+                    </List>
+                </Box>
+            </Drawer>
+
             <Box sx={{ 
                 display: 'flex',
-                pt: '84px', // Increased from 64px to 84px to add more space below navbar
+                pt: '84px',
                 height: 'calc(100vh - 64px)',
-                overflow: 'hidden'
+                overflow: 'hidden',
+                ml: `${drawerWidth}px`
             }}>
-                <Drawer
-                    variant="permanent"
-                    sx={{
-                        width: 240,
-                        flexShrink: 0,
-                        '& .MuiDrawer-paper': {
-                            width: 240,
-                            boxSizing: 'border-box',
-                            borderRight: '1px solid rgba(0, 0, 0, 0.12)',
-                            mt: '64px',
-                            height: 'calc(100% - 64px)',
-                            pt: 2 // Added padding top to the drawer content
-                        },
-                    }}
-                >
-                    <Box sx={{ width: 240 }}>
-                        <Typography variant="h6" sx={{ p: 2 }}>Filter Status</Typography>
-                        <Divider />
-                        <List>
-                            <ListItem 
-                                button 
-                                selected={filter === 'all'}
-                                onClick={() => setFilter('all')}
-                            >
-                                <ListItemText primary="All Requests" />
-                            </ListItem>
-                            <ListItem 
-                                button 
-                                selected={filter === 'pending'}
-                                onClick={() => setFilter('pending')}
-                            >
-                                <ListItemText primary="Pending" />
-                            </ListItem>
-                            <ListItem 
-                                button 
-                                selected={filter === 'approved'}
-                                onClick={() => setFilter('approved')}
-                            >
-                                <ListItemText primary="Approved" />
-                            </ListItem>
-                            <ListItem 
-                                button 
-                                selected={filter === 'completed'}
-                                onClick={() => setFilter('completed')}
-                            >
-                                <ListItemText primary="Completed" />
-                            </ListItem>
-                        </List>
-                    </Box>
-                </Drawer>
-
                 <Box
                     component="main"
                     sx={{
                         flexGrow: 1,
-                        p: 4, // Increased padding from 3 to 4
-                        pt: 3, // Specific top padding
+                        p: 4,
                         overflow: 'auto',
                         height: '100%',
-                        width: { sm: `calc(100% - 240px)` }
+                        width: '100%'
                     }}
                 >
                     <Tabs 
@@ -316,9 +329,11 @@ const NGODashboard = () => {
                         />
                     </Tabs>
 
-                    <Typography variant="h4" gutterBottom sx={{ mb: 3 }}>
-                        {getRequestTypeTitle()}
-                    </Typography>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+                        <Typography variant="h4" gutterBottom>
+                            {getRequestTypeTitle()}
+                        </Typography>
+                    </Box>
                     
                     {loading ? (
                         <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
@@ -377,7 +392,6 @@ const NGODashboard = () => {
                 </Box>
             </Box>
 
-            {/* Details Dialog */}
             <Dialog open={openDialog} onClose={() => setOpenDialog(false)} maxWidth="md" fullWidth>
                 <DialogTitle>Request Details</DialogTitle>
                 <DialogContent>
