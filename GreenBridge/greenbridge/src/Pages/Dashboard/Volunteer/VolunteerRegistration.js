@@ -77,7 +77,7 @@ const VolunteerRegistration = () => {
 
         try {
             const response = await axios.post(
-                'http://127.0.0.1:8000/api/volunteer/register/',
+                'http://127.0.0.1:8000/api/v1/volunteer/register/',
                 formData,
                 {
                     headers: {
@@ -92,6 +92,7 @@ const VolunteerRegistration = () => {
                 navigate('/dashboard');
             }, 2000);
         } catch (error) {
+            console.error('Registration error:', error);
             setError(error.response?.data?.error || 'Registration failed. Please try again.');
         }
     };

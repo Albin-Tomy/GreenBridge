@@ -17,7 +17,7 @@ const BlockchainExplorer = () => {
     const fetchBlockchainData = async () => {
         try {
             const response = await axios.get(
-                'http://127.0.0.1:8000/api/volunteer/blockchain/',
+                'http://127.0.0.1:8000/api/v1/volunteer/blockchain/',
                 {
                     headers: { Authorization: `Bearer ${token}` }
                 }
@@ -25,6 +25,7 @@ const BlockchainExplorer = () => {
             setBlockchainData(response.data);
             setLoading(false);
         } catch (error) {
+            console.error('Error fetching blockchain data:', error);
             setError('Error fetching blockchain data');
             setLoading(false);
         }

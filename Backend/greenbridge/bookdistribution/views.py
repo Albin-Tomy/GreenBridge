@@ -48,8 +48,8 @@ def update_book_request_status(request, pk):
         book_request = get_object_or_404(BookRequest, pk=pk)
         new_status = request.data.get('status')
         
-        # Validate the status value
-        valid_statuses = ['pending', 'approved', 'rejected', 'collected']
+        # Update valid statuses to include 'cancelled'
+        valid_statuses = ['pending', 'approved', 'rejected', 'collected', 'cancelled']
         if new_status not in valid_statuses:
             return Response(
                 {'error': f'Invalid status. Must be one of: {", ".join(valid_statuses)}'}, 

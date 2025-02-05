@@ -27,7 +27,7 @@ const VolunteerProfile = () => {
     const fetchProfile = async () => {
         try {
             const response = await axios.get(
-                'http://127.0.0.1:8000/api/volunteer/profile/',
+                'http://127.0.0.1:8000/api/v1/volunteer/profile/',
                 {
                     headers: { Authorization: `Bearer ${token}` }
                 }
@@ -41,7 +41,8 @@ const VolunteerProfile = () => {
                 preferred_location: response.data.preferred_location || ''
             });
         } catch (error) {
-            setError('Error fetching profile');
+            console.error('Error fetching profile:', error);
+            setError('Error fetching profile. Please try again.');
         }
     };
 
@@ -56,7 +57,7 @@ const VolunteerProfile = () => {
         e.preventDefault();
         try {
             await axios.put(
-                'http://127.0.0.1:8000/api/volunteer/update/',
+                'http://127.0.0.1:8000/api/v1/volunteer/update/',
                 formData,
                 {
                     headers: { Authorization: `Bearer ${token}` }
@@ -66,7 +67,8 @@ const VolunteerProfile = () => {
             setIsEditing(false);
             fetchProfile();
         } catch (error) {
-            setError('Error updating profile');
+            console.error('Error updating profile:', error);
+            setError('Error updating profile. Please try again.');
         }
     };
 
@@ -74,15 +76,19 @@ const VolunteerProfile = () => {
         if (window.confirm('Are you sure you want to quit volunteering? This action cannot be undone.')) {
             try {
                 await axios.post(
-                    'http://127.0.0.1:8000/api/volunteer/quit/',
+                    'http://127.0.0.1:8000/api/v1/volunteer/quit/',
                     {},
                     {
                         headers: { Authorization: `Bearer ${token}` }
                     }
                 );
-                navigate('/dashboard');
+                setMessage('Successfully quit volunteering');
+                setTimeout(() => {
+                    navigate('/dashboard');
+                }, 2000);
             } catch (error) {
-                setError('Error quitting volunteer service');
+                console.error('Error quitting volunteer service:', error);
+                setError('Error quitting volunteer service. Please try again.');
             }
         }
     };

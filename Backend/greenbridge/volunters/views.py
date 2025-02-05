@@ -23,13 +23,6 @@ def get_blockchain():
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def register_volunteer(request):
-    print("=== Debug Info ===")
-    print("Request method:", request.method)
-    print("Request path:", request.path)
-    print("Request data:", request.data)
-    print("Request user:", request.user)
-    print("=================")
-    
     try:
         # Check if user already registered as volunteer
         if hasattr(request.user, 'volunteer'):
@@ -42,7 +35,7 @@ def register_volunteer(request):
         try:
             user_profile = User_profile.objects.get(user=request.user)
         except User_profile.DoesNotExist:
-            pass  # Profile doesn't exist, but that's okay
+            pass
 
         # Create volunteer registration
         volunteer = VolunteerRegistration.objects.create(
@@ -64,7 +57,7 @@ def register_volunteer(request):
                 'user_id': request.user.id,
                 'interested_services': volunteer.interested_services,
                 'availability': volunteer.availability,
-                'timestamp': str(volunteer.created_at)
+                'timestamp': str(time())
             }
         })
         cache.set('volunteer_blockchain', blockchain)
@@ -109,7 +102,7 @@ def update_volunteer_profile(request):
                 'action': 'PROFILE_UPDATE',
                 'details': {
                     'updated_fields': request.data,
-                    'timestamp': str(volunteer.updated_at)
+                    'timestamp': str(time())
                 }
             })
             cache.set('volunteer_blockchain', blockchain)
