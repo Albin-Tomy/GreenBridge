@@ -7,7 +7,8 @@ class FoodRequest(models.Model):
         ('approved', 'Approved'),
         ('collected', 'Collected'),
         ('distributed', 'Distributed'),
-        ('cancelled', 'Cancelled')
+        ('cancelled', 'Cancelled'),
+        ('quality_issue', 'Quality Issue Reported')
     ]
 
     FOOD_TYPE_CHOICES = [

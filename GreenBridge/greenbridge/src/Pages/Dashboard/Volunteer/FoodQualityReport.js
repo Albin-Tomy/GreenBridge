@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import Header from '../../../components/Header';
 import './FoodQualityReport.css';
 
-const FoodQualityReport = ({ distributionId }) => {
+const FoodQualityReport = () => {
+    const { distributionId } = useParams();
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
-        issue_type: 'expired',
+        issue_type: 'good',
         description: '',
         temperature: '',
         images: []
@@ -17,6 +18,7 @@ const FoodQualityReport = ({ distributionId }) => {
     const [message, setMessage] = useState('');
 
     const issueTypes = [
+        { value: 'good', label: 'Good Quality' },
         { value: 'expired', label: 'Food Expired' },
         { value: 'contaminated', label: 'Food Contaminated' },
         { value: 'spoiled', label: 'Food Spoiled' },
@@ -63,9 +65,10 @@ const FoodQualityReport = ({ distributionId }) => {
                 }
             );
 
-            setMessage('Quality report submitted successfully');
+            setMessage(response.data.message);
+            
             setTimeout(() => {
-                navigate('/volunteer/distributions');
+                navigate('/volunteer/dashboard');
             }, 2000);
         } catch (error) {
             setError(error.response?.data?.error || 'Failed to submit report');

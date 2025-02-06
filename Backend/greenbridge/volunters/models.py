@@ -1,6 +1,6 @@
 from django.db import models
 from authentication.models import User, User_profile
-from food_distributions.models import FoodDistributionRequest
+from fooddistribution.models import FoodRequest
 
 class VolunteerRegistration(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='volunteer')
@@ -62,6 +62,7 @@ class BlockchainBlock(models.Model):
 
 class FoodQualityReport(models.Model):
     QUALITY_ISSUES = [
+        ('good', 'Good Quality'),
         ('expired', 'Food Expired'),
         ('contaminated', 'Food Contaminated'),
         ('spoiled', 'Food Spoiled'),
@@ -72,18 +73,18 @@ class FoodQualityReport(models.Model):
 
     STATUS_CHOICES = [
         ('pending', 'Pending Review'),
-        ('approved', 'Report Approved'),
-        ('rejected', 'Report Rejected')
+        ('approved', 'Report Approved - Food Good'),
+        ('rejected', 'Report Approved - Food Rejected')
     ]
 
     volunteer = models.ForeignKey(VolunteerRegistration, on_delete=models.CASCADE)
-    distribution_request = models.ForeignKey(FoodDistributionRequest, on_delete=models.CASCADE)
+    distribution_request = models.ForeignKey('fooddistribution.FoodRequest', on_delete=models.CASCADE)
     issue_type = models.CharField(max_length=20, choices=QUALITY_ISSUES)
     description = models.TextField()
     images = models.JSONField(null=True, blank=True)
     temperature = models.FloatField(null=True, blank=True)
     reported_at = models.DateTimeField(auto_now_add=True)
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     admin_notes = models.TextField(null=True, blank=True)
     resolved_at = models.DateTimeField(null=True, blank=True)
 

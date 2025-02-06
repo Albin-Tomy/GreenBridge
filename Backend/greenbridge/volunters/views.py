@@ -11,6 +11,8 @@ from django.core.cache import cache
 from time import time
 from django.utils import timezone
 from rest_framework.parsers import MultiPartParser, FormParser
+from django.core.files.storage import default_storage
+from fooddistribution.models import FoodRequest
 
 # Create your views here.
 
@@ -185,11 +187,19 @@ def get_blockchain_details(request):
 def report_food_quality(request):
     try:
         volunteer = VolunteerRegistration.objects.get(user=request.user)
-        
+        food_request_id = request.data.get('distribution_id')
+
+        try:
+            food_request = FoodRequest.objects.get(id=food_request_id)
+        except FoodRequest.DoesNotExist:
+            return Response({
+                'error': f'Food request with ID {food_request_id} not found'
+            }, status=status.HTTP_404_NOT_FOUND)
+
         # Create quality report
         report = FoodQualityReport.objects.create(
             volunteer=volunteer,
-            distribution_request_id=request.data.get('distribution_id'),
+            distribution_request=food_request,
             issue_type=request.data.get('issue_type'),
             description=request.data.get('description'),
             temperature=request.data.get('temperature')
@@ -199,11 +209,23 @@ def report_food_quality(request):
         if 'images' in request.FILES:
             image_urls = []
             for image in request.FILES.getlist('images'):
-                # Save image and get URL
-                # You'll need to implement image storage logic here
+                image_name = f"quality_reports/{report.id}/{image.name}"
+                image_path = default_storage.save(image_name, image)
+                image_url = default_storage.url(image_path)
                 image_urls.append(image_url)
             report.images = image_urls
             report.save()
+
+        # Update food request status based on quality report
+        if request.data.get('issue_type') == 'good':
+            food_request.status = 'collected'
+            report.status = 'approved'
+        else:
+            food_request.status = 'quality_issue'
+            report.status = 'pending'
+        
+        food_request.save()
+        report.save()
 
         # Add to blockchain
         blockchain = get_blockchain()
@@ -212,15 +234,17 @@ def report_food_quality(request):
             'action': 'QUALITY_REPORT',
             'details': {
                 'report_id': report.id,
-                'distribution_id': report.distribution_request_id,
+                'food_request_id': food_request.id,
                 'issue_type': report.issue_type,
+                'status': report.status,
                 'timestamp': str(timezone.now())
             }
         })
 
         return Response({
             'message': 'Quality report submitted successfully',
-            'report_id': report.id
+            'report_id': report.id,
+            'status': report.status
         }, status=status.HTTP_201_CREATED)
 
     except Exception as e:
