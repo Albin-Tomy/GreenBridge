@@ -3,7 +3,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes, parser_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from .models import VolunteerRegistration, FoodQualityReport
+from .models import VolunteerRegistration, BlockchainBlock
 from .serializers import VolunteerRegistrationSerializer
 from authentication.models import User_profile
 from .blockchain import VolunteerBlockchain
@@ -12,7 +12,6 @@ from time import time
 from django.utils import timezone
 from rest_framework.parsers import MultiPartParser, FormParser
 from django.core.files.storage import default_storage
-from fooddistribution.models import FoodRequest
 
 # Create your views here.
 

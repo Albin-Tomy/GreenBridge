@@ -1,12 +1,15 @@
 from django.shortcuts import render, get_object_or_404
 from rest_framework import status
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, parser_classes
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
-from .models import FoodRequest, FoodDistribution
-from .serializers import FoodRequestSerializer, FoodDistributionSerializer
+from .models import FoodRequest, FoodDistribution, FoodQualityReport
+from .serializers import FoodRequestSerializer, FoodDistributionSerializer, FoodQualityReportSerializer
 from authentication.models import User
 from volunteer.views import award_points
+from django.core.files.storage import default_storage
+from volunters.models import VolunteerRegistration
 
 # Create your views here.
 
@@ -77,3 +80,101 @@ def update_food_request_status(request, pk):
             {'error': 'Food request not found'}, 
             status=status.HTTP_404_NOT_FOUND
         )
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+@parser_classes([MultiPartParser, FormParser])
+def submit_quality_report(request, request_id):
+    try:
+        volunteer = VolunteerRegistration.objects.get(user=request.user)
+        food_request = FoodRequest.objects.get(id=request_id)
+
+        # Check if request is approved
+        if food_request.status != 'approved':
+            return Response({
+                'error': 'Can only submit quality report for approved requests'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Create quality report
+        report = FoodQualityReport.objects.create(
+            food_request=food_request,
+            volunteer=volunteer,
+            issue_type=request.data.get('issue_type'),
+            description=request.data.get('description'),
+            temperature=request.data.get('temperature')
+        )
+
+        # Handle image uploads
+        if 'images' in request.FILES:
+            image_urls = []
+            for image in request.FILES.getlist('images'):
+                image_name = f"quality_reports/{report.id}/{image.name}"
+                image_path = default_storage.save(image_name, image)
+                image_url = default_storage.url(image_path)
+                image_urls.append(image_url)
+            report.images = image_urls
+            report.save()
+
+        return Response({
+            'message': 'Quality report submitted successfully',
+            'report_id': report.id
+        }, status=status.HTTP_201_CREATED)
+
+    except Exception as e:
+        return Response({
+            'error': str(e)
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def update_request_status(request, request_id):
+    try:
+        volunteer = VolunteerRegistration.objects.get(user=request.user)
+        food_request = FoodRequest.objects.get(id=request_id)
+
+        # Check if quality report exists
+        if not FoodQualityReport.objects.filter(food_request=food_request).exists():
+            return Response({
+                'error': 'Must submit quality report before updating status'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        action = request.data.get('action')
+        if action == 'accept':
+            food_request.status = 'collected'
+        elif action == 'cancel':
+            food_request.status = 'cancelled'
+        else:
+            return Response({
+                'error': 'Invalid action'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        food_request.save()
+        return Response({
+            'message': f'Request {action}ed successfully',
+            'status': food_request.status
+        })
+
+    except Exception as e:
+        return Response({
+            'error': str(e)
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_request_quality_report(request, request_id):
+    try:
+        food_request = FoodRequest.objects.get(id=request_id)
+        report = FoodQualityReport.objects.filter(food_request=food_request).first()
+
+        if not report:
+            return Response({
+                'message': 'No quality report found for this request'
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = FoodQualityReportSerializer(report)
+        return Response(serializer.data)
+
+    except FoodRequest.DoesNotExist:
+        return Response({
+            'error': 'Food request not found'
+        }, status=status.HTTP_404_NOT_FOUND)

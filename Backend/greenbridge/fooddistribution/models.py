@@ -1,5 +1,6 @@
 from django.db import models
 from authentication.models import User
+from volunters.models import VolunteerRegistration
 
 class FoodRequest(models.Model):
     STATUS_CHOICES = [
@@ -45,3 +46,37 @@ class FoodDistribution(models.Model):
 
     def __str__(self):
         return f"Distribution for {self.food_request} - {self.distribution_date.date()}"
+
+class FoodQualityReport(models.Model):
+    QUALITY_ISSUES = [
+        ('good', 'Good Quality'),
+        ('expired', 'Food Expired'),
+        ('contaminated', 'Food Contaminated'),
+        ('spoiled', 'Food Spoiled'),
+        ('packaging_damaged', 'Packaging Damaged'),
+        ('temperature_issue', 'Temperature Control Issue'),
+        ('other', 'Other Issue')
+    ]
+
+    STATUS_CHOICES = [
+        ('pending', 'Pending Review'),
+        ('approved', 'Report Approved'),
+        ('rejected', 'Report Rejected')
+    ]
+
+    food_request = models.ForeignKey(FoodRequest, on_delete=models.CASCADE, related_name='quality_reports')
+    volunteer = models.ForeignKey(VolunteerRegistration, on_delete=models.CASCADE, related_name='food_quality_reports')
+    issue_type = models.CharField(max_length=20, choices=QUALITY_ISSUES)
+    description = models.TextField()
+    images = models.JSONField(null=True, blank=True)
+    temperature = models.FloatField(null=True, blank=True)
+    reported_at = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    admin_notes = models.TextField(null=True, blank=True)
+    resolved_at = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return f"Quality Report #{self.id} for Food Request #{self.food_request.id}"
+
+    class Meta:
+        ordering = ['-reported_at']
