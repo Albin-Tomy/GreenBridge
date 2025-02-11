@@ -86,44 +86,37 @@ def update_food_request_status(request, pk):
 @parser_classes([MultiPartParser, FormParser])
 def submit_quality_report(request, request_id):
     try:
-        volunteer = VolunteerRegistration.objects.get(user=request.user)
         food_request = FoodRequest.objects.get(id=request_id)
-
-        # Check if request is approved
-        if food_request.status != 'approved':
-            return Response({
-                'error': 'Can only submit quality report for approved requests'
-            }, status=status.HTTP_400_BAD_REQUEST)
+        volunteer = VolunteerRegistration.objects.get(user=request.user)
 
         # Create quality report
-        report = FoodQualityReport.objects.create(
-            food_request=food_request,
-            volunteer=volunteer,
-            issue_type=request.data.get('issue_type'),
-            description=request.data.get('description'),
-            temperature=request.data.get('temperature')
-        )
+        report_data = {
+            'food_request': food_request.id,
+            'volunteer': volunteer.id,
+            'issue_type': request.data.get('issue_type'),
+            'description': request.data.get('description'),
+            'temperature': request.data.get('temperature'),
+            'packaging_integrity': request.data.get('packaging_integrity'),
+            'labeling_accuracy': request.data.get('labeling_accuracy'),
+            'allergen_check': request.data.get('allergen_check'),
+            'hygiene_check': request.data.get('hygiene_check'),
+            'weight_check': request.data.get('weight_check'),
+            'visual_inspection': request.data.get('visual_inspection'),
+            'smell_test': request.data.get('smell_test'),
+            'expiration_check': request.data.get('expiration_check'),
+            'storage_condition': request.data.get('storage_condition'),
+        }
 
-        # Handle image uploads
-        if 'images' in request.FILES:
-            image_urls = []
-            for image in request.FILES.getlist('images'):
-                image_name = f"quality_reports/{report.id}/{image.name}"
-                image_path = default_storage.save(image_name, image)
-                image_url = default_storage.url(image_path)
-                image_urls.append(image_url)
-            report.images = image_urls
-            report.save()
+        serializer = FoodQualityReportSerializer(data=report_data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'message': 'Quality report submitted successfully', 'report_id': serializer.data['id']}, status=201)
+        return Response(serializer.errors, status=400)
 
-        return Response({
-            'message': 'Quality report submitted successfully',
-            'report_id': report.id
-        }, status=status.HTTP_201_CREATED)
-
-    except Exception as e:
-        return Response({
-            'error': str(e)
-        }, status=status.HTTP_400_BAD_REQUEST)
+    except FoodRequest.DoesNotExist:
+        return Response({'error': 'Food request not found'}, status=404)
+    except VolunteerRegistration.DoesNotExist:
+        return Response({'error': 'Volunteer not found'}, status=404)
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])

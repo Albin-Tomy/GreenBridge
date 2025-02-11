@@ -16,4 +16,4 @@ class FoodQualityReportSerializer(serializers.ModelSerializer):
     class Meta:
         model = FoodQualityReport
         fields = '__all__'
-        read_only_fields = ('reported_at', 'resolved_at', 'status')
+        read_only_fields = ('reported_at', 'status', 'admin_notes', 'resolved_at')

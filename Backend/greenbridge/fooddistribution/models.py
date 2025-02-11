@@ -69,7 +69,18 @@ class FoodQualityReport(models.Model):
     issue_type = models.CharField(max_length=20, choices=QUALITY_ISSUES)
     description = models.TextField()
 
-    temperature = models.FloatField(null=True, blank=True)
+    # Additional Quality Testing Fields
+    temperature = models.FloatField(null=True, blank=True, help_text="Temperature of the food at the time of pickup (in Celsius).")
+    packaging_integrity = models.BooleanField(default=True, help_text="Is the packaging intact and undamaged?")
+    labeling_accuracy = models.BooleanField(default=True, help_text="Are the labels accurate and legible?")
+    allergen_check = models.BooleanField(default=True, help_text="Are allergens properly labeled and separated?")
+    hygiene_check = models.BooleanField(default=True, help_text="Is the food stored in a hygienic condition?")
+    weight_check = models.FloatField(null=True, blank=True, help_text="Weight of the food package (in kilograms).")
+    visual_inspection = models.BooleanField(default=True, help_text="Does the food pass visual inspection for spoilage or contamination?")
+    smell_test = models.BooleanField(default=True, help_text="Does the food pass the smell test for freshness?")
+    expiration_check = models.BooleanField(default=True, help_text="Is the food within its expiration date?")
+    storage_condition = models.CharField(max_length=50, null=True, blank=True, help_text="Condition of storage (e.g., refrigerated, frozen, room temperature).")
+
     reported_at = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     admin_notes = models.TextField(null=True, blank=True)

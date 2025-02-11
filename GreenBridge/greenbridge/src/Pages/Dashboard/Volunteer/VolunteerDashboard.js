@@ -28,6 +28,7 @@ import axios from 'axios';
 import { format } from 'date-fns';
 import VolunteerPoints from './VolunteerPoints';
 import { useNavigate } from 'react-router-dom';
+import QualityReportForm from './QualityReportForm';
 
 const VolunteerDashboard = () => {
     const [activeTab, setActiveTab] = useState(0);
@@ -35,11 +36,30 @@ const VolunteerDashboard = () => {
     const [loading, setLoading] = useState(true);
     const [selectedRequest, setSelectedRequest] = useState(null);
     const [openDialog, setOpenDialog] = useState(false);
+    const [showQualityForm, setShowQualityForm] = useState(false);
+    const [userName, setUserName] = useState("User"); // Default user name
     const navigate = useNavigate();
 
     useEffect(() => {
         fetchApprovedRequests();
-    }, [activeTab]);
+        const fetchUserProfile = async () => {
+            const token = localStorage.getItem('authToken');
+            const userId = localStorage.getItem('userId');
+            if (userId && token) {
+                try {
+                    const response = await axios.get(`http://127.0.0.1:8000/api/v1/auth/user_profiles/${userId}/`, {
+                        headers: { Authorization: `Bearer ${token}` },
+                    });
+                    const name = response.data.first_name || response.data.email || "User";
+                    setUserName(name);
+                } catch (error) {
+                    console.error('Error fetching user profile:', error);
+                }
+            }
+        };
+
+        fetchUserProfile();
+    }, []);
 
     const fetchApprovedRequests = async () => {
         try {
@@ -103,7 +123,13 @@ const VolunteerDashboard = () => {
     };
 
     const handleQualityIssue = (requestId) => {
-        navigate(`/volunteer/quality-report/${requestId}`);
+        console.log("Selected Request ID:", requestId);
+        setSelectedRequest(requestId);
+        setShowQualityForm(true);
+    };
+
+    const handleReportSubmitted = () => {
+        fetchApprovedRequests();
     };
 
     const getStatusChip = () => {
@@ -332,13 +358,19 @@ const VolunteerDashboard = () => {
                                 Request #{selectedRequest.id}
                             </Typography>
                             <Box sx={{ display: 'grid', gap: 2, gridTemplateColumns: 'repeat(2, 1fr)' }}>
-                                <Typography><strong>Donor:</strong> {selectedRequest.user.name || selectedRequest.user.email}</Typography>
+                                <Typography>
+                                    <strong>Donor:</strong> {selectedRequest.user?.name || selectedRequest.user?.email || "Unknown Donor"}
+                                </Typography>
                                 <Typography><strong>Status:</strong> {getStatusChip()}</Typography>
                                 {renderRequestDetails(selectedRequest)}
                                 <Typography><strong>Contact:</strong> {selectedRequest.contact_number}</Typography>
-                                <Typography sx={{ gridColumn: 'span 2' }}><strong>Pickup Address:</strong> {selectedRequest.pickup_address}</Typography>
+                                <Typography sx={{ gridColumn: 'span 2' }}>
+                                    <strong>Pickup Address:</strong> {selectedRequest.pickup_address}
+                                </Typography>
                                 {selectedRequest.additional_notes && (
-                                    <Typography sx={{ gridColumn: 'span 2' }}><strong>Additional Notes:</strong> {selectedRequest.additional_notes}</Typography>
+                                    <Typography sx={{ gridColumn: 'span 2' }}>
+                                        <strong>Additional Notes:</strong> {selectedRequest.additional_notes}
+                                    </Typography>
                                 )}
                             </Box>
                         </Box>
@@ -366,8 +398,15 @@ const VolunteerDashboard = () => {
                     </Button>
                 </DialogActions>
             </Dialog>
+
+            <QualityReportForm
+                open={showQualityForm}
+                onClose={() => setShowQualityForm(false)}
+                requestId={selectedRequest}
+                onSubmitSuccess={handleReportSubmitted}
+            />
         </Box>
     );
 };
 
-export default VolunteerDashboard; 
+export default VolunteerDashboard;
