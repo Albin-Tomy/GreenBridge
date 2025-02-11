@@ -68,7 +68,7 @@ class FoodQualityReport(models.Model):
     volunteer = models.ForeignKey(VolunteerRegistration, on_delete=models.CASCADE, related_name='food_quality_reports')
     issue_type = models.CharField(max_length=20, choices=QUALITY_ISSUES)
     description = models.TextField()
-    images = models.JSONField(null=True, blank=True)
+
     temperature = models.FloatField(null=True, blank=True)
     reported_at = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
