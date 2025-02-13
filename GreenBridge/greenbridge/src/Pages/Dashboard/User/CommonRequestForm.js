@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../../../components/Header';
+import SchoolIcon from '@mui/icons-material/School';
+import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
+import RestaurantIcon from '@mui/icons-material/Restaurant';
+import ShoppingBasketIcon from '@mui/icons-material/ShoppingBasket';
+import MenuBookIcon from '@mui/icons-material/MenuBook';
+import DeleteIcon from '@mui/icons-material/Delete';
 import './CommonRequest.css';
 
 const CommonRequestForm = () => {
@@ -27,6 +33,12 @@ const CommonRequestForm = () => {
             case 'book':
                 navigate('/book-request');
                 break;
+            case 'school':
+                navigate('/school-request');
+                break;
+            case 'money':
+                navigate('/donate-money');
+                break;
             case 'waste':
                 navigate('/request');
                 break;
@@ -35,67 +47,73 @@ const CommonRequestForm = () => {
         }
     };
 
+    const requestCards = [
+        {
+            type: 'food',
+            icon: <RestaurantIcon sx={{ fontSize: 40 }}/>,
+            title: 'Food Redistribution',
+            description: 'Request pickup for excess food to be redistributed to those in need',
+            items: ['Cooked Food', 'Raw Food', 'Packaged Food', 'Beverages']
+        },
+        {
+            type: 'grocery',
+            icon: <ShoppingBasketIcon sx={{ fontSize: 40 }}/>,
+            title: 'Grocery Distribution',
+            description: 'Request pickup for grocery items to be distributed',
+            items: ['Grains & Cereals', 'Pulses & Lentils', 'Spices & Condiments', 'Cooking Oils']
+        },
+        {
+            type: 'book',
+            icon: <MenuBookIcon sx={{ fontSize: 40 }}/>,
+            title: 'Book Distribution',
+            description: 'Request pickup for educational books and materials',
+            items: ['School Textbooks', 'College Textbooks', 'Reference Books', 'Study Materials']
+        },
+        {
+            type: 'school',
+            icon: <SchoolIcon sx={{ fontSize: 40 }}/>,
+            title: 'School Supplies',
+            description: 'Donate school supplies to support education',
+            items: ['Stationery', 'Bags', 'Uniforms', 'Educational Tools']
+        },
+        {
+            type: 'money',
+            icon: <MonetizationOnIcon sx={{ fontSize: 40 }}/>,
+            title: 'Donate Money',
+            description: 'Make a monetary contribution to support our cause',
+            items: ['One-time Donation', 'Monthly Support', 'Project Specific', 'Emergency Fund']
+        },
+        {
+            type: 'waste',
+            icon: <DeleteIcon sx={{ fontSize: 40 }}/>,
+            title: 'Waste Collection',
+            description: 'Request pickup for various types of waste',
+            items: ['Recyclable Waste', 'Organic Waste', 'Electronic Waste', 'Other Waste']
+        }
+    ];
+
     return (
         <div>
             <Header />
             <div className="common-request-container">
                 <h2>Select Request Type</h2>
                 <div className="request-type-cards">
-                    <div 
-                        className={`request-card ${requestType === 'food' ? 'selected' : ''}`}
-                        onClick={() => handleRequestTypeChange('food')}
-                    >
-                        <h3>Food Redistribution</h3>
-                        <p>Request pickup for excess food to be redistributed to those in need</p>
-                        <ul>
-                            <li>Cooked Food</li>
-                            <li>Raw Food</li>
-                            <li>Packaged Food</li>
-                            <li>Beverages</li>
-                        </ul>
-                    </div>
-
-                    <div 
-                        className={`request-card ${requestType === 'grocery' ? 'selected' : ''}`}
-                        onClick={() => handleRequestTypeChange('grocery')}
-                    >
-                        <h3>Grocery Distribution</h3>
-                        <p>Request pickup for grocery items to be distributed</p>
-                        <ul>
-                            <li>Grains & Cereals</li>
-                            <li>Pulses & Lentils</li>
-                            <li>Spices & Condiments</li>
-                            <li>Cooking Oils</li>
-                        </ul>
-                    </div>
-
-                    <div 
-                        className={`request-card ${requestType === 'book' ? 'selected' : ''}`}
-                        onClick={() => handleRequestTypeChange('book')}
-                    >
-                        <h3>Book Distribution</h3>
-                        <p>Request pickup for educational books and materials</p>
-                        <ul>
-                            <li>School Textbooks</li>
-                            <li>College Textbooks</li>
-                            <li>Reference Books</li>
-                            <li>Study Materials</li>
-                        </ul>
-                    </div>
-
-                    <div 
-                        className={`request-card ${requestType === 'waste' ? 'selected' : ''}`}
-                        onClick={() => handleRequestTypeChange('waste')}
-                    >
-                        <h3>Waste Collection</h3>
-                        <p>Request pickup for various types of waste</p>
-                        <ul>
-                            <li>Recyclable Waste</li>
-                            <li>Organic Waste</li>
-                            <li>Electronic Waste</li>
-                            <li>Other Waste</li>
-                        </ul>
-                    </div>
+                    {requestCards.map((card) => (
+                        <div 
+                            key={card.type}
+                            className={`request-card ${requestType === card.type ? 'selected' : ''}`}
+                            onClick={() => handleRequestTypeChange(card.type)}
+                        >
+                            <div className="card-icon">{card.icon}</div>
+                            <h3>{card.title}</h3>
+                            <p>{card.description}</p>
+                            <ul>
+                                {card.items.map((item, index) => (
+                                    <li key={index}>{item}</li>
+                                ))}
+                            </ul>
+                        </div>
+                    ))}
                 </div>
             </div>
         </div>

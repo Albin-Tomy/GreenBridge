@@ -61,6 +61,8 @@ import UserDashboard from './Pages/Dashboard/User/UserDashboard';
 import BookRequestForm from './Pages/Dashboard/User/BookRequestForm';
 import GroceryRequestForm from './Pages/Dashboard/User/GroceryRequestForm';
 import FoodQualityReport from './Pages/Dashboard/Volunteer/FoodQualityReport';
+import DonateMoneyPage from './Pages/Dashboard/User/DonateMoneyPage';
+import SchoolSupplyRequestForm from './Pages/Dashboard/User/SchoolSupplyRequestForm';
 
 function App() {
   return (
@@ -148,6 +150,10 @@ function App() {
           <Route path="/grocery-request" element={<GroceryRequestForm />} />
 
           <Route path="/volunteer/quality-report/:distributionId" element={<FoodQualityReport />} />
+
+          <Route path="/donate-money" element={<DonateMoneyPage />} />
+
+          <Route path="/school-request" element={<SchoolSupplyRequestForm />} />
 
         </Routes>
       </Router>

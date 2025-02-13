@@ -67,6 +67,8 @@ INSTALLED_APPS = [
     'bookdistribution',
     'volunteer',
     'food_distributions',
+    'schoolsupplies',
+    'donations',
 ]
 SITE_ID = 1
 
@@ -285,3 +287,7 @@ RAZORPAY_API_SECRET = os.getenv("RAZORPAY_API_SECRET")
 # Google OAuth2 settings
 GOOGLE_OAUTH2_CLIENT_ID = os.getenv('GOOGLE_OAUTH2_CLIENT_ID')
 GOOGLE_OAUTH2_CLIENT_SECRET = os.getenv('GOOGLE_OAUTH2_CLIENT_SECRET')
+
+# Add Razorpay settings
+RAZORPAY_KEY_ID = 'your_key_id'
+RAZORPAY_KEY_SECRET = 'your_key_secret'

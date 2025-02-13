@@ -34,6 +34,8 @@ urlpatterns = [
     path('api/v1/food/', include('fooddistribution.urls')),
     path('api/v1/book/', include('bookdistribution.urls')),
     path('api/v1/grocery/', include('grocerydistribution.urls')),
+    path('api/v1/school-supplies/', include('schoolsupplies.urls')),
+    path('api/v1/donations/', include('donations.urls')),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

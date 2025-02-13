@@ -30,6 +30,7 @@ import RestaurantIcon from '@mui/icons-material/Restaurant';
 import ShoppingBasketIcon from '@mui/icons-material/ShoppingBasket';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
 import AssignmentIcon from '@mui/icons-material/Assignment';
+import SchoolIcon from '@mui/icons-material/School';
 import Header from '../../../components/Navbar';
 import axios from 'axios';
 import { format } from 'date-fns';
@@ -126,6 +127,9 @@ const NGODashboard = () => {
                 case 2:
                     endpoint = 'book';
                     break;
+                case 3:  // Add school supplies endpoint
+                    endpoint = 'school-supplies';
+                    break;
                 default:
                     endpoint = 'food';
             }
@@ -145,7 +149,7 @@ const NGODashboard = () => {
     const handleStatusUpdate = async (id, newStatus) => {
         try {
             const token = localStorage.getItem('authToken');
-            const endpoint = activeTab === 0 ? 'food' : activeTab === 1 ? 'grocery' : 'book';
+            const endpoint = activeTab === 0 ? 'food' : activeTab === 1 ? 'grocery' : activeTab === 2 ? 'book' : 'school-supplies';
             await axios.put(
                 `http://127.0.0.1:8000/api/v1/${endpoint}/request/${id}/update-status/`,
                 { status: newStatus },
@@ -326,6 +330,28 @@ const NGODashboard = () => {
                     </>
                 ) : null;
 
+            case 3: // School Supplies
+                return request.supply_type ? (
+                    <>
+                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                            <SchoolIcon sx={{ mr: 1 }} />
+                            <Typography>
+                                {request.supply_type.charAt(0).toUpperCase() + request.supply_type.slice(1)} - {request.quantity} items
+                            </Typography>
+                        </Box>
+                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                            <Typography variant="body2" color="textSecondary">
+                                Education Level: {request.education_level.replace('_', ' ').charAt(0).toUpperCase() + request.education_level.slice(1)}
+                            </Typography>
+                        </Box>
+                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                            <Typography variant="body2" color="textSecondary">
+                                Condition: {request.condition}
+                            </Typography>
+                        </Box>
+                    </>
+                ) : null;
+
             default:
                 return null;
         }
@@ -334,13 +360,15 @@ const NGODashboard = () => {
     const getRequestTypeTitle = () => {
         switch(activeTab) {
             case 0:
-                return "Food Distribution Requests";
+                return 'Food Distribution Requests';
             case 1:
-                return "Grocery Distribution Requests";
+                return 'Grocery Distribution Requests';
             case 2:
-                return "Book Distribution Requests";
+                return 'Book Distribution Requests';
+            case 3:  // Add school supplies case
+                return 'School Supplies Requests';
             default:
-                return "Distribution Requests";
+                return 'Requests';
         }
     };
 
@@ -462,6 +490,11 @@ const NGODashboard = () => {
                         <Tab 
                             icon={<MenuBookIcon />} 
                             label="Book Requests" 
+                            iconPosition="start"
+                        />
+                        <Tab 
+                            icon={<SchoolIcon />} 
+                            label="School Supplies" 
                             iconPosition="start"
                         />
                     </Tabs>
