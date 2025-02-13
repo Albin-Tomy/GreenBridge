@@ -29,11 +29,74 @@ import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import RestaurantIcon from '@mui/icons-material/Restaurant';
 import ShoppingBasketIcon from '@mui/icons-material/ShoppingBasket';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
+import AssignmentIcon from '@mui/icons-material/Assignment';
 import Header from '../../../components/Navbar';
 import axios from 'axios';
 import { format } from 'date-fns';
 
 const drawerWidth = 240;
+
+const QualityReportDialog = ({ open, onClose, report }) => {
+    if (!report) return null;
+
+    return (
+        <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
+            <DialogTitle>Quality Report Details</DialogTitle>
+            <DialogContent>
+                <Box sx={{ p: 2 }}>
+                    <Grid container spacing={2}>
+                        <Grid item xs={12} sm={6}>
+                            <Typography><strong>Issue Type:</strong> {report.issue_type}</Typography>
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <Typography><strong>Status:</strong> {report.status}</Typography>
+                        </Grid>
+                        <Grid item xs={12}>
+                            <Typography><strong>Description:</strong> {report.description}</Typography>
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <Typography><strong>Temperature:</strong> {report.temperature}°C</Typography>
+                        </Grid>
+                        <Grid item xs={12}>
+                            <Typography variant="h6" sx={{ mt: 2, mb: 1 }}>Quality Checks</Typography>
+                            <Grid container spacing={1}>
+                                {[
+                                    { label: 'Packaging Integrity', value: report.packaging_integrity },
+                                    { label: 'Labeling Accuracy', value: report.labeling_accuracy },
+                                    { label: 'Allergen Check', value: report.allergen_check },
+                                    { label: 'Hygiene Check', value: report.hygiene_check },
+                                    { label: 'Visual Inspection', value: report.visual_inspection },
+                                    { label: 'Smell Test', value: report.smell_test },
+                                    { label: 'Expiration Check', value: report.expiration_check },
+                                ].map((check, index) => (
+                                    <Grid item xs={12} sm={6} key={index}>
+                                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                            <Chip
+                                                size="small"
+                                                color={check.value ? "success" : "error"}
+                                                label={check.label}
+                                                sx={{ mr: 1 }}
+                                            />
+                                            {check.value ? "Pass" : "Fail"}
+                                        </Box>
+                                    </Grid>
+                                ))}
+                            </Grid>
+                        </Grid>
+                        {report.storage_condition && (
+                            <Grid item xs={12}>
+                                <Typography><strong>Storage Condition:</strong> {report.storage_condition}</Typography>
+                            </Grid>
+                        )}
+                    </Grid>
+                </Box>
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={onClose}>Close</Button>
+            </DialogActions>
+        </Dialog>
+    );
+};
 
 const NGODashboard = () => {
     const [activeTab, setActiveTab] = useState(0);
@@ -42,6 +105,8 @@ const NGODashboard = () => {
     const [selectedRequest, setSelectedRequest] = useState(null);
     const [openDialog, setOpenDialog] = useState(false);
     const [filter, setFilter] = useState('all');
+    const [qualityReport, setQualityReport] = useState(null);
+    const [showQualityReport, setShowQualityReport] = useState(false);
 
     useEffect(() => {
         fetchRequests();
@@ -95,6 +160,23 @@ const NGODashboard = () => {
         }
     };
 
+    const fetchQualityReport = async (requestId) => {
+        try {
+            const token = localStorage.getItem('authToken');
+            const response = await axios.get(
+                `http://127.0.0.1:8000/api/v1/food/request/${requestId}/quality-report/view/`,
+                {
+                    headers: { Authorization: `Bearer ${token}` }
+                }
+            );
+            setQualityReport(response.data);
+            setShowQualityReport(true);
+        } catch (error) {
+            console.error('Error fetching quality report:', error);
+            alert('No quality report found for this request');
+        }
+    };
+
     const statusActions = {
         pending: [
             { label: 'Approve', action: 'approved', color: 'primary' },
@@ -102,6 +184,13 @@ const NGODashboard = () => {
         ],
         approved: [
             { label: 'Cancel', action: 'cancelled', color: 'error' }
+        ],
+        collected: [
+            { label: 'Mark Distributed', action: 'distributed', color: 'success' }
+        ],
+        quality_issue: [
+            { label: 'Review Complete', action: 'approved', color: 'primary' },
+            { label: 'Cancel Request', action: 'cancelled', color: 'error' }
         ]
     };
 
@@ -120,21 +209,62 @@ const NGODashboard = () => {
 
     const getActionButtons = (request) => {
         const actions = statusActions[request.status];
-        if (!actions) return null;
-
+        const isFoodRequest = activeTab === 0;
+        
         return (
-            <Box sx={{ display: 'flex', gap: 1 }}>
-                {actions.map((action, index) => (
+            <Box sx={{ 
+                display: 'flex', 
+                flexDirection: 'column',  // Stack buttons vertically
+                gap: 1,
+                mt: 2  // Add margin top for spacing
+            }}>
+                <Box sx={{ 
+                    display: 'flex', 
+                    gap: 1, 
+                    width: '100%'  // Full width for first row
+                }}>
                     <Button
-                        key={index}
-                        variant={action.color === 'error' ? 'outlined' : 'contained'}
-                        color={action.color}
-                        onClick={() => handleStatusUpdate(request.id, action.action)}
+                        variant="outlined"
+                        startIcon={<VisibilityIcon />}
+                        onClick={() => {
+                            setSelectedRequest(request);
+                            setOpenDialog(true);
+                        }}
                         size="small"
+                        fullWidth  // Make button take full width
                     >
-                        {action.label}
+                        View Details
                     </Button>
-                ))}
+                    {isFoodRequest && (request.status === 'collected' || request.status === 'quality_issue') && (
+                        <Button
+                            variant="outlined"
+                            startIcon={<AssignmentIcon />}
+                            onClick={() => fetchQualityReport(request.id)}
+                            size="small"
+                            fullWidth
+                        >
+                            View Quality Report
+                        </Button>
+                    )}
+                </Box>
+                <Box sx={{ 
+                    display: 'flex', 
+                    justifyContent: 'flex-end',
+                    gap: 1,
+                    width: '100%'
+                }}>
+                    {actions?.map((action, index) => (
+                        <Button
+                            key={index}
+                            variant={action.color === 'error' ? 'outlined' : 'contained'}
+                            color={action.color}
+                            onClick={() => handleStatusUpdate(request.id, action.action)}
+                            size="small"
+                        >
+                            {action.label}
+                        </Button>
+                    ))}
+                </Box>
             </Box>
         );
     };
@@ -242,13 +372,15 @@ const NGODashboard = () => {
                     '& .MuiDrawer-paper': {
                         width: drawerWidth,
                         boxSizing: 'border-box',
-                        mt: '64px',
-                        pt: 2,
-                        backgroundColor: (theme) => theme.palette.background.default
+                        mt: '64px',  // Match header height
+                        pt: 0,  // Remove top padding
+                        backgroundColor: (theme) => theme.palette.background.default,
+                        borderRight: '1px solid',
+                        borderColor: 'divider'
                     },
                 }}
             >
-                <Box sx={{ px: 2 }}>
+                <Box sx={{ px: 2, py: 2 }}>  <br></br>
                     <Typography variant="h6" sx={{ mb: 2 }}>
                         Filter by Status
                     </Typography>
@@ -266,14 +398,18 @@ const NGODashboard = () => {
                                     sx={{
                                         borderRadius: 1,
                                         '&.Mui-selected': {
-                                            backgroundColor: (theme) => theme.palette.action.selected
+                                            backgroundColor: (theme) => theme.palette.primary.light,
+                                            color: (theme) => theme.palette.primary.contrastText,
+                                        },
+                                        '&:hover': {
+                                            backgroundColor: (theme) => theme.palette.primary.lighter,
                                         }
                                     }}
                                 >
                                     <ListItemText 
                                         primary={btn.label}
                                         primaryTypographyProps={{
-                                            color: filter === btn.value ? 'primary' : 'textPrimary'
+                                            color: filter === btn.value ? 'inherit' : 'textPrimary'
                                         }}
                                     />
                                     <Chip 
@@ -282,6 +418,7 @@ const NGODashboard = () => {
                                             btn.value === 'all' ? true : r.status === btn.value
                                         ).length}
                                         color={filter === btn.value ? 'primary' : 'default'}
+                                        sx={{ ml: 1 }}
                                     />
                                 </ListItemButton>
                             </ListItem>
@@ -350,10 +487,10 @@ const NGODashboard = () => {
                             ) : (
                                 requests.map((request) => (
                                     <Grid item xs={12} sm={6} md={4} key={request.id}>
-                                        <Card className="request-card">
-                                            <CardContent>
+                                        <Card>
+                                            <CardContent sx={{ pb: 1 }}>  
                                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                                                    <Typography variant="h6" component="div">
+                                                    <Typography variant="h6">
                                                         Request #{request.id}
                                                     </Typography>
                                                     {getStatusChip(request.status)}
@@ -367,22 +504,11 @@ const NGODashboard = () => {
                                                         {request.pickup_address}
                                                     </Typography>
                                                 </Box>
-
-                                                <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
-                                                    <Button
-                                                        variant="outlined"
-                                                        startIcon={<VisibilityIcon />}
-                                                        onClick={() => {
-                                                            setSelectedRequest(request);
-                                                            setOpenDialog(true);
-                                                        }}
-                                                        size="small"
-                                                    >
-                                                        View Details
-                                                    </Button>
-                                                    {getActionButtons(request)}
-                                                </Box>
                                             </CardContent>
+                                            
+                                            <Box sx={{ px: 2, pb: 2 }}>  
+                                                {getActionButtons(request)}
+                                            </Box>
                                         </Card>
                                     </Grid>
                                 ))
@@ -415,9 +541,27 @@ const NGODashboard = () => {
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setOpenDialog(false)}>Close</Button>
+                    {selectedRequest && activeTab === 0 && // Only show for food requests
+                     (selectedRequest.status === 'collected' || selectedRequest.status === 'quality_issue') && (
+                        <Button
+                            variant="outlined"
+                            startIcon={<AssignmentIcon />}
+                            onClick={() => fetchQualityReport(selectedRequest.id)}
+                        >
+                            View Quality Report
+                        </Button>
+                    )}
                     {selectedRequest && getActionButtons(selectedRequest)}
                 </DialogActions>
             </Dialog>
+
+            {activeTab === 0 && (
+                <QualityReportDialog
+                    open={showQualityReport}
+                    onClose={() => setShowQualityReport(false)}
+                    report={qualityReport}
+                />
+            )}
         </Box>
     );
 };

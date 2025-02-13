@@ -81,30 +81,53 @@ def update_food_request_status(request, pk):
             status=status.HTTP_404_NOT_FOUND
         )
 
+# @api_view(['POST'])
+# @permission_classes([IsAuthenticated])
+# @parser_classes([MultiPartParser, FormParser])
+# def submit_quality_report(request, request_id):
+#     try:
+#         food_request = FoodRequest.objects.get(id=request_id)
+#         volunteer = VolunteerRegistration.objects.get(user=request.user)
+
+#         # Create quality report
+#         report_data = {
+#             'food_request': food_request.id,
+#             'volunteer': volunteer.id,
+#             'issue_type': request.data.get('issue_type'),
+#             'description': request.data.get('description'),
+#             'temperature': request.data.get('temperature'),
+#             'packaging_integrity': request.data.get('packaging_integrity'),
+#             'labeling_accuracy': request.data.get('labeling_accuracy'),
+#             'allergen_check': request.data.get('allergen_check'),
+#             'hygiene_check': request.data.get('hygiene_check'),
+#             'weight_check': request.data.get('weight_check'),
+#             'visual_inspection': request.data.get('visual_inspection'),
+#             'smell_test': request.data.get('smell_test'),
+#             'expiration_check': request.data.get('expiration_check'),
+#             'storage_condition': request.data.get('storage_condition'),
+#         }
+
+#         serializer = FoodQualityReportSerializer(data=report_data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response({'message': 'Quality report submitted successfully', 'report_id': serializer.data['id']}, status=201)
+#         return Response(serializer.errors, status=400)
+
+#     except FoodRequest.DoesNotExist:
+#         return Response({'error': 'Food request not found'}, status=404)
+#     except VolunteerRegistration.DoesNotExist:
+#         return Response({'error': 'Volunteer not found'}, status=404)
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-@parser_classes([MultiPartParser, FormParser])
 def submit_quality_report(request, request_id):
     try:
         food_request = FoodRequest.objects.get(id=request_id)
         volunteer = VolunteerRegistration.objects.get(user=request.user)
 
-        # Create quality report
         report_data = {
             'food_request': food_request.id,
             'volunteer': volunteer.id,
-            'issue_type': request.data.get('issue_type'),
-            'description': request.data.get('description'),
-            'temperature': request.data.get('temperature'),
-            'packaging_integrity': request.data.get('packaging_integrity'),
-            'labeling_accuracy': request.data.get('labeling_accuracy'),
-            'allergen_check': request.data.get('allergen_check'),
-            'hygiene_check': request.data.get('hygiene_check'),
-            'weight_check': request.data.get('weight_check'),
-            'visual_inspection': request.data.get('visual_inspection'),
-            'smell_test': request.data.get('smell_test'),
-            'expiration_check': request.data.get('expiration_check'),
-            'storage_condition': request.data.get('storage_condition'),
+            **request.data
         }
 
         serializer = FoodQualityReportSerializer(data=report_data)
@@ -118,6 +141,7 @@ def submit_quality_report(request, request_id):
     except VolunteerRegistration.DoesNotExist:
         return Response({'error': 'Volunteer not found'}, status=404)
 
+        
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def update_request_status(request, request_id):
