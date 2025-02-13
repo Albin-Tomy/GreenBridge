@@ -79,14 +79,37 @@ const DonateMoneyPage = () => {
 
             if (response.data.order_id) {
                 const options = {
-                    key: process.env.REACT_APP_RAZORPAY_KEY_ID,
-                    amount: formData.amount * 100, // Amount in paise
+                    key: process.env.REACT_APP_RAZORPAY_API_KEY,
+                    amount: formData.amount * 100,
                     currency: 'INR',
                     name: 'GreenBridge',
                     description: `${formData.donation_type} donation for ${formData.purpose}`,
                     order_id: response.data.order_id,
-                    handler: function(response) {
-                        handlePaymentSuccess(response);
+                    handler: async function(response) {
+                        try {
+                            const token = localStorage.getItem('authToken');
+                            await axios.post(
+                                `${BASE_URL}/api/v1/donations/verify/`,
+                                {
+                                    payment_id: response.razorpay_payment_id,
+                                    order_id: response.razorpay_order_id,
+                                    signature: response.razorpay_signature
+                                },
+                                {
+                                    headers: {
+                                        'Authorization': `Bearer ${token}`,
+                                        'Content-Type': 'application/json'
+                                    }
+                                }
+                            );
+
+                            toast.success('Thank you for your donation!');
+                            setTimeout(() => {
+                                navigate('/dashboard');
+                            }, 2000);
+                        } catch (error) {
+                            toast.error('Payment verification failed. Please contact support.');
+                        }
                     },
                     prefill: {
                         name: localStorage.getItem('userName'),
@@ -104,33 +127,6 @@ const DonateMoneyPage = () => {
             toast.error(error.response?.data?.error || 'Failed to process donation');
         } finally {
             setLoading(false);
-        }
-    };
-
-    const handlePaymentSuccess = async (response) => {
-        try {
-            const token = localStorage.getItem('authToken');
-            await axios.post(
-                `${BASE_URL}/api/v1/donations/verify/`,
-                {
-                    payment_id: response.razorpay_payment_id,
-                    order_id: response.razorpay_order_id,
-                    signature: response.razorpay_signature
-                },
-                {
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    }
-                }
-            );
-
-            toast.success('Thank you for your donation!');
-            setTimeout(() => {
-                navigate('/dashboard');
-            }, 2000);
-        } catch (error) {
-            toast.error('Failed to verify payment. Please contact support.');
         }
     };
 

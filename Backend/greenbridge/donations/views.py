@@ -7,41 +7,41 @@ from .serializers import DonationSerializer
 import razorpay
 from django.conf import settings
 import json
-import time
+from django.utils import timezone
 
-client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
+# Initialize Razorpay client
+razorpay_client = razorpay.Client(auth=(settings.RAZORPAY_API_KEY, settings.RAZORPAY_API_SECRET))
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_donation(request):
     try:
         data = request.data
-        amount = int(float(data['amount']) * 100)  # Convert to paise
-        
+        amount = int(float(data['amount']))
+
         # Create Razorpay Order
-        payment_data = {
-            'amount': amount,
+        razorpay_order = razorpay_client.order.create({
+            'amount': amount * 100,  # Convert to paise
             'currency': 'INR',
-            'receipt': f'don_{int(time.time())}',
-            'payment_capture': 1
-        }
-        
-        order = client.order.create(data=payment_data)
-        
-        # Create donation record
+            'payment_capture': 1,
+            'receipt': f'don_{int(timezone.now().timestamp())}'
+        })
+
+        # Create donation record with pending status
         donation = Donation.objects.create(
             user=request.user,
-            amount=float(data['amount']),
+            amount=amount,
             donation_type=data['donation_type'],
             purpose=data['purpose'],
-            razorpay_order_id=order['id']
+            status='pending',
+            razorpay_order_id=razorpay_order['id']
         )
-        
+
         return Response({
-            'order_id': order['id'],
+            'order_id': razorpay_order['id'],
             'donation_id': donation.id
         })
-        
+
     except Exception as e:
         return Response({
             'error': str(e)
@@ -52,25 +52,37 @@ def create_donation(request):
 def verify_donation(request):
     try:
         data = request.data
-        donation = Donation.objects.get(razorpay_order_id=data['order_id'])
         
-        # Verify signature
+        # Verify the payment signature
         params_dict = {
             'razorpay_payment_id': data['payment_id'],
             'razorpay_order_id': data['order_id'],
             'razorpay_signature': data['signature']
         }
-        
-        client.utility.verify_payment_signature(params_dict)
-        
+
+        # Verify signature
+        razorpay_client.utility.verify_payment_signature(params_dict)
+
         # Update donation status
+        donation = Donation.objects.get(razorpay_order_id=data['order_id'])
         donation.status = 'completed'
         donation.razorpay_payment_id = data['payment_id']
         donation.save()
-        
-        return Response({'status': 'Payment verified successfully'})
-        
+
+        return Response({
+            'status': 'Payment verified successfully',
+            'donation_id': donation.id
+        })
+
     except Exception as e:
+        # If verification fails, mark donation as failed
+        try:
+            donation = Donation.objects.get(razorpay_order_id=data['order_id'])
+            donation.status = 'failed'
+            donation.save()
+        except:
+            pass
+
         return Response({
             'error': str(e)
         }, status=status.HTTP_400_BAD_REQUEST)
@@ -78,6 +90,6 @@ def verify_donation(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_user_donations(request):
-    donations = Donation.objects.filter(user=request.user)
+    donations = Donation.objects.filter(user=request.user).order_by('-created_at')
     serializer = DonationSerializer(donations, many=True)
     return Response(serializer.data) 
