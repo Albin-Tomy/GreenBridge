@@ -309,10 +309,23 @@ def get_all_users(request):
     
 
 @api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
 def delete_user(request, user_id):
-    user = get_object_or_404(User, id=user_id)
-    user.delete()
-    return Response({"message": "User deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
+    try:
+        user = User.objects.get(id=user_id)
+        # Prevent admin from deleting themselves
+        if request.user.id == user_id:
+            return Response(
+                {"error": "Cannot delete your own account"}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        user.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    except User.DoesNotExist:
+        return Response(
+            {"error": "User not found"}, 
+            status=status.HTTP_404_NOT_FOUND
+        )
 
 
 
