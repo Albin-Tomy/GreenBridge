@@ -14,7 +14,8 @@ import {
     Card,
     CardContent,
     Tabs,
-    Tab
+    Tab,
+    Alert
 } from '@mui/material';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
@@ -22,12 +23,12 @@ import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import RestaurantIcon from '@mui/icons-material/Restaurant';
 import ShoppingBasketIcon from '@mui/icons-material/ShoppingBasket';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
+import SchoolIcon from '@mui/icons-material/School';
 import ErrorIcon from '@mui/icons-material/Error';
 import Header from '../../../components/Header';
 import axios from 'axios';
 import { format } from 'date-fns';
 import VolunteerPoints from './VolunteerPoints';
-import { useNavigate } from 'react-router-dom';
 import QualityReportForm from './QualityReportForm';
 
 const VolunteerDashboard = () => {
@@ -37,34 +38,19 @@ const VolunteerDashboard = () => {
     const [selectedRequest, setSelectedRequest] = useState(null);
     const [openDialog, setOpenDialog] = useState(false);
     const [showQualityForm, setShowQualityForm] = useState(false);
-    const [userName, setUserName] = useState("User"); // Default user name
-    const navigate = useNavigate();
+    const [error, setError] = useState(null);
 
     useEffect(() => {
         fetchApprovedRequests();
-        const fetchUserProfile = async () => {
-            const token = localStorage.getItem('authToken');
-            const userId = localStorage.getItem('userId');
-            if (userId && token) {
-                try {
-                    const response = await axios.get(`http://127.0.0.1:8000/api/v1/auth/user_profiles/${userId}/`, {
-                        headers: { Authorization: `Bearer ${token}` },
-                    });
-                    const name = response.data.first_name || response.data.email || "User";
-                    setUserName(name);
-                } catch (error) {
-                    console.error('Error fetching user profile:', error);
-                }
-            }
-        };
-
-        fetchUserProfile();
-    }, []);
+    }, [activeTab]);
 
     const fetchApprovedRequests = async () => {
         try {
+            setLoading(true);
+            setError(null);
             const token = localStorage.getItem('authToken');
             let endpoint;
+            
             switch(activeTab) {
                 case 0:
                     endpoint = 'food';
@@ -75,6 +61,9 @@ const VolunteerDashboard = () => {
                 case 2:
                     endpoint = 'book';
                     break;
+                case 3:
+                    endpoint = 'school-supplies';
+                    break;
                 default:
                     endpoint = 'food';
             }
@@ -84,9 +73,10 @@ const VolunteerDashboard = () => {
                 params: { status: 'approved' }
             });
             setRequests(response.data);
-            setLoading(false);
         } catch (error) {
             console.error('Error fetching requests:', error);
+            setError('Failed to fetch requests. Please try again later.');
+        } finally {
             setLoading(false);
         }
     };
@@ -94,46 +84,47 @@ const VolunteerDashboard = () => {
     const handleMarkAsCollected = async (id) => {
         try {
             const token = localStorage.getItem('authToken');
-            const endpoint = activeTab === 0 ? 'food' : activeTab === 1 ? 'grocery' : 'book';
+            let endpoint;
             
-            const url = `http://127.0.0.1:8000/api/v1/${endpoint}/request/${id}/update-status/`;
-            const data = { status: 'collected' };
+            switch(activeTab) {
+                case 0:
+                    endpoint = 'food';
+                    break;
+                case 1:
+                    endpoint = 'grocery';
+                    break;
+                case 2:
+                    endpoint = 'book';
+                    break;
+                case 3:
+                    endpoint = 'school-supplies';
+                    break;
+                default:
+                    endpoint = 'food';
+            }
             
-            console.log('Making request to:', url);
-            console.log('With data:', data);
-            
-            const response = await axios.put(url, data, {
-                headers: { 
-                    Authorization: `Bearer ${token}`,
-                    'Content-Type': 'application/json'
+            await axios.put(
+                `http://127.0.0.1:8000/api/v1/${endpoint}/request/${id}/update-status/`,
+                { status: 'collected' },
+                {
+                    headers: { 
+                        Authorization: `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
                 }
-            });
+            );
             
-            console.log('Response:', response.data);
             fetchApprovedRequests();
             setOpenDialog(false);
         } catch (error) {
-            console.error('Error details:', {
-                message: error.message,
-                response: error.response?.data,
-                status: error.response?.status
-            });
-            alert('Error updating request status. Please try again.');
+            console.error('Error updating status:', error);
+            setError('Failed to update status. Please try again.');
         }
     };
 
     const handleQualityIssue = (requestId) => {
-        console.log("Selected Request ID:", requestId);
         setSelectedRequest(requestId);
         setShowQualityForm(true);
-    };
-
-    const handleReportSubmitted = () => {
-        fetchApprovedRequests();
-    };
-
-    const getStatusChip = () => {
-        return <Chip label="APPROVED" color="success" size="small" />;
     };
 
     const renderRequestDetails = (request) => {
@@ -141,57 +132,70 @@ const VolunteerDashboard = () => {
 
         switch(activeTab) {
             case 0: // Food
-                return request.food_type ? (
+                return (
                     <>
                         <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                             <RestaurantIcon sx={{ mr: 1 }} />
                             <Typography>
-                                {request.food_type.charAt(0).toUpperCase() + request.food_type.slice(1)} - {request.quantity} kg/L
+                                {request.food_type} - {request.quantity}
                             </Typography>
                         </Box>
                         <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                             <AccessTimeIcon sx={{ mr: 1 }} />
                             <Typography>
-                                Best Before: {format(new Date(request.expiry_time), 'dd/MM/yyyy HH:mm')}
+                                Expires: {format(new Date(request.expiry_time), 'dd/MM/yyyy HH:mm')}
                             </Typography>
                         </Box>
                     </>
-                ) : null;
+                );
 
             case 1: // Grocery
-                return request.grocery_type ? (
+                return (
                     <>
                         <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                             <ShoppingBasketIcon sx={{ mr: 1 }} />
                             <Typography>
-                                {request.grocery_type.charAt(0).toUpperCase() + request.grocery_type.slice(1)} - {request.quantity} kg
+                                {request.grocery_type} - {request.quantity}
                             </Typography>
                         </Box>
                         <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                             <AccessTimeIcon sx={{ mr: 1 }} />
                             <Typography>
-                                Expiry Date: {format(new Date(request.expiry_date), 'dd/MM/yyyy')}
+                                Expires: {format(new Date(request.expiry_date), 'dd/MM/yyyy')}
                             </Typography>
                         </Box>
                     </>
-                ) : null;
+                );
 
-            case 2: // Book
-                return request.book_type ? (
+            case 2: // Books
+                return (
                     <>
                         <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                             <MenuBookIcon sx={{ mr: 1 }} />
                             <Typography>
-                                {request.book_type.charAt(0).toUpperCase() + request.book_type.slice(1)} - {request.quantity} books
+                                {request.book_type} - {request.quantity} books
                             </Typography>
                         </Box>
-                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                            <Typography>
-                                Subject: {request.subject} ({request.education_level})
-                            </Typography>
-                        </Box>
+                        <Typography variant="body2" color="textSecondary">
+                            Subject: {request.subject}
+                        </Typography>
                     </>
-                ) : null;
+                );
+
+            case 3: // School Supplies
+                return (
+                    <>
+                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                            <SchoolIcon sx={{ mr: 1 }} />
+                            <Typography>
+                                {request.supply_type} - {request.quantity} items
+                            </Typography>
+                        </Box>
+                        <Typography variant="body2" color="textSecondary">
+                            Grade Level: {request.grade_level}
+                        </Typography>
+                    </>
+                );
 
             default:
                 return null;
@@ -201,41 +205,23 @@ const VolunteerDashboard = () => {
     const getRequestTypeTitle = () => {
         switch(activeTab) {
             case 0:
-                return "Food Pickup Requests";
+                return "Food Collection Requests";
             case 1:
-                return "Grocery Pickup Requests";
+                return "Grocery Collection Requests";
             case 2:
-                return "Book Pickup Requests";
+                return "Book Collection Requests";
+            case 3:
+                return "School Supplies Collection Requests";
             default:
-                return "Pickup Requests";
+                return "Collection Requests";
         }
     };
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-            <Box sx={{ 
-                position: 'fixed',
-                width: '100%',
-                top: 0,
-                zIndex: (theme) => theme.zIndex.drawer + 1
-            }}>
-                <Header />
-            </Box>
+            <Header />
 
-            <Box
-                component="main"
-                sx={{
-                    flexGrow: 1,
-                    p: 4,
-                    pt: '120px',
-                    overflow: 'auto',
-                    height: '100%',
-                    width: '100%',
-                    maxWidth: '1500px',
-                    margin: '0 auto',
-                    px: { xs: 2, sm: 4, md: 6 }
-                }}
-            >
+            <Box component="main" sx={{ flexGrow: 1, p: 3, mt: 8 }}>
                 <Box sx={{ mb: 4 }}>
                     <VolunteerPoints />
                 </Box>
@@ -245,35 +231,22 @@ const VolunteerDashboard = () => {
                     onChange={(e, newValue) => setActiveTab(newValue)}
                     sx={{ mb: 3 }}
                 >
-                    <Tab 
-                        icon={<RestaurantIcon />} 
-                        label="Food Requests" 
-                        iconPosition="start"
-                    />
-                    <Tab 
-                        icon={<ShoppingBasketIcon />} 
-                        label="Grocery Requests" 
-                        iconPosition="start"
-                    />
-                    <Tab 
-                        icon={<MenuBookIcon />} 
-                        label="Book Requests" 
-                        iconPosition="start"
-                    />
+                    <Tab icon={<RestaurantIcon />} label="Food" />
+                    <Tab icon={<ShoppingBasketIcon />} label="Grocery" />
+                    <Tab icon={<MenuBookIcon />} label="Books" />
+                    <Tab icon={<SchoolIcon />} label="School Supplies" />
                 </Tabs>
 
-                <Typography 
-                    variant="h4" 
-                    gutterBottom 
-                    sx={{ 
-                        mb: 4,
-                        fontWeight: 'bold',
-                        color: (theme) => theme.palette.primary.main 
-                    }}
-                >
+                <Typography variant="h4" gutterBottom sx={{ mb: 4 }}>
                     {getRequestTypeTitle()}
                 </Typography>
-                
+
+                {error && (
+                    <Alert severity="error" sx={{ mb: 3 }}>
+                        {error}
+                    </Alert>
+                )}
+
                 {loading ? (
                     <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
                         <CircularProgress />
@@ -291,23 +264,27 @@ const VolunteerDashboard = () => {
                                 <Grid item xs={12} sm={6} md={4} key={request.id}>
                                     <Card>
                                         <CardContent>
+                                            {/* Request Header */}
                                             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
                                                 <Typography variant="h6">
                                                     Request #{request.id}
                                                 </Typography>
-                                                {getStatusChip()}
+                                                <Chip label="APPROVED" color="success" size="small" />
                                             </Box>
-                                            
+
+                                            {/* Request Details */}
                                             {renderRequestDetails(request)}
 
-                                            <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                                            {/* Location */}
+                                            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                                                 <LocationOnIcon sx={{ mr: 1 }} />
                                                 <Typography noWrap>
                                                     {request.pickup_address}
                                                 </Typography>
                                             </Box>
 
-                                            <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2, gap: 1 }}>
+                                            {/* Action Buttons */}
+                                            <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
                                                 <Button
                                                     variant="outlined"
                                                     startIcon={<VisibilityIcon />}
@@ -315,9 +292,8 @@ const VolunteerDashboard = () => {
                                                         setSelectedRequest(request);
                                                         setOpenDialog(true);
                                                     }}
-                                                    size="small"
                                                 >
-                                                    View Details
+                                                    Details
                                                 </Button>
                                                 <Box sx={{ display: 'flex', gap: 1 }}>
                                                     <Button
@@ -325,17 +301,15 @@ const VolunteerDashboard = () => {
                                                         color="error"
                                                         startIcon={<ErrorIcon />}
                                                         onClick={() => handleQualityIssue(request.id)}
-                                                        size="small"
                                                     >
-                                                        Report Quality
+                                                        Report Issue
                                                     </Button>
                                                     <Button
                                                         variant="contained"
                                                         color="success"
                                                         onClick={() => handleMarkAsCollected(request.id)}
-                                                        size="small"
                                                     >
-                                                        Mark as Collected
+                                                        Collect
                                                     </Button>
                                                 </Box>
                                             </Box>
@@ -346,65 +320,66 @@ const VolunteerDashboard = () => {
                         )}
                     </Grid>
                 )}
-            </Box>
 
-            {/* Details Dialog */}
-            <Dialog open={openDialog} onClose={() => setOpenDialog(false)} maxWidth="md" fullWidth>
-                <DialogTitle>Request Details</DialogTitle>
-                <DialogContent>
-                    {selectedRequest && (
-                        <Box sx={{ p: 2 }}>
-                            <Typography variant="h6" gutterBottom>
-                                Request #{selectedRequest.id}
-                            </Typography>
-                            <Box sx={{ display: 'grid', gap: 2, gridTemplateColumns: 'repeat(2, 1fr)' }}>
-                                <Typography>
-                                    <strong>Donor:</strong> {selectedRequest.user?.name || selectedRequest.user?.email || "Unknown Donor"}
-                                </Typography>
-                                <Typography><strong>Status:</strong> {getStatusChip()}</Typography>
+                {/* Details Dialog */}
+                <Dialog 
+                    open={openDialog} 
+                    onClose={() => setOpenDialog(false)}
+                    maxWidth="md"
+                    fullWidth
+                >
+                    <DialogTitle>Request Details</DialogTitle>
+                    <DialogContent>
+                        {selectedRequest && (
+                            <Box sx={{ p: 2 }}>
                                 {renderRequestDetails(selectedRequest)}
-                                <Typography><strong>Contact:</strong> {selectedRequest.contact_number}</Typography>
-                                <Typography sx={{ gridColumn: 'span 2' }}>
-                                    <strong>Pickup Address:</strong> {selectedRequest.pickup_address}
+                                <Typography sx={{ mt: 2 }}>
+                                    <strong>Contact:</strong> {selectedRequest.contact_number}
+                                </Typography>
+                                <Typography sx={{ mt: 1 }}>
+                                    <strong>Address:</strong> {selectedRequest.pickup_address}
                                 </Typography>
                                 {selectedRequest.additional_notes && (
-                                    <Typography sx={{ gridColumn: 'span 2' }}>
-                                        <strong>Additional Notes:</strong> {selectedRequest.additional_notes}
+                                    <Typography sx={{ mt: 1 }}>
+                                        <strong>Notes:</strong> {selectedRequest.additional_notes}
                                     </Typography>
                                 )}
                             </Box>
-                        </Box>
-                    )}
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setOpenDialog(false)}>Close</Button>
-                    <Button
-                        variant="outlined"
-                        color="error"
-                        startIcon={<ErrorIcon />}
-                        onClick={() => {
-                            setOpenDialog(false);
-                            handleQualityIssue(selectedRequest.id);
-                        }}
-                    >
-                        Report Quality Issue
-                    </Button>
-                    <Button 
-                        variant="contained" 
-                        color="success"
-                        onClick={() => handleMarkAsCollected(selectedRequest.id)}
-                    >
-                        Mark as Collected
-                    </Button>
-                </DialogActions>
-            </Dialog>
+                        )}
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={() => setOpenDialog(false)}>Close</Button>
+                        <Button
+                            variant="outlined"
+                            color="error"
+                            onClick={() => {
+                                setOpenDialog(false);
+                                handleQualityIssue(selectedRequest.id);
+                            }}
+                        >
+                            Report Issue
+                        </Button>
+                        <Button
+                            variant="contained"
+                            color="success"
+                            onClick={() => handleMarkAsCollected(selectedRequest.id)}
+                        >
+                            Mark as Collected
+                        </Button>
+                    </DialogActions>
+                </Dialog>
 
-            <QualityReportForm
-                open={showQualityForm}
-                onClose={() => setShowQualityForm(false)}
-                requestId={selectedRequest}
-                onSubmitSuccess={handleReportSubmitted}
-            />
+                {/* Quality Report Form */}
+                <QualityReportForm
+                    open={showQualityForm}
+                    onClose={() => setShowQualityForm(false)}
+                    requestId={selectedRequest}
+                    onSubmitSuccess={() => {
+                        setShowQualityForm(false);
+                        fetchApprovedRequests();
+                    }}
+                />
+            </Box>
         </Box>
     );
 };

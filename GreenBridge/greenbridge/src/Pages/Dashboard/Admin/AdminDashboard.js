@@ -21,9 +21,16 @@ const AdminDashboard = () => {
     requestStats: [],
     monthlyActivity: []
   });
+  const [metrics, setMetrics] = useState({
+    total_food: 0,
+    total_beneficiaries: 0,
+    total_waste_prevented: 0,
+    monthly_trends: []
+  });
 
   useEffect(() => {
     fetchDashboardData();
+    fetchMetrics();
   }, []);
 
   const fetchDashboardData = async () => {
@@ -57,6 +64,19 @@ const AdminDashboard = () => {
   const processMonthlyData = (requests) => {
     // Process requests to get monthly statistics
     // Implementation here
+  };
+
+  const fetchMetrics = async () => {
+    try {
+      const token = localStorage.getItem('authToken');
+      const response = await axios.get(
+        'http://127.0.0.1:8000/api/v1/food/metrics/analytics/',
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setMetrics(response.data);
+    } catch (error) {
+      console.error('Error fetching metrics:', error);
+    }
   };
 
   const renderDashboard = () => (
@@ -143,6 +163,77 @@ const AdminDashboard = () => {
       default:
         return renderDashboard();
     }
+  };
+
+  const DashboardMetrics = () => {
+    return (
+      <Grid container spacing={3} className="metrics-container">
+        <Grid item xs={12} md={4}>
+          <Card className="metric-card">
+            <CardContent>
+              <Typography variant="h6">Total Distribution</Typography>
+              <Typography variant="h4">
+                {metrics.total_food.toFixed(2)} kg
+              </Typography>
+              <Typography variant="body2" color="textSecondary">
+                Food distributed to date
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+        
+        <Grid item xs={12} md={4}>
+          <Card className="metric-card">
+            <CardContent>
+              <Typography variant="h6">Beneficiaries Reached</Typography>
+              <Typography variant="h4">
+                {metrics.total_beneficiaries}
+              </Typography>
+              <Typography variant="body2" color="textSecondary">
+                People helped
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+        
+        <Grid item xs={12} md={4}>
+          <Card className="metric-card">
+            <CardContent>
+              <Typography variant="h6">Food Waste Prevented</Typography>
+              <Typography variant="h4">
+                {metrics.total_waste_prevented.toFixed(2)} kg
+              </Typography>
+              <Typography variant="body2" color="textSecondary">
+                Environmental impact
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        {/* Monthly Trends Chart */}
+        <Grid item xs={12}>
+          <Card>
+            <CardContent>
+              <Typography variant="h6">Monthly Distribution Trends</Typography>
+              <BarChart
+                width={800}
+                height={300}
+                data={metrics.monthly_trends}
+                margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="month" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="monthly_food" fill="#8884d8" name="Food Distributed (kg)" />
+                <Bar dataKey="monthly_beneficiaries" fill="#82ca9d" name="Beneficiaries" />
+              </BarChart>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+    );
   };
 
   return (

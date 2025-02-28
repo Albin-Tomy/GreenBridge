@@ -91,3 +91,29 @@ class FoodQualityReport(models.Model):
 
     class Meta:
         ordering = ['-reported_at']
+
+class DistributionMetrics(models.Model):
+    date = models.DateField(auto_now_add=True)
+    total_food_distributed = models.FloatField(default=0)
+    number_of_beneficiaries = models.IntegerField(default=0)
+    food_waste_prevented = models.FloatField(default=0)
+    
+    class Meta:
+        ordering = ['-date']
+
+class Donor(models.Model):
+    name = models.CharField(max_length=200)
+    contact_info = models.CharField(max_length=200)
+    reliability_score = models.FloatField(default=5.0)
+    
+    def __str__(self):
+        return self.name
+
+class Donation(models.Model):
+    donor = models.ForeignKey(Donor, on_delete=models.CASCADE, related_name='donations')
+    date = models.DateTimeField(auto_now_add=True)
+    items = models.JSONField()
+    quantity = models.FloatField()
+    
+    def __str__(self):
+        return f"Donation by {self.donor.name} on {self.date}"

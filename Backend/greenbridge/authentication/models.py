@@ -31,6 +31,7 @@ class User(AbstractBaseUser,PermissionsMixin):
     updated_at=models.DateTimeField(auto_now=True)
     created_at=models.DateTimeField(auto_now_add=True)
     is_ngo = models.BooleanField(default=False)
+    is_volunteer = models.BooleanField(default=False)
 
     USERNAME_FIELD='email'
     # REQUIRED_FIELDS=['email']

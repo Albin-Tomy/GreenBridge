@@ -34,6 +34,13 @@
     "recharts": "^2.15.1",
     "web-vitals": "^2.1.4"
   },
+  "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    "eslint-plugin-import": "^2.29.1",
+    "@babel/core": "^7.24.0",
+    "@babel/preset-react": "^7.23.3",
+    "eslint-config-react-app": "^7.0.1"
+  },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",

@@ -47,6 +47,10 @@ def register_volunteer(request):
             preferred_location=request.data.get('preferred_location', '')
         )
 
+        # Set user as volunteer
+        request.user.is_volunteer = True
+        request.user.save()
+
         # Add to blockchain
         blockchain = get_blockchain()
         blockchain.add_block({
@@ -143,6 +147,10 @@ def quit_volunteer(request):
                 'timestamp': str(time())
             }
         })
+        
+        # Set user's volunteer status to False
+        request.user.is_volunteer = False
+        request.user.save()
         
         volunteer.delete()
         return Response({
