@@ -3,7 +3,10 @@
     "react-app"
   ],
   "plugins": [
-    "import"
+    "react",
+    "import",
+    "jsx-a11y",
+    "react-hooks"
   ],
   "rules": {
     "import/no-anonymous-default-export": "off"

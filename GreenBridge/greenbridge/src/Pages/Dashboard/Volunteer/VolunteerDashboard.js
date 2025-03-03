@@ -52,27 +52,29 @@ const VolunteerDashboard = () => {
             let endpoint;
             
             switch(activeTab) {
-                case 0:
-                    endpoint = 'food';
+                case 0: // Food
+                    endpoint = 'food/all';
                     break;
-                case 1:
-                    endpoint = 'grocery';
+                case 1: // Grocery
+                    endpoint = 'grocery/all';
                     break;
-                case 2:
-                    endpoint = 'book';
+                case 2: // Books
+                    endpoint = 'book/all';
                     break;
-                case 3:
-                    endpoint = 'school-supplies';
+                case 3: // School Supplies
+                    endpoint = 'school-supplies/all';
                     break;
                 default:
-                    endpoint = 'food';
+                    endpoint = 'food/all';
             }
             
-            const response = await axios.get(`http://127.0.0.1:8000/api/v1/${endpoint}/all/`, {
+            const response = await axios.get(`http://127.0.0.1:8000/api/v1/${endpoint}/`, {
                 headers: { Authorization: `Bearer ${token}` },
                 params: { status: 'approved' }
             });
-            setRequests(response.data);
+
+            const approvedRequests = response.data.filter(request => request.status === 'approved');
+            setRequests(approvedRequests);
         } catch (error) {
             console.error('Error fetching requests:', error);
             setError('Failed to fetch requests. Please try again later.');
@@ -130,6 +132,19 @@ const VolunteerDashboard = () => {
     const renderRequestDetails = (request) => {
         if (!request) return null;
 
+        // Helper function to safely format date
+        const formatDate = (dateString, formatPattern = 'dd/MM/yyyy HH:mm') => {
+            try {
+                if (!dateString) return 'Not specified';
+                const date = new Date(dateString);
+                if (isNaN(date.getTime())) return 'Invalid date';
+                return format(date, formatPattern);
+            } catch (error) {
+                console.error('Date formatting error:', error);
+                return 'Invalid date';
+            }
+        };
+
         switch(activeTab) {
             case 0: // Food
                 return (
@@ -137,13 +152,13 @@ const VolunteerDashboard = () => {
                         <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                             <RestaurantIcon sx={{ mr: 1 }} />
                             <Typography>
-                                {request.food_type} - {request.quantity}
+                                {request.food_type} - {request.quantity || 'N/A'}
                             </Typography>
                         </Box>
                         <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                             <AccessTimeIcon sx={{ mr: 1 }} />
                             <Typography>
-                                Expires: {format(new Date(request.expiry_time), 'dd/MM/yyyy HH:mm')}
+                                Expires: {formatDate(request.expiry_time)}
                             </Typography>
                         </Box>
                     </>
@@ -155,15 +170,17 @@ const VolunteerDashboard = () => {
                         <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                             <ShoppingBasketIcon sx={{ mr: 1 }} />
                             <Typography>
-                                {request.grocery_type} - {request.quantity}
+                                {request.grocery_type} - {request.quantity || 'N/A'}
                             </Typography>
                         </Box>
-                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                            <AccessTimeIcon sx={{ mr: 1 }} />
-                            <Typography>
-                                Expires: {format(new Date(request.expiry_date), 'dd/MM/yyyy')}
-                            </Typography>
-                        </Box>
+                        {request.expiry_date && (
+                            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                                <AccessTimeIcon sx={{ mr: 1 }} />
+                                <Typography>
+                                    Expires: {formatDate(request.expiry_date, 'dd/MM/yyyy')}
+                                </Typography>
+                            </Box>
+                        )}
                     </>
                 );
 
@@ -173,12 +190,14 @@ const VolunteerDashboard = () => {
                         <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                             <MenuBookIcon sx={{ mr: 1 }} />
                             <Typography>
-                                {request.book_type} - {request.quantity} books
+                                {request.book_type} - {request.quantity || 'N/A'} books
                             </Typography>
                         </Box>
-                        <Typography variant="body2" color="textSecondary">
-                            Subject: {request.subject}
-                        </Typography>
+                        {request.subject && (
+                            <Typography variant="body2" color="textSecondary">
+                                Subject: {request.subject}
+                            </Typography>
+                        )}
                     </>
                 );
 
@@ -188,12 +207,14 @@ const VolunteerDashboard = () => {
                         <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                             <SchoolIcon sx={{ mr: 1 }} />
                             <Typography>
-                                {request.supply_type} - {request.quantity} items
+                                {request.supply_type} - {request.quantity || 'N/A'} items
                             </Typography>
                         </Box>
-                        <Typography variant="body2" color="textSecondary">
-                            Grade Level: {request.grade_level}
-                        </Typography>
+                        {request.grade_level && (
+                            <Typography variant="body2" color="textSecondary">
+                                Grade Level: {request.grade_level}
+                            </Typography>
+                        )}
                     </>
                 );
 
@@ -215,6 +236,42 @@ const VolunteerDashboard = () => {
             default:
                 return "Collection Requests";
         }
+    };
+
+    const renderActionButtons = (request) => {
+        return (
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
+                <Button
+                    variant="outlined"
+                    startIcon={<VisibilityIcon />}
+                    onClick={() => {
+                        setSelectedRequest(request);
+                        setOpenDialog(true);
+                    }}
+                >
+                    Details
+                </Button>
+                <Box sx={{ display: 'flex', gap: 1 }}>
+                    {activeTab === 0 && (
+                        <Button
+                            variant="outlined"
+                            color="error"
+                            startIcon={<ErrorIcon />}
+                            onClick={() => handleQualityIssue(request.id)}
+                        >
+                            Report Issue
+                        </Button>
+                    )}
+                    <Button
+                        variant="contained"
+                        color="success"
+                        onClick={() => handleMarkAsCollected(request.id)}
+                    >
+                        Collect
+                    </Button>
+                </Box>
+            </Box>
+        );
     };
 
     return (
@@ -284,35 +341,7 @@ const VolunteerDashboard = () => {
                                             </Box>
 
                                             {/* Action Buttons */}
-                                            <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
-                                                <Button
-                                                    variant="outlined"
-                                                    startIcon={<VisibilityIcon />}
-                                                    onClick={() => {
-                                                        setSelectedRequest(request);
-                                                        setOpenDialog(true);
-                                                    }}
-                                                >
-                                                    Details
-                                                </Button>
-                                                <Box sx={{ display: 'flex', gap: 1 }}>
-                                                    <Button
-                                                        variant="outlined"
-                                                        color="error"
-                                                        startIcon={<ErrorIcon />}
-                                                        onClick={() => handleQualityIssue(request.id)}
-                                                    >
-                                                        Report Issue
-                                                    </Button>
-                                                    <Button
-                                                        variant="contained"
-                                                        color="success"
-                                                        onClick={() => handleMarkAsCollected(request.id)}
-                                                    >
-                                                        Collect
-                                                    </Button>
-                                                </Box>
-                                            </Box>
+                                            {renderActionButtons(request)}
                                         </CardContent>
                                     </Card>
                                 </Grid>
@@ -349,16 +378,18 @@ const VolunteerDashboard = () => {
                     </DialogContent>
                     <DialogActions>
                         <Button onClick={() => setOpenDialog(false)}>Close</Button>
-                        <Button
-                            variant="outlined"
-                            color="error"
-                            onClick={() => {
-                                setOpenDialog(false);
-                                handleQualityIssue(selectedRequest.id);
-                            }}
-                        >
-                            Report Issue
-                        </Button>
+                        {activeTab === 0 && (
+                            <Button
+                                variant="outlined"
+                                color="error"
+                                onClick={() => {
+                                    setOpenDialog(false);
+                                    handleQualityIssue(selectedRequest.id);
+                                }}
+                            >
+                                Report Issue
+                            </Button>
+                        )}
                         <Button
                             variant="contained"
                             color="success"
@@ -370,15 +401,17 @@ const VolunteerDashboard = () => {
                 </Dialog>
 
                 {/* Quality Report Form */}
-                <QualityReportForm
-                    open={showQualityForm}
-                    onClose={() => setShowQualityForm(false)}
-                    requestId={selectedRequest}
-                    onSubmitSuccess={() => {
-                        setShowQualityForm(false);
-                        fetchApprovedRequests();
-                    }}
-                />
+                {activeTab === 0 && (
+                    <QualityReportForm
+                        open={showQualityForm}
+                        onClose={() => setShowQualityForm(false)}
+                        requestId={selectedRequest}
+                        onSubmitSuccess={() => {
+                            setShowQualityForm(false);
+                            fetchApprovedRequests();
+                        }}
+                    />
+                )}
             </Box>
         </Box>
     );
