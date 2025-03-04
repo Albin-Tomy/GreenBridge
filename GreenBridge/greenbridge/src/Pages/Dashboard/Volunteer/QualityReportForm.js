@@ -47,34 +47,35 @@ const QualityReportForm = ({ open, onClose, requestId, onSubmitSuccess }) => {
         });
     };
 
-    const handleSubmit = async () => {
-        setLoading(true);
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            await onSubmitSuccess(formData);  // Pass the form data to parent
+            resetForm();
+            onClose();
+        } catch (error) {
+            console.error('Error submitting quality report:', error);
+            setError('Failed to submit quality report');
+        }
+    };
+
+    const resetForm = () => {
+        setFormData({
+            issue_type: '',
+            description: '',
+            temperature: null,
+            packaging_integrity: true,
+            labeling_accuracy: true,
+            allergen_check: true,
+            hygiene_check: true,
+            weight_check: null,
+            visual_inspection: true,
+            smell_test: true,
+            expiration_check: true,
+            storage_condition: ''
+        });
         setError(null);
         setSuccess(false);
-
-        try {
-            const token = localStorage.getItem('authToken');
-            const response = await axios.post(
-                `http://127.0.0.1:8000/api/v1/food/request/${requestId}/quality-report/`,
-                formData,
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    }
-                }
-            );
-
-            setSuccess(true);
-            onSubmitSuccess();
-            setTimeout(() => {
-                onClose();
-            }, 2000);
-        } catch (err) {
-            setError(err.response?.data?.error || 'Failed to submit quality report');
-        } finally {
-            setLoading(false);
-        }
     };
 
     return (

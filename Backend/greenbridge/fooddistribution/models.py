@@ -117,3 +117,45 @@ class Donation(models.Model):
     
     def __str__(self):
         return f"Donation by {self.donor.name} on {self.date}"
+
+class FoodDistributionPlan(models.Model):
+    STATUS_CHOICES = [
+        ('planned', 'Planned'),
+        ('in_progress', 'In Progress'),
+        ('completed', 'Completed'),
+        ('cancelled', 'Cancelled')
+    ]
+
+    food_request = models.ForeignKey(FoodRequest, on_delete=models.CASCADE, related_name='distribution_plans')
+    volunteer = models.ForeignKey('volunters.VolunteerRegistration', on_delete=models.SET_NULL, null=True)
+    
+    # Distribution Details
+    distribution_date = models.DateTimeField()
+    distribution_location = models.CharField(max_length=255)
+    beneficiary_type = models.CharField(max_length=100)  # e.g., "Orphanage", "Old Age Home"
+    beneficiary_name = models.CharField(max_length=255)
+    beneficiary_contact = models.CharField(max_length=15)
+    estimated_beneficiaries = models.IntegerField()
+    
+    # Actual Distribution Details
+    actual_beneficiaries = models.IntegerField(null=True, blank=True)
+    food_condition_on_delivery = models.TextField(null=True, blank=True)
+    distribution_proof = models.ImageField(upload_to='distribution_proofs/', null=True, blank=True)
+    
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='planned')
+    notes = models.TextField(blank=True, null=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Distribution Plan #{self.id} for Food Request #{self.food_request.id}"
+
+class DistributionFeedback(models.Model):
+    distribution = models.ForeignKey(FoodDistributionPlan, on_delete=models.CASCADE, related_name='feedback')
+    rating = models.IntegerField(choices=[(i, i) for i in range(1, 6)])
+    feedback_text = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Feedback for Distribution #{self.distribution.id}"

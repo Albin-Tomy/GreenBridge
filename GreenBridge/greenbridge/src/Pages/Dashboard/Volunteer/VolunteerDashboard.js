@@ -28,8 +28,9 @@ import ErrorIcon from '@mui/icons-material/Error';
 import Header from '../../../components/Header';
 import axios from 'axios';
 import { format } from 'date-fns';
-import VolunteerPoints from './VolunteerPoints';
 import QualityReportForm from './QualityReportForm';
+import DistributionPlan from '../../Distribution/DistributionPlan';
+import DistributionDetails from '../../Distribution/DistributionDetails';
 
 const VolunteerDashboard = () => {
     const [activeTab, setActiveTab] = useState(0);
@@ -39,6 +40,10 @@ const VolunteerDashboard = () => {
     const [openDialog, setOpenDialog] = useState(false);
     const [showQualityForm, setShowQualityForm] = useState(false);
     const [error, setError] = useState(null);
+    const [showDistributionForm, setShowDistributionForm] = useState(false);
+    const [selectedForDistribution, setSelectedForDistribution] = useState(null);
+    const [showDistributionDetails, setShowDistributionDetails] = useState(false);
+    const [selectedDistribution, setSelectedDistribution] = useState(null);
 
     useEffect(() => {
         fetchApprovedRequests();
@@ -69,12 +74,14 @@ const VolunteerDashboard = () => {
             }
             
             const response = await axios.get(`http://127.0.0.1:8000/api/v1/${endpoint}/`, {
-                headers: { Authorization: `Bearer ${token}` },
-                params: { status: 'approved' }
+                headers: { Authorization: `Bearer ${token}` }
             });
 
-            const approvedRequests = response.data.filter(request => request.status === 'approved');
-            setRequests(approvedRequests);
+            // Filter for approved, collected, and distribution_planned requests
+            const filteredRequests = response.data.filter(request => 
+                ['approved', 'collected', 'distribution_planned'].includes(request.status)
+            );
+            setRequests(filteredRequests);
         } catch (error) {
             console.error('Error fetching requests:', error);
             setError('Failed to fetch requests. Please try again later.');
@@ -84,6 +91,17 @@ const VolunteerDashboard = () => {
     };
 
     const handleMarkAsCollected = async (id) => {
+        try {
+            setSelectedRequest(id);
+            setOpenDialog(false);
+            setShowQualityForm(true);
+        } catch (error) {
+            console.error('Error:', error);
+            setError('Failed to process collection. Please try again.');
+        }
+    };
+
+    const handleQualityReportSubmit = async (reportData) => {
         try {
             const token = localStorage.getItem('authToken');
             let endpoint;
@@ -104,9 +122,22 @@ const VolunteerDashboard = () => {
                 default:
                     endpoint = 'food';
             }
-            
+
+            // First submit quality report
+            await axios.post(
+                `http://127.0.0.1:8000/api/v1/${endpoint}/request/${selectedRequest}/quality-report/`,
+                reportData,
+                {
+                    headers: { 
+                        Authorization: `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                }
+            );
+
+            // Then update status to collected
             await axios.put(
-                `http://127.0.0.1:8000/api/v1/${endpoint}/request/${id}/update-status/`,
+                `http://127.0.0.1:8000/api/v1/${endpoint}/request/${selectedRequest}/update-status/`,
                 { status: 'collected' },
                 {
                     headers: { 
@@ -116,8 +147,8 @@ const VolunteerDashboard = () => {
                 }
             );
             
+            setShowQualityForm(false);
             fetchApprovedRequests();
-            setOpenDialog(false);
         } catch (error) {
             console.error('Error updating status:', error);
             setError('Failed to update status. Please try again.');
@@ -127,6 +158,119 @@ const VolunteerDashboard = () => {
     const handleQualityIssue = (requestId) => {
         setSelectedRequest(requestId);
         setShowQualityForm(true);
+    };
+
+    const handleCreateDistribution = async (formData) => {
+        try {
+            const token = localStorage.getItem('authToken');
+            // First create the distribution plan with status 'planned'
+            await axios.post(
+                `http://127.0.0.1:8000/api/v1/food/request/${selectedForDistribution}/distribution/`,
+                {
+                    ...formData,
+                    status: 'planned'  // Explicitly set the initial status
+                },
+                {
+                    headers: { 
+                        Authorization: `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                }
+            );
+
+            // Then update the food request status
+            await axios.put(
+                `http://127.0.0.1:8000/api/v1/food/request/${selectedForDistribution}/update-status/`,
+                { 
+                    status: 'distribution_planned'  // Use consistent status value
+                },
+                {
+                    headers: { 
+                        Authorization: `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                }
+            );
+
+            setShowDistributionForm(false);
+            fetchApprovedRequests();
+            setError(null);
+            alert('Distribution plan created successfully!');
+        } catch (error) {
+            console.error('Error creating distribution plan:', error);
+            const errorMessage = error.response?.data?.error || error.message;
+            setError('Failed to create distribution plan: ' + errorMessage);
+        }
+    };
+
+    const fetchDistributionDetails = async (requestId) => {
+        try {
+            const token = localStorage.getItem('authToken');
+            
+            // Get the distribution plan using the new endpoint
+            const planResponse = await axios.get(
+                `http://127.0.0.1:8000/api/v1/food/request/${requestId}/distribution/get/`,
+                {
+                    headers: { Authorization: `Bearer ${token}` }
+                }
+            );
+            
+            if (planResponse.data) {
+                setSelectedDistribution(planResponse.data);
+                setShowDistributionDetails(true);
+                setError(null);
+            } else {
+                setError('No distribution plan found for this request');
+            }
+        } catch (error) {
+            console.error('Error fetching distribution details:', error);
+            const errorMessage = error.response?.data?.error || 'Failed to fetch distribution details';
+            setError(errorMessage);
+        }
+    };
+
+    const handleDistributionStatusUpdate = async (newStatus) => {
+        try {
+            const token = localStorage.getItem('authToken');
+            
+            // First update the distribution plan status
+            await axios.put(
+                `http://127.0.0.1:8000/api/v1/food/distribution/${selectedDistribution.id}/update-status/`,
+                { status: newStatus },
+                {
+                    headers: { 
+                        Authorization: `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                }
+            );
+
+            // If distribution is completed, update the food request status
+            if (newStatus === 'completed') {
+                await axios.put(
+                    `http://127.0.0.1:8000/api/v1/food/request/${selectedDistribution.food_request}/update-status/`,
+                    { 
+                        status: 'distributed',
+                        distribution_id: selectedDistribution.id  // Pass the distribution ID
+                    },
+                    {
+                        headers: { 
+                            Authorization: `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    }
+                );
+            }
+            
+            // Refresh the details
+            await fetchDistributionDetails(selectedDistribution.food_request);
+            fetchApprovedRequests();
+            setError(null);
+        } catch (error) {
+            console.error('Error updating distribution status:', error);
+            const errorMessage = error.response?.data?.error || error.message;
+            setError('Failed to update distribution status: ' + errorMessage);
+        }
     };
 
     const renderRequestDetails = (request) => {
@@ -238,6 +382,19 @@ const VolunteerDashboard = () => {
         }
     };
 
+    const getStatusColor = (status) => {
+        switch(status) {
+            case 'approved':
+                return 'success';
+            case 'collected':
+                return 'primary';
+            case 'distribution_planned':
+                return 'secondary';
+            default:
+                return 'default';
+        }
+    };
+
     const renderActionButtons = (request) => {
         return (
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
@@ -252,23 +409,46 @@ const VolunteerDashboard = () => {
                     Details
                 </Button>
                 <Box sx={{ display: 'flex', gap: 1 }}>
-                    {activeTab === 0 && (
+                    {activeTab === 0 && request.status === 'collected' && (
                         <Button
-                            variant="outlined"
-                            color="error"
-                            startIcon={<ErrorIcon />}
-                            onClick={() => handleQualityIssue(request.id)}
+                            variant="contained"
+                            color="primary"
+                            onClick={() => {
+                                setSelectedForDistribution(request.id);
+                                setShowDistributionForm(true);
+                            }}
                         >
-                            Report Issue
+                            Plan Distribution
                         </Button>
                     )}
-                    <Button
-                        variant="contained"
-                        color="success"
-                        onClick={() => handleMarkAsCollected(request.id)}
-                    >
-                        Collect
-                    </Button>
+                    {activeTab === 0 && request.status === 'distribution_planned' && (
+                        <Button
+                            variant="contained"
+                            color="secondary"
+                            onClick={() => fetchDistributionDetails(request.id)}
+                        >
+                            View Distribution Plan
+                        </Button>
+                    )}
+                    {activeTab === 0 && request.status === 'approved' && (
+                        <>
+                            <Button
+                                variant="outlined"
+                                color="error"
+                                startIcon={<ErrorIcon />}
+                                onClick={() => handleQualityIssue(request.id)}
+                            >
+                                Report Issue
+                            </Button>
+                            <Button
+                                variant="contained"
+                                color="success"
+                                onClick={() => handleMarkAsCollected(request.id)}
+                            >
+                                Collect
+                            </Button>
+                        </>
+                    )}
                 </Box>
             </Box>
         );
@@ -279,19 +459,31 @@ const VolunteerDashboard = () => {
             <Header />
 
             <Box component="main" sx={{ flexGrow: 1, p: 3, mt: 8 }}>
-                <Box sx={{ mb: 4 }}>
-                    <VolunteerPoints />
-                </Box>
-
                 <Tabs 
                     value={activeTab} 
                     onChange={(e, newValue) => setActiveTab(newValue)}
                     sx={{ mb: 3 }}
                 >
-                    <Tab icon={<RestaurantIcon />} label="Food" />
-                    <Tab icon={<ShoppingBasketIcon />} label="Grocery" />
-                    <Tab icon={<MenuBookIcon />} label="Books" />
-                    <Tab icon={<SchoolIcon />} label="School Supplies" />
+                    <Tab 
+                        icon={<RestaurantIcon />} 
+                        label="Food Requests" 
+                        iconPosition="start"
+                    />
+                    <Tab 
+                        icon={<ShoppingBasketIcon />} 
+                        label="Grocery Requests" 
+                        iconPosition="start"
+                    />
+                    <Tab 
+                        icon={<MenuBookIcon />} 
+                        label="Book Requests" 
+                        iconPosition="start"
+                    />
+                    <Tab 
+                        icon={<SchoolIcon />} 
+                        label="School Supplies" 
+                        iconPosition="start"
+                    />
                 </Tabs>
 
                 <Typography variant="h4" gutterBottom sx={{ mb: 4 }}>
@@ -326,7 +518,11 @@ const VolunteerDashboard = () => {
                                                 <Typography variant="h6">
                                                     Request #{request.id}
                                                 </Typography>
-                                                <Chip label="APPROVED" color="success" size="small" />
+                                                <Chip 
+                                                    label={request.status.toUpperCase()} 
+                                                    color={getStatusColor(request.status)} 
+                                                    size="small" 
+                                                />
                                             </Box>
 
                                             {/* Request Details */}
@@ -406,12 +602,33 @@ const VolunteerDashboard = () => {
                         open={showQualityForm}
                         onClose={() => setShowQualityForm(false)}
                         requestId={selectedRequest}
-                        onSubmitSuccess={() => {
-                            setShowQualityForm(false);
-                            fetchApprovedRequests();
-                        }}
+                        onSubmitSuccess={(reportData) => handleQualityReportSubmit(reportData)}
                     />
                 )}
+
+                {/* Add Distribution Plan Form Dialog */}
+                <Dialog
+                    open={showDistributionForm}
+                    onClose={() => setShowDistributionForm(false)}
+                    maxWidth="md"
+                    fullWidth
+                >
+                    <DialogContent>
+                        <DistributionPlan
+                            foodRequest={selectedForDistribution}
+                            onSubmit={handleCreateDistribution}
+                            onClose={() => setShowDistributionForm(false)}
+                        />
+                    </DialogContent>
+                </Dialog>
+
+                {/* Add Distribution Details Dialog */}
+                <DistributionDetails
+                    open={showDistributionDetails}
+                    onClose={() => setShowDistributionDetails(false)}
+                    distribution={selectedDistribution}
+                    onStatusUpdate={handleDistributionStatusUpdate}
+                />
             </Box>
         </Box>
     );

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import FoodRequest, FoodDistribution, FoodQualityReport, DistributionMetrics, Donor, Donation
+from .models import FoodRequest, FoodDistribution, FoodQualityReport, DistributionMetrics, Donor, Donation, FoodDistributionPlan, DistributionFeedback
 
 class FoodRequestSerializer(serializers.ModelSerializer):
     class Meta:
@@ -34,3 +34,19 @@ class DonorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Donor
         fields = ['id', 'name', 'contact_info', 'reliability_score', 'donations']
+
+class FoodDistributionPlanSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FoodDistributionPlan
+        fields = [
+            'id', 'food_request', 'volunteer', 'distribution_date',
+            'distribution_location', 'beneficiary_type', 'beneficiary_name',
+            'beneficiary_contact', 'estimated_beneficiaries', 'status',
+            'notes', 'created_at', 'updated_at'
+        ]
+
+class DistributionFeedbackSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DistributionFeedback
+        fields = ['id', 'distribution', 'rating', 'feedback_text', 'created_at']
+        read_only_fields = ['created_at']

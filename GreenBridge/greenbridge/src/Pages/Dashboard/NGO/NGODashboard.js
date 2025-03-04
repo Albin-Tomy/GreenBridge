@@ -34,6 +34,7 @@ import SchoolIcon from '@mui/icons-material/School';
 import Header from '../../../components/Navbar';
 import axios from 'axios';
 import { format } from 'date-fns';
+import NGODistributionDetails from '../../Distribution/NGODistributionDetails';
 
 const drawerWidth = 240;
 
@@ -108,6 +109,9 @@ const NGODashboard = () => {
     const [filter, setFilter] = useState('all');
     const [qualityReport, setQualityReport] = useState(null);
     const [showQualityReport, setShowQualityReport] = useState(false);
+    const [showDistributionDetails, setShowDistributionDetails] = useState(false);
+    const [selectedDistribution, setSelectedDistribution] = useState(null);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
         fetchRequests();
@@ -181,6 +185,26 @@ const NGODashboard = () => {
         }
     };
 
+    const fetchDistributionDetails = async (requestId) => {
+        try {
+            const token = localStorage.getItem('authToken');
+            const response = await axios.get(
+                `http://127.0.0.1:8000/api/v1/food/request/${requestId}/distribution/completed/`,
+                {
+                    headers: { Authorization: `Bearer ${token}` }
+                }
+            );
+            
+            if (response.data) {
+                setSelectedDistribution(response.data);
+                setShowDistributionDetails(true);
+            }
+        } catch (error) {
+            console.error('Error fetching distribution details:', error);
+            setError('Failed to fetch distribution details');
+        }
+    };
+
     const statusActions = {
         pending: [
             { label: 'Approve', action: 'approved', color: 'primary' },
@@ -212,63 +236,53 @@ const NGODashboard = () => {
     };
 
     const getActionButtons = (request) => {
-        const actions = statusActions[request.status];
+        const actions = statusActions[request.status] || [];
         const isFoodRequest = activeTab === 0;
         
         return (
-            <Box sx={{ 
-                display: 'flex', 
-                flexDirection: 'column',  // Stack buttons vertically
-                gap: 1,
-                mt: 2  // Add margin top for spacing
-            }}>
-                <Box sx={{ 
-                    display: 'flex', 
-                    gap: 1, 
-                    width: '100%'  // Full width for first row
-                }}>
+            <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end', mt: 2 }}>
+                <Button
+                    variant="outlined"
+                    startIcon={<VisibilityIcon />}
+                    onClick={() => {
+                        setSelectedRequest(request);
+                        setOpenDialog(true);
+                    }}
+                >
+                    Details
+                </Button>
+
+                {/* Add View Distribution Details button for distributed requests */}
+                {request.status === 'distributed' && (
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={() => fetchDistributionDetails(request.id)}
+                    >
+                        View Distribution Details
+                    </Button>
+                )}
+
+                {isFoodRequest && (request.status === 'collected' || request.status === 'quality_issue') && (
                     <Button
                         variant="outlined"
-                        startIcon={<VisibilityIcon />}
-                        onClick={() => {
-                            setSelectedRequest(request);
-                            setOpenDialog(true);
-                        }}
-                        size="small"
-                        fullWidth  // Make button take full width
+                        startIcon={<AssignmentIcon />}
+                        onClick={() => fetchQualityReport(request.id)}
                     >
-                        View Details
+                        View Quality Report
                     </Button>
-                    {isFoodRequest && (request.status === 'collected' || request.status === 'quality_issue') && (
-                        <Button
-                            variant="outlined"
-                            startIcon={<AssignmentIcon />}
-                            onClick={() => fetchQualityReport(request.id)}
-                            size="small"
-                            fullWidth
-                        >
-                            View Quality Report
-                        </Button>
-                    )}
-                </Box>
-                <Box sx={{ 
-                    display: 'flex', 
-                    justifyContent: 'flex-end',
-                    gap: 1,
-                    width: '100%'
-                }}>
-                    {actions?.map((action, index) => (
-                        <Button
-                            key={index}
-                            variant={action.color === 'error' ? 'outlined' : 'contained'}
-                            color={action.color}
-                            onClick={() => handleStatusUpdate(request.id, action.action)}
-                            size="small"
-                        >
-                            {action.label}
-                        </Button>
-                    ))}
-                </Box>
+                )}
+
+                {actions.map((action, index) => (
+                    <Button
+                        key={index}
+                        variant="contained"
+                        color={action.color}
+                        onClick={() => handleStatusUpdate(request.id, action.action)}
+                    >
+                        {action.label}
+                    </Button>
+                ))}
             </Box>
         );
     };
@@ -521,27 +535,51 @@ const NGODashboard = () => {
                                 requests.map((request) => (
                                     <Grid item xs={12} sm={6} md={4} key={request.id}>
                                         <Card>
-                                            <CardContent sx={{ pb: 1 }}>  
+                                            <CardContent>
+                                                {/* Request Header */}
                                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
                                                     <Typography variant="h6">
                                                         Request #{request.id}
                                                     </Typography>
                                                     {getStatusChip(request.status)}
                                                 </Box>
-                                                
+
+                                                {/* Request Details */}
                                                 {renderRequestDetails(request)}
 
-                                                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                                                {/* Location */}
+                                                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                                                     <LocationOnIcon sx={{ mr: 1 }} />
                                                     <Typography noWrap>
                                                         {request.pickup_address}
                                                     </Typography>
                                                 </Box>
+
+                                                {/* Action Buttons */}
+                                                <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end', mt: 2 }}>
+                                                    <Button
+                                                        variant="outlined"
+                                                        startIcon={<VisibilityIcon />}
+                                                        onClick={() => {
+                                                            setSelectedRequest(request);
+                                                            setOpenDialog(true);
+                                                        }}
+                                                    >
+                                                        Details
+                                                    </Button>
+                                                    
+                                                    {/* Add View Distribution Details button for distributed requests */}
+                                                    {request.status === 'distributed' && (
+                                                        <Button
+                                                            variant="contained"
+                                                            color="primary"
+                                                            onClick={() => fetchDistributionDetails(request.id)}
+                                                        >
+                                                            View Distribution
+                                                        </Button>
+                                                    )}
+                                                </Box>
                                             </CardContent>
-                                            
-                                            <Box sx={{ px: 2, pb: 2 }}>  
-                                                {getActionButtons(request)}
-                                            </Box>
                                         </Card>
                                     </Grid>
                                 ))
@@ -584,6 +622,16 @@ const NGODashboard = () => {
                             View Quality Report
                         </Button>
                     )}
+                    {/* Add View Distribution Details button for distributed requests */}
+                    {selectedRequest && selectedRequest.status === 'distributed' && (
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={() => fetchDistributionDetails(selectedRequest.id)}
+                        >
+                            View Distribution Details
+                        </Button>
+                    )}
                     {selectedRequest && getActionButtons(selectedRequest)}
                 </DialogActions>
             </Dialog>
@@ -595,6 +643,12 @@ const NGODashboard = () => {
                     report={qualityReport}
                 />
             )}
+
+            <NGODistributionDetails
+                open={showDistributionDetails}
+                onClose={() => setShowDistributionDetails(false)}
+                distribution={selectedDistribution}
+            />
         </Box>
     );
 };

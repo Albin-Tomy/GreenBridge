@@ -4,8 +4,8 @@ from rest_framework.decorators import api_view, permission_classes, parser_class
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
-from .models import FoodRequest, FoodDistribution, FoodQualityReport, DistributionMetrics
-from .serializers import FoodRequestSerializer, FoodDistributionSerializer, FoodQualityReportSerializer, DistributionMetricsSerializer
+from .models import FoodRequest, FoodDistribution, FoodQualityReport, DistributionMetrics, FoodDistributionPlan
+from .serializers import FoodRequestSerializer, FoodDistributionSerializer, FoodQualityReportSerializer, DistributionMetricsSerializer, FoodDistributionPlanSerializer
 from authentication.models import User
 from volunteer.views import award_points
 from django.core.files.storage import default_storage
@@ -195,35 +195,38 @@ def submit_quality_report(request, request_id):
         return Response({'error': 'Volunteer not found'}, status=404)
 
         
-@api_view(['POST'])
+@api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_request_status(request, request_id):
     try:
-        volunteer = VolunteerRegistration.objects.get(user=request.user)
         food_request = FoodRequest.objects.get(id=request_id)
-
-        # Check if quality report exists
-        if not FoodQualityReport.objects.filter(food_request=food_request).exists():
+        new_status = request.data.get('status')
+        
+        # Validate the status transition
+        valid_transitions = {
+            'pending': ['approved', 'cancelled'],
+            'approved': ['collected', 'cancelled'],
+            'collected': ['distribution_planned', 'quality_issue'],
+            'quality_issue': ['approved', 'cancelled'],
+            'distribution_planned': ['distributed'],
+            'distributed': []  # No further transitions allowed
+        }
+        
+        if new_status not in valid_transitions.get(food_request.status, []):
             return Response({
-                'error': 'Must submit quality report before updating status'
+                'error': f'Invalid status transition from {food_request.status} to {new_status}'
             }, status=status.HTTP_400_BAD_REQUEST)
-
-        action = request.data.get('action')
-        if action == 'accept':
-            food_request.status = 'collected'
-        elif action == 'cancel':
-            food_request.status = 'cancelled'
-        else:
-            return Response({
-                'error': 'Invalid action'
-            }, status=status.HTTP_400_BAD_REQUEST)
-
+        
+        # Update the status
+        food_request.status = new_status
         food_request.save()
+        
+        return Response({'message': 'Status updated successfully'})
+        
+    except FoodRequest.DoesNotExist:
         return Response({
-            'message': f'Request {action}ed successfully',
-            'status': food_request.status
-        })
-
+            'error': 'Food request not found'
+        }, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
         return Response({
             'error': str(e)
@@ -297,3 +300,179 @@ def test_email(request):
     except Exception as e:
         logger.error(f"Test email failed: {str(e)}")
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_distribution_plan(request, food_request_id):
+    try:
+        food_request = FoodRequest.objects.get(id=food_request_id)
+        
+        # Verify request is collected
+        if food_request.status != 'collected':
+            return Response({
+                'error': 'Food request must be collected before creating distribution plan'
+            }, status=status.HTTP_400_BAD_REQUEST)
+            
+        serializer = FoodDistributionPlanSerializer(data={
+            **request.data,
+            'food_request': food_request_id,
+            'volunteer': request.user.volunteer.id if hasattr(request.user, 'volunteer') else None,
+            'status': 'planned'  # Ensure status is set
+        })
+        
+        if serializer.is_valid():
+            distribution_plan = serializer.save()
+            
+            # Update food request status
+            food_request.status = 'distribution_planned'
+            food_request.save()
+            
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+    except FoodRequest.DoesNotExist:
+        return Response({
+            'error': 'Food request not found'
+        }, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def complete_distribution(request, plan_id):
+    try:
+        distribution_plan = FoodDistributionPlan.objects.get(id=plan_id)
+        
+        # Handle file upload for distribution proof
+        if 'distribution_proof' in request.FILES:
+            distribution_plan.distribution_proof = request.FILES['distribution_proof']
+            
+        distribution_plan.status = 'completed'
+        distribution_plan.actual_beneficiaries = request.data.get('actual_beneficiaries')
+        distribution_plan.food_condition_on_delivery = request.data.get('food_condition')
+        distribution_plan.save()
+        
+        # Update food request status
+        distribution_plan.food_request.status = 'distributed'
+        distribution_plan.food_request.save()
+        
+        return Response({
+            'message': 'Distribution completed successfully'
+        })
+        
+    except FoodDistributionPlan.DoesNotExist:
+        return Response({
+            'error': 'Distribution plan not found'
+        }, status=status.HTTP_404_NOT_FOUND)
+
+# Add this new view for distribution feedback
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def submit_distribution_feedback(request, plan_id):
+    try:
+        distribution_plan = FoodDistributionPlan.objects.get(id=plan_id)
+        
+        # Check if distribution is completed
+        if distribution_plan.status != 'completed':
+            return Response({
+                'error': 'Can only submit feedback for completed distributions'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Create feedback
+        serializer = DistributionFeedbackSerializer(data={
+            **request.data,
+            'distribution': plan_id
+        })
+        
+        if serializer.is_valid():
+            feedback = serializer.save()
+            return Response({
+                'message': 'Feedback submitted successfully',
+                'data': serializer.data
+            }, status=status.HTTP_201_CREATED)
+            
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+    except FoodDistributionPlan.DoesNotExist:
+        return Response({
+            'error': 'Distribution plan not found'
+        }, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_distribution_plan(request, plan_id):
+    try:
+        # Get distribution plan directly by its ID
+        distribution = FoodDistributionPlan.objects.get(id=plan_id)
+        serializer = FoodDistributionPlanSerializer(distribution)
+        return Response(serializer.data)
+    except FoodDistributionPlan.DoesNotExist:
+        return Response({
+            'error': f'Distribution plan #{plan_id} not found'
+        }, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({
+            'error': f'Error fetching distribution plan: {str(e)}'
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_distribution_status(request, plan_id):
+    try:
+        distribution = FoodDistributionPlan.objects.get(id=plan_id)
+        distribution.status = request.data['status']
+        distribution.save()
+        
+        if request.data['status'] == 'completed':
+            distribution.food_request.status = 'distributed'
+            distribution.food_request.save()
+            
+        return Response({'message': 'Status updated successfully'})
+    except FoodDistributionPlan.DoesNotExist:
+        return Response({
+            'error': 'Distribution plan not found'
+        }, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_distribution_plan_by_request(request, food_request_id):
+    try:
+        # Get the latest distribution plan for this food request
+        distribution = FoodDistributionPlan.objects.filter(
+            food_request_id=food_request_id
+        ).order_by('-created_at').first()  # Get the most recent plan
+        
+        if not distribution:
+            return Response({
+                'error': f'No distribution plan found for request #{food_request_id}'
+            }, status=status.HTTP_404_NOT_FOUND)
+            
+        serializer = FoodDistributionPlanSerializer(distribution)
+        return Response(serializer.data)
+        
+    except Exception as e:
+        return Response({
+            'error': f'Error fetching distribution plan: {str(e)}'
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_completed_distribution_plan(request, food_request_id):
+    try:
+        # Get the completed distribution plan for this food request
+        distribution = FoodDistributionPlan.objects.filter(
+            food_request_id=food_request_id,
+            status='completed'  # Only get completed distributions
+        ).first()
+        
+        if not distribution:
+            return Response({
+                'error': f'No completed distribution plan found for request #{food_request_id}'
+            }, status=status.HTTP_404_NOT_FOUND)
+            
+        serializer = FoodDistributionPlanSerializer(distribution)
+        return Response(serializer.data)
+        
+    except Exception as e:
+        return Response({
+            'error': f'Error fetching distribution plan: {str(e)}'
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
