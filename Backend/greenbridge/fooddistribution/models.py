@@ -159,3 +159,4 @@ class DistributionFeedback(models.Model):
 
     def __str__(self):
         return f"Feedback for Distribution #{self.distribution.id}"
+

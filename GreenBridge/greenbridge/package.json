@@ -48,7 +48,9 @@
     "eslint-plugin-jsx-a11y": "^6.8.0",
     "eslint-plugin-react": "^7.34.0",
     "eslint-plugin-react-hooks": "^4.6.0",
-    "schema-utils": "^4.2.0"
+    "file-loader": "^6.2.0",
+    "schema-utils": "^4.2.0",
+    "url-loader": "^4.1.1"
   },
   "scripts": {
     "start": "react-scripts start",

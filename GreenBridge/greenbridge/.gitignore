@@ -17,3 +17,10 @@
 .env.production.local
 
 
+# Images
+src/assets/*.png
+src/assets/*.jpg
+src/assets/*.jpeg
+src/assets/*.gif
+
+

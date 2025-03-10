@@ -31,6 +31,12 @@ import { format } from 'date-fns';
 import QualityReportForm from './QualityReportForm';
 import DistributionPlan from '../../Distribution/DistributionPlan';
 import DistributionDetails from '../../Distribution/DistributionDetails';
+import GroceryDistributionPlan from '../../Distribution/GroceryDistributionPlan';
+import GroceryDistributionDetails from '../../Distribution/GroceryDistributionDetails';
+import SchoolSuppliesDistributionPlan from '../../Distribution/SchoolSuppliesDistributionPlan';
+import SchoolSuppliesDistributionDetails from '../../Distribution/SchoolSuppliesDistributionDetails';
+import BookDistributionPlan from '../../Distribution/BookDistributionPlan';
+import BookDistributionDetails from '../../Distribution/BookDistributionDetails';
 
 const VolunteerDashboard = () => {
     const [activeTab, setActiveTab] = useState(0);
@@ -44,6 +50,15 @@ const VolunteerDashboard = () => {
     const [selectedForDistribution, setSelectedForDistribution] = useState(null);
     const [showDistributionDetails, setShowDistributionDetails] = useState(false);
     const [selectedDistribution, setSelectedDistribution] = useState(null);
+    const [showGroceryDistributionForm, setShowGroceryDistributionForm] = useState(false);
+    const [showGroceryDistributionDetails, setShowGroceryDistributionDetails] = useState(false);
+    const [selectedGroceryDistribution, setSelectedGroceryDistribution] = useState(null);
+    const [showSchoolSuppliesDistributionPlan, setShowSchoolSuppliesDistributionPlan] = useState(false);
+    const [showSchoolSuppliesDistributionDetails, setShowSchoolSuppliesDistributionDetails] = useState(false);
+    const [selectedSchoolSuppliesDistribution, setSelectedSchoolSuppliesDistribution] = useState(null);
+    const [showBookDistributionPlan, setShowBookDistributionPlan] = useState(false);
+    const [showBookDistributionDetails, setShowBookDistributionDetails] = useState(false);
+    const [selectedBookDistribution, setSelectedBookDistribution] = useState(null);
 
     useEffect(() => {
         fetchApprovedRequests();
@@ -82,7 +97,7 @@ const VolunteerDashboard = () => {
                 ['approved', 'collected', 'distribution_planned'].includes(request.status)
             );
             setRequests(filteredRequests);
-        } catch (error) {
+                } catch (error) {
             console.error('Error fetching requests:', error);
             setError('Failed to fetch requests. Please try again later.');
         } finally {
@@ -92,12 +107,35 @@ const VolunteerDashboard = () => {
 
     const handleMarkAsCollected = async (id) => {
         try {
-            setSelectedRequest(id);
-            setOpenDialog(false);
-            setShowQualityForm(true);
+            const token = localStorage.getItem('authToken');
+            let endpoint;
+            switch(activeTab) {
+                case 0:
+                    endpoint = 'food';
+                    break;
+                case 1:
+                    endpoint = 'grocery';
+                    break;
+                case 2:
+                    endpoint = 'book';
+                    break;
+                case 3:
+                    endpoint = 'school-supplies';
+                    break;
+                default:
+                    endpoint = 'food';
+            }
+            
+            await axios.put(
+                `http://127.0.0.1:8000/api/v1/${endpoint}/request/${id}/update-status/`,
+                { status: 'collected' },
+                {
+                    headers: { Authorization: `Bearer ${token}` }
+                }
+            );
+            fetchApprovedRequests();
         } catch (error) {
-            console.error('Error:', error);
-            setError('Failed to process collection. Please try again.');
+            console.error('Error marking request as collected:', error);
         }
     };
 
@@ -122,7 +160,7 @@ const VolunteerDashboard = () => {
                 default:
                     endpoint = 'food';
             }
-
+            
             // First submit quality report
             await axios.post(
                 `http://127.0.0.1:8000/api/v1/${endpoint}/request/${selectedRequest}/quality-report/`,
@@ -140,10 +178,10 @@ const VolunteerDashboard = () => {
                 `http://127.0.0.1:8000/api/v1/${endpoint}/request/${selectedRequest}/update-status/`,
                 { status: 'collected' },
                 {
-                    headers: { 
-                        Authorization: `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    }
+                headers: { 
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
                 }
             );
             
@@ -193,7 +231,7 @@ const VolunteerDashboard = () => {
             );
 
             setShowDistributionForm(false);
-            fetchApprovedRequests();
+        fetchApprovedRequests();
             setError(null);
             alert('Distribution plan created successfully!');
         } catch (error) {
@@ -273,6 +311,244 @@ const VolunteerDashboard = () => {
         }
     };
 
+    const handleCreateGroceryDistribution = async (formData) => {
+        try {
+            const token = localStorage.getItem('authToken');
+            await axios.post(
+                `http://127.0.0.1:8000/api/v1/grocery/request/${selectedForDistribution}/distribution/`,
+                {
+                    ...formData,
+                    status: 'planned'
+                },
+                {
+                    headers: { 
+                        Authorization: `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                }
+            );
+
+            await axios.put(
+                `http://127.0.0.1:8000/api/v1/grocery/request/${selectedForDistribution}/update-status/`,
+                { 
+                    status: 'distribution_planned'
+                },
+                {
+                    headers: { 
+                        Authorization: `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                }
+            );
+
+            setShowGroceryDistributionForm(false);
+            fetchApprovedRequests();
+            setError(null);
+            alert('Grocery distribution plan created successfully!');
+        } catch (error) {
+            console.error('Error creating grocery distribution plan:', error);
+            const errorMessage = error.response?.data?.error || error.message;
+            setError('Failed to create grocery distribution plan: ' + errorMessage);
+        }
+    };
+
+    const fetchGroceryDistributionDetails = async (requestId) => {
+        try {
+            const token = localStorage.getItem('authToken');
+            const planResponse = await axios.get(
+                `http://127.0.0.1:8000/api/v1/grocery/request/${requestId}/distribution/get/`,
+                {
+                    headers: { Authorization: `Bearer ${token}` }
+                }
+            );
+            
+            if (planResponse.data) {
+                setSelectedGroceryDistribution(planResponse.data);
+                setShowGroceryDistributionDetails(true);
+                setError(null);
+            } else {
+                setError('No grocery distribution plan found for this request');
+            }
+        } catch (error) {
+            console.error('Error fetching grocery distribution details:', error);
+            const errorMessage = error.response?.data?.error || 'Failed to fetch distribution details';
+            setError(errorMessage);
+        }
+    };
+
+    const handleGroceryDistributionStatusUpdate = async (newStatus) => {
+        try {
+            const token = localStorage.getItem('authToken');
+            
+            await axios.put(
+                `http://127.0.0.1:8000/api/v1/grocery/distribution/${selectedGroceryDistribution.id}/update-status/`,
+                { status: newStatus },
+                {
+                    headers: { 
+                        Authorization: `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                }
+            );
+
+            if (newStatus === 'completed') {
+                await axios.put(
+                    `http://127.0.0.1:8000/api/v1/grocery/request/${selectedGroceryDistribution.grocery_request}/update-status/`,
+                    { 
+                        status: 'distributed',
+                        distribution_id: selectedGroceryDistribution.id
+                    },
+                    {
+                        headers: { 
+                            Authorization: `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    }
+                );
+            }
+            
+            await fetchGroceryDistributionDetails(selectedGroceryDistribution.grocery_request);
+            fetchApprovedRequests();
+            setError(null);
+        } catch (error) {
+            console.error('Error updating grocery distribution status:', error);
+            const errorMessage = error.response?.data?.error || error.message;
+            setError('Failed to update distribution status: ' + errorMessage);
+        }
+    };
+
+    const handleCreateSchoolSuppliesDistribution = async (formData) => {
+        try {
+            const token = localStorage.getItem('authToken');
+            await axios.post(
+                `http://127.0.0.1:8000/api/v1/school-supplies/request/${selectedRequest.id}/distribution/`,
+                formData,
+                {
+                    headers: { Authorization: `Bearer ${token}` }
+                }
+            );
+            setShowSchoolSuppliesDistributionPlan(false);
+            fetchApprovedRequests();
+        } catch (error) {
+            console.error('Error creating school supplies distribution plan:', error);
+        }
+    };
+
+    const fetchSchoolSuppliesDistributionDetails = async (requestId) => {
+        try {
+            const token = localStorage.getItem('authToken');
+            const response = await axios.get(
+                `http://127.0.0.1:8000/api/v1/school-supplies/request/${requestId}/distribution/get/`,
+                {
+                    headers: { Authorization: `Bearer ${token}` }
+                }
+            );
+            
+            if (response.data) {
+                setSelectedSchoolSuppliesDistribution(response.data);
+                setShowSchoolSuppliesDistributionDetails(true);
+            }
+        } catch (error) {
+            console.error('Error fetching school supplies distribution details:', error);
+            setError('Failed to fetch distribution details');
+        }
+    };
+
+    const handleSchoolSuppliesDistributionStatusUpdate = async (newStatus) => {
+        try {
+            const token = localStorage.getItem('authToken');
+            await axios.put(
+                `http://127.0.0.1:8000/api/v1/school-supplies/distribution/${selectedSchoolSuppliesDistribution.id}/update-status/`,
+                { status: newStatus },
+                {
+                    headers: { Authorization: `Bearer ${token}` }
+                }
+            );
+            
+            if (newStatus === 'completed') {
+                await axios.put(
+                    `http://127.0.0.1:8000/api/v1/school-supplies/distribution/${selectedSchoolSuppliesDistribution.id}/complete/`,
+                    {},
+                    {
+                        headers: { Authorization: `Bearer ${token}` }
+                    }
+                );
+            }
+            
+            setShowSchoolSuppliesDistributionDetails(false);
+            fetchApprovedRequests();
+        } catch (error) {
+            console.error('Error updating school supplies distribution status:', error);
+        }
+    };
+
+    const handleCreateBookDistribution = async (formData) => {
+        try {
+            const token = localStorage.getItem('authToken');
+            await axios.post(
+                `http://127.0.0.1:8000/api/v1/book/request/${selectedRequest.id}/distribution/`,
+                formData,
+                {
+                    headers: { Authorization: `Bearer ${token}` }
+                }
+            );
+            setShowBookDistributionPlan(false);
+            fetchApprovedRequests();
+        } catch (error) {
+            console.error('Error creating book distribution plan:', error);
+            setError('Failed to create book distribution plan');
+        }
+    };
+
+    const fetchBookDistributionDetails = async (requestId) => {
+        try {
+            const token = localStorage.getItem('authToken');
+            const response = await axios.get(
+                `http://127.0.0.1:8000/api/v1/book/request/${requestId}/distribution/get/`,
+                {
+                    headers: { Authorization: `Bearer ${token}` }
+                }
+            );
+            
+            if (response.data) {
+                setSelectedBookDistribution(response.data);
+                setShowBookDistributionDetails(true);
+            }
+        } catch (error) {
+            console.error('Error fetching book distribution details:', error);
+            setError('Failed to fetch distribution details');
+        }
+    };
+
+    const handleBookDistributionStatusUpdate = async (newStatus) => {
+        try {
+            const token = localStorage.getItem('authToken');
+            await axios.put(
+                `http://127.0.0.1:8000/api/v1/book/distribution/${selectedBookDistribution.id}/update-status/`,
+                { status: newStatus },
+                {
+                    headers: { Authorization: `Bearer ${token}` }
+                }
+            );
+            
+            if (newStatus === 'completed') {
+                await axios.put(
+                    `http://127.0.0.1:8000/api/v1/book/distribution/${selectedBookDistribution.id}/complete/`,
+                    {},
+                    {
+                        headers: { Authorization: `Bearer ${token}` }
+                    }
+                );
+            }
+            
+            setShowBookDistributionDetails(false);
+            fetchApprovedRequests();
+        } catch (error) {
+            console.error('Error updating book distribution status:', error);
+            setError('Failed to update distribution status');
+        }
+    };
+
     const renderRequestDetails = (request) => {
         if (!request) return null;
 
@@ -318,12 +594,12 @@ const VolunteerDashboard = () => {
                             </Typography>
                         </Box>
                         {request.expiry_date && (
-                            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                                <AccessTimeIcon sx={{ mr: 1 }} />
-                                <Typography>
+                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                            <AccessTimeIcon sx={{ mr: 1 }} />
+                            <Typography>
                                     Expires: {formatDate(request.expiry_date, 'dd/MM/yyyy')}
-                                </Typography>
-                            </Box>
+                            </Typography>
+                        </Box>
                         )}
                     </>
                 );
@@ -396,67 +672,124 @@ const VolunteerDashboard = () => {
     };
 
     const renderActionButtons = (request) => {
-        return (
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
-                <Button
-                    variant="outlined"
-                    startIcon={<VisibilityIcon />}
-                    onClick={() => {
-                        setSelectedRequest(request);
-                        setOpenDialog(true);
-                    }}
-                >
-                    Details
-                </Button>
-                <Box sx={{ display: 'flex', gap: 1 }}>
-                    {activeTab === 0 && request.status === 'collected' && (
-                        <Button
-                            variant="contained"
-                            color="primary"
-                            onClick={() => {
-                                setSelectedForDistribution(request.id);
-                                setShowDistributionForm(true);
-                            }}
-                        >
-                            Plan Distribution
-                        </Button>
-                    )}
-                    {activeTab === 0 && request.status === 'distribution_planned' && (
-                        <Button
-                            variant="contained"
-                            color="secondary"
-                            onClick={() => fetchDistributionDetails(request.id)}
-                        >
-                            View Distribution Plan
-                        </Button>
-                    )}
-                    {activeTab === 0 && request.status === 'approved' && (
-                        <>
-                            <Button
-                                variant="outlined"
-                                color="error"
-                                startIcon={<ErrorIcon />}
-                                onClick={() => handleQualityIssue(request.id)}
-                            >
-                                Report Issue
-                            </Button>
-                            <Button
-                                variant="contained"
-                                color="success"
-                                onClick={() => handleMarkAsCollected(request.id)}
-                            >
-                                Collect
-                            </Button>
-                        </>
-                    )}
-                </Box>
-            </Box>
-        );
+        if (!request) return null;
+
+        switch (request.status) {
+            case 'approved':
+                return (
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={() => handleMarkAsCollected(request.id)}
+                    >
+                        Mark as Collected
+                    </Button>
+                );
+            case 'collected':
+                let distributionComponent;
+                switch(activeTab) {
+                    case 0:
+                        distributionComponent = (
+                            <DistributionPlan
+                                foodRequest={request}
+                                onSubmit={handleCreateDistribution}
+                                onClose={() => setShowDistributionForm(false)}
+                            />
+                        );
+                        break;
+                    case 1:
+                        distributionComponent = (
+                            <GroceryDistributionPlan
+                                groceryRequest={request}
+                                onSubmit={handleCreateGroceryDistribution}
+                                onClose={() => setShowGroceryDistributionForm(false)}
+                            />
+                        );
+                        break;
+                    case 2:
+                        distributionComponent = (
+                            <BookDistributionPlan
+                                bookRequest={request}
+                                onSubmit={handleCreateBookDistribution}
+                                onClose={() => setShowBookDistributionPlan(false)}
+                            />
+                        );
+                        break;
+                    case 3:
+                        distributionComponent = (
+                            <SchoolSuppliesDistributionPlan
+                                suppliesRequest={request}
+                                onSubmit={handleCreateSchoolSuppliesDistribution}
+                                onClose={() => setShowSchoolSuppliesDistributionPlan(false)}
+                            />
+                        );
+                        break;
+                    default:
+                        distributionComponent = null;
+                }
+                return (
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={() => {
+                            setSelectedRequest(request);
+                            switch(activeTab) {
+                                case 0:
+                                    setShowDistributionForm(true);
+                                    break;
+                                case 1:
+                                    setShowGroceryDistributionForm(true);
+                                    break;
+                                case 2:
+                                    setShowBookDistributionPlan(true);
+                                    break;
+                                case 3:
+                                    setShowSchoolSuppliesDistributionPlan(true);
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }}
+                    >
+                        Create Distribution Plan
+                    </Button>
+                );
+            case 'distribution_planned':
+            case 'distributed':
+                return (
+                    <Button
+                        variant="outlined"
+                        color="primary"
+                        onClick={() => {
+                            switch(activeTab) {
+                                case 0:
+                                    fetchDistributionDetails(request.id);
+                                    break;
+                                case 1:
+                                    fetchGroceryDistributionDetails(request.id);
+                                    break;
+                                case 2:
+                                    fetchBookDistributionDetails(request.id);
+                                    break;
+                                case 3:
+                                    fetchSchoolSuppliesDistributionDetails(request.id);
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }}
+                    >
+                        View Distribution Details
+                    </Button>
+                );
+            default:
+                return null;
+        }
     };
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-            <Header />
+                <Header />
 
             <Box component="main" sx={{ flexGrow: 1, p: 3, mt: 8 }}>
                 <Tabs 
@@ -495,7 +828,7 @@ const VolunteerDashboard = () => {
                         {error}
                     </Alert>
                 )}
-
+                
                 {loading ? (
                     <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
                         <CircularProgress />
@@ -524,7 +857,7 @@ const VolunteerDashboard = () => {
                                                     size="small" 
                                                 />
                                             </Box>
-
+                                            
                                             {/* Request Details */}
                                             {renderRequestDetails(request)}
 
@@ -546,17 +879,17 @@ const VolunteerDashboard = () => {
                     </Grid>
                 )}
 
-                {/* Details Dialog */}
+            {/* Details Dialog */}
                 <Dialog 
                     open={openDialog} 
                     onClose={() => setOpenDialog(false)}
                     maxWidth="md"
                     fullWidth
                 >
-                    <DialogTitle>Request Details</DialogTitle>
-                    <DialogContent>
-                        {selectedRequest && (
-                            <Box sx={{ p: 2 }}>
+                <DialogTitle>Request Details</DialogTitle>
+                <DialogContent>
+                    {selectedRequest && (
+                        <Box sx={{ p: 2 }}>
                                 {renderRequestDetails(selectedRequest)}
                                 <Typography sx={{ mt: 2 }}>
                                     <strong>Contact:</strong> {selectedRequest.contact_number}
@@ -569,39 +902,39 @@ const VolunteerDashboard = () => {
                                         <strong>Notes:</strong> {selectedRequest.additional_notes}
                                     </Typography>
                                 )}
-                            </Box>
-                        )}
-                    </DialogContent>
-                    <DialogActions>
-                        <Button onClick={() => setOpenDialog(false)}>Close</Button>
+                        </Box>
+                    )}
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setOpenDialog(false)}>Close</Button>
                         {activeTab === 0 && (
-                            <Button
-                                variant="outlined"
-                                color="error"
-                                onClick={() => {
-                                    setOpenDialog(false);
-                                    handleQualityIssue(selectedRequest.id);
-                                }}
-                            >
+                    <Button
+                        variant="outlined"
+                        color="error"
+                        onClick={() => {
+                            setOpenDialog(false);
+                            handleQualityIssue(selectedRequest.id);
+                        }}
+                    >
                                 Report Issue
-                            </Button>
+                    </Button>
                         )}
-                        <Button
-                            variant="contained"
-                            color="success"
-                            onClick={() => handleMarkAsCollected(selectedRequest.id)}
-                        >
-                            Mark as Collected
-                        </Button>
-                    </DialogActions>
-                </Dialog>
+                    <Button 
+                        variant="contained" 
+                        color="success"
+                        onClick={() => handleMarkAsCollected(selectedRequest.id)}
+                    >
+                        Mark as Collected
+                    </Button>
+                </DialogActions>
+            </Dialog>
 
                 {/* Quality Report Form */}
                 {activeTab === 0 && (
-                    <QualityReportForm
-                        open={showQualityForm}
-                        onClose={() => setShowQualityForm(false)}
-                        requestId={selectedRequest}
+            <QualityReportForm
+                open={showQualityForm}
+                onClose={() => setShowQualityForm(false)}
+                requestId={selectedRequest}
                         onSubmitSuccess={(reportData) => handleQualityReportSubmit(reportData)}
                     />
                 )}
@@ -628,6 +961,66 @@ const VolunteerDashboard = () => {
                     onClose={() => setShowDistributionDetails(false)}
                     distribution={selectedDistribution}
                     onStatusUpdate={handleDistributionStatusUpdate}
+                />
+
+                {/* Add Grocery Distribution Plan Form Dialog */}
+                <Dialog
+                    open={showGroceryDistributionForm}
+                    onClose={() => setShowGroceryDistributionForm(false)}
+                    maxWidth="md"
+                    fullWidth
+                >
+                    <DialogContent>
+                        <GroceryDistributionPlan
+                            groceryRequest={selectedForDistribution}
+                            onSubmit={handleCreateGroceryDistribution}
+                            onClose={() => setShowGroceryDistributionForm(false)}
+                        />
+                    </DialogContent>
+                </Dialog>
+
+                {/* Add Grocery Distribution Details Dialog */}
+                <GroceryDistributionDetails
+                    open={showGroceryDistributionDetails}
+                    onClose={() => setShowGroceryDistributionDetails(false)}
+                    distribution={selectedGroceryDistribution}
+                    onStatusUpdate={handleGroceryDistributionStatusUpdate}
+                />
+
+                {showSchoolSuppliesDistributionPlan && selectedRequest && (
+                    <Dialog open={showSchoolSuppliesDistributionPlan} onClose={() => setShowSchoolSuppliesDistributionPlan(false)} maxWidth="md" fullWidth>
+                        <SchoolSuppliesDistributionPlan
+                            suppliesRequest={selectedRequest}
+                            onSubmit={handleCreateSchoolSuppliesDistribution}
+                            onClose={() => setShowSchoolSuppliesDistributionPlan(false)}
+                        />
+                    </Dialog>
+                )}
+
+                <SchoolSuppliesDistributionDetails
+                    open={showSchoolSuppliesDistributionDetails}
+                    onClose={() => setShowSchoolSuppliesDistributionDetails(false)}
+                    distribution={selectedSchoolSuppliesDistribution}
+                    onStatusUpdate={handleSchoolSuppliesDistributionStatusUpdate}
+                />
+
+                {/* Add Book Distribution Plan Dialog */}
+                {showBookDistributionPlan && selectedRequest && (
+                    <Dialog open={showBookDistributionPlan} onClose={() => setShowBookDistributionPlan(false)} maxWidth="md" fullWidth>
+                        <BookDistributionPlan
+                            bookRequest={selectedRequest}
+                            onSubmit={handleCreateBookDistribution}
+                            onClose={() => setShowBookDistributionPlan(false)}
+                        />
+                    </Dialog>
+                )}
+
+                {/* Add Book Distribution Details Dialog */}
+                <BookDistributionDetails
+                    open={showBookDistributionDetails}
+                    onClose={() => setShowBookDistributionDetails(false)}
+                    distribution={selectedBookDistribution}
+                    onStatusUpdate={handleBookDistributionStatusUpdate}
                 />
             </Box>
         </Box>

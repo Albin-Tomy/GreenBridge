@@ -7,6 +7,7 @@ import logo from '../assets/logo.png';
 import axios from 'axios';
 import { MdAccountCircle } from 'react-icons/md';
 import Notifications from './Notifications';
+import { Google as GoogleIcon } from '@mui/icons-material';
 
 // Configure Axios interceptor for automatic logout on token expiration
 axios.interceptors.response.use(

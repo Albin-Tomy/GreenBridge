@@ -1,12 +1,16 @@
 from django.db import models
 from authentication.models import User
+from volunters.models import VolunteerRegistration
 
 class BookRequest(models.Model):
     STATUS_CHOICES = [
         ('pending', 'Pending'),
         ('approved', 'Approved'),
         ('rejected', 'Rejected'),
-        ('collected', 'Collected')
+        ('collected', 'Collected'),
+        ('distribution_planned', 'Distribution Planned'),
+        ('distributed', 'Distributed'),
+        ('cancelled', 'Cancelled')
     ]
 
     BOOK_TYPE_CHOICES = [
@@ -53,4 +57,43 @@ class BookDistribution(models.Model):
     notes = models.TextField(blank=True)
 
     def __str__(self):
-        return f"Distribution for {self.request}" 
+        return f"Distribution for {self.request}"
+
+class BookDistributionPlan(models.Model):
+    STATUS_CHOICES = [
+        ('planned', 'Planned'),
+        ('in_progress', 'In Progress'),
+        ('completed', 'Completed'),
+        ('cancelled', 'Cancelled')
+    ]
+
+    book_request = models.ForeignKey(BookRequest, on_delete=models.CASCADE, related_name='distribution_plans')
+    volunteer = models.ForeignKey('volunters.VolunteerRegistration', on_delete=models.SET_NULL, null=True)
+    
+    # Distribution Details
+    distribution_date = models.DateTimeField()
+    distribution_location = models.CharField(max_length=255)
+    beneficiary_type = models.CharField(max_length=100)
+    beneficiary_name = models.CharField(max_length=255)
+    beneficiary_contact = models.CharField(max_length=15)
+    number_of_beneficiaries = models.IntegerField()
+    education_level = models.CharField(max_length=100)
+    subject_preferences = models.TextField(blank=True, null=True)
+    
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='planned')
+    notes = models.TextField(blank=True, null=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Distribution Plan #{self.id} for Book Request #{self.book_request.id}"
+
+class BookDistributionFeedback(models.Model):
+    distribution = models.ForeignKey(BookDistributionPlan, on_delete=models.CASCADE, related_name='feedback')
+    rating = models.IntegerField(choices=[(i, i) for i in range(1, 6)])
+    feedback_text = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Feedback for Distribution #{self.distribution.id}" 

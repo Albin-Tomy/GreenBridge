@@ -7,11 +7,13 @@ import RestaurantIcon from '@mui/icons-material/Restaurant';
 import ShoppingBasketIcon from '@mui/icons-material/ShoppingBasket';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
 import DeleteIcon from '@mui/icons-material/Delete';
+import LegalConsentForm from '../Volunteer/LegalConsentForm';
 import './CommonRequest.css';
 
 const CommonRequestForm = () => {
     const navigate = useNavigate();
     const [requestType, setRequestType] = useState('');
+    const [showConsentForm, setShowConsentForm] = useState(false);
 
     // Check if user is logged in
     useEffect(() => {
@@ -23,6 +25,16 @@ const CommonRequestForm = () => {
 
     const handleRequestTypeChange = (type) => {
         setRequestType(type);
+        if (type === 'food') {
+            // Show consent form first for food requests
+            setShowConsentForm(true);
+        } else {
+            // For other types, navigate directly
+            navigateToForm(type);
+        }
+    };
+
+    const navigateToForm = (type) => {
         switch(type) {
             case 'food':
                 navigate('/food-request');
@@ -45,6 +57,11 @@ const CommonRequestForm = () => {
             default:
                 break;
         }
+    };
+
+    const handleConsentAgree = () => {
+        setShowConsentForm(false);
+        navigateToForm('food');
     };
 
     const requestCards = [
@@ -115,6 +132,13 @@ const CommonRequestForm = () => {
                         </div>
                     ))}
                 </div>
+
+                {/* Legal Consent Form Dialog */}
+                <LegalConsentForm
+                    open={showConsentForm}
+                    onClose={() => setShowConsentForm(false)}
+                    onAgree={handleConsentAgree}
+                />
             </div>
         </div>
     );

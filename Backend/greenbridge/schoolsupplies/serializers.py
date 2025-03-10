@@ -1,26 +1,30 @@
 from rest_framework import serializers
-from .models import SchoolSupplyRequest, SchoolSupplyDistribution
+from .models import (
+    SchoolSuppliesRequest,
+    SchoolSupplyDistribution,
+    SchoolSuppliesDistributionPlan,
+    SchoolSuppliesDistributionFeedback
+)
 
-class SchoolSupplyRequestSerializer(serializers.ModelSerializer):
-    user_email = serializers.SerializerMethodField()
-
+class SchoolSuppliesRequestSerializer(serializers.ModelSerializer):
     class Meta:
-        model = SchoolSupplyRequest
-        fields = [
-            'id', 'user', 'user_email', 'supply_type', 'education_level',
-            'quantity', 'description', 'condition', 'pickup_address',
-            'contact_number', 'additional_notes', 'status',
-            'created_at', 'updated_at'
-        ]
-        read_only_fields = ['user', 'user_email']
-
-    def get_user_email(self, obj):
-        return obj.user.email if obj.user else None
+        model = SchoolSuppliesRequest
+        fields = '__all__'
+        read_only_fields = ('user', 'status', 'created_at', 'updated_at')
 
 class SchoolSupplyDistributionSerializer(serializers.ModelSerializer):
     class Meta:
         model = SchoolSupplyDistribution
-        fields = [
-            'id', 'request', 'distributed_to', 'distribution_date',
-            'beneficiary_count', 'distribution_location', 'notes'
-        ] 
+        fields = '__all__'
+
+class SchoolSuppliesDistributionPlanSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SchoolSuppliesDistributionPlan
+        fields = '__all__'
+        read_only_fields = ('created_at', 'updated_at')
+
+class SchoolSuppliesDistributionFeedbackSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SchoolSuppliesDistributionFeedback
+        fields = '__all__'
+        read_only_fields = ('created_at',) 

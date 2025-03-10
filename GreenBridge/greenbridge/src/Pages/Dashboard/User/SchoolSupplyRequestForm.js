@@ -28,7 +28,6 @@ const SchoolSupplyRequestForm = () => {
         supply_type: '',
         education_level: '',
         quantity: '',
-        description: '',
         condition: '',
         pickup_address: '',
         contact_number: '',
@@ -43,18 +42,20 @@ const SchoolSupplyRequestForm = () => {
     }, [navigate]);
 
     const supplyTypes = [
+        { value: 'notebooks', label: 'Notebooks' },
+        { value: 'textbooks', label: 'Textbooks' },
         { value: 'stationery', label: 'Stationery' },
+        { value: 'uniforms', label: 'Uniforms' },
         { value: 'bags', label: 'School Bags' },
-        { value: 'uniforms', label: 'School Uniforms' },
-        { value: 'shoes', label: 'School Shoes' },
-        { value: 'books', label: 'Text Books' },
-        { value: 'other', label: 'Other Supplies' }
+        { value: 'others', label: 'Others' }
     ];
 
     const educationLevels = [
         { value: 'primary', label: 'Primary School' },
-        { value: 'secondary', label: 'Secondary School' },
+        { value: 'middle', label: 'Middle School' },
+        { value: 'high', label: 'High School' },
         { value: 'higher_secondary', label: 'Higher Secondary' },
+        { value: 'college', label: 'College' },
         { value: 'other', label: 'Other' }
     ];
 
@@ -91,7 +92,6 @@ const SchoolSupplyRequestForm = () => {
                 supply_type: '',
                 education_level: '',
                 quantity: '',
-                description: '',
                 condition: '',
                 pickup_address: '',
                 contact_number: '',
@@ -181,20 +181,6 @@ const SchoolSupplyRequestForm = () => {
                                     value={formData.condition}
                                     onChange={handleChange}
                                     placeholder="e.g., New, Good, Used but functional"
-                                />
-                            </Grid>
-
-                            <Grid item xs={12}>
-                                <TextField
-                                    fullWidth
-                                    required
-                                    label="Description"
-                                    name="description"
-                                    multiline
-                                    rows={3}
-                                    value={formData.description}
-                                    onChange={handleChange}
-                                    placeholder="Please describe the items you're donating"
                                 />
                             </Grid>
 
