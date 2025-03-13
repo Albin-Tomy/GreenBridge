@@ -10,6 +10,7 @@ urlpatterns = [
     
     # Distribution plan endpoints
     path('request/<int:book_request_id>/distribution/', views.create_book_distribution_plan, name='create-book-distribution-plan'),
+    path('distribution/<int:plan_id>/start/', views.start_book_distribution, name='start-book-distribution'),
     path('distribution/<int:plan_id>/complete/', views.complete_book_distribution, name='complete-book-distribution'),
     path('distribution/<int:plan_id>/view/', views.get_book_distribution_plan, name='view-book-distribution'),
     path('distribution/<int:plan_id>/update-status/', views.update_book_distribution_status, name='update-book-distribution-status'),

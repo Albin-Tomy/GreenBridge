@@ -63,6 +63,7 @@ import GroceryRequestForm from './Pages/Dashboard/User/GroceryRequestForm';
 import FoodQualityReport from './Pages/Dashboard/Volunteer/FoodQualityReport';
 import DonateMoneyPage from './Pages/Dashboard/User/DonateMoneyPage';
 import SchoolSupplyRequestForm from './Pages/Dashboard/User/SchoolSupplyRequestForm';
+import AdminLanding from './Pages/Dashboard/Admin/AdminLanding';
 
 function App() {
   return (
@@ -154,6 +155,8 @@ function App() {
           <Route path="/donate-money" element={<DonateMoneyPage />} />
 
           <Route path="/school-request" element={<SchoolSupplyRequestForm />} />
+
+          <Route path="/admin" element={<AdminProtectedRoute element={<AdminLanding />} />} />
 
         </Routes>
       </Router>

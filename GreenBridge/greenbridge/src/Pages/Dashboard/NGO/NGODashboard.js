@@ -31,10 +31,13 @@ import ShoppingBasketIcon from '@mui/icons-material/ShoppingBasket';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import SchoolIcon from '@mui/icons-material/School';
+import MoneyIcon from '@mui/icons-material/Money';
 import Header from '../../../components/Navbar';
 import axios from 'axios';
 import { format } from 'date-fns';
 import NGODistributionDetails from '../../Distribution/NGODistributionDetails';
+import NGOMoneyRequestForm from '../../NGO/NGOMoneyRequestForm';
+import NGOMoneyRequestList from '../../NGO/NGOMoneyRequestList';
 
 const drawerWidth = 240;
 
@@ -112,12 +115,17 @@ const NGODashboard = () => {
     const [showDistributionDetails, setShowDistributionDetails] = useState(false);
     const [selectedDistribution, setSelectedDistribution] = useState(null);
     const [error, setError] = useState(null);
+    const [showMoneyRequestForm, setShowMoneyRequestForm] = useState(false);
 
     useEffect(() => {
-        fetchRequests();
+        if (activeTab !== 4) {
+            fetchRequests();
+        }
     }, [filter, activeTab]);
 
     const fetchRequests = async () => {
+        if (activeTab === 4) return;
+        
         try {
             const token = localStorage.getItem('authToken');
             let endpoint;
@@ -131,7 +139,7 @@ const NGODashboard = () => {
                 case 2:
                     endpoint = 'book';
                     break;
-                case 3:  // Add school supplies endpoint
+                case 3:
                     endpoint = 'school-supplies';
                     break;
                 default:
@@ -252,7 +260,6 @@ const NGODashboard = () => {
                     Details
                 </Button>
 
-                {/* Add View Distribution Details button for distributed requests */}
                 {request.status === 'distributed' && (
                     <Button
                         variant="contained"
@@ -379,7 +386,7 @@ const NGODashboard = () => {
                 return 'Grocery Distribution Requests';
             case 2:
                 return 'Book Distribution Requests';
-            case 3:  // Add school supplies case
+            case 3:
                 return 'School Supplies Requests';
             default:
                 return 'Requests';
@@ -394,6 +401,102 @@ const NGODashboard = () => {
         { value: 'distributed', label: 'Distributed' },
         { value: 'cancelled', label: 'Cancelled' }
     ];
+
+    const renderContent = () => {
+        if (activeTab === 4) {
+            return (
+                <Box>
+                    {showMoneyRequestForm ? (
+                        <Box>
+                            <Button 
+                                variant="outlined" 
+                                onClick={() => setShowMoneyRequestForm(false)}
+                                sx={{ mb: 3 }}
+                            >
+                                Back to Requests
+                            </Button>
+                            <NGOMoneyRequestForm />
+                        </Box>
+                    ) : (
+                        <Box>
+                            <Button 
+                                variant="contained" 
+                                color="primary" 
+                                onClick={() => setShowMoneyRequestForm(true)}
+                                sx={{ mb: 3 }}
+                            >
+                                New Money Request
+                            </Button>
+                            <NGOMoneyRequestList isAdmin={false} />
+                        </Box>
+                    )}
+                </Box>
+            );
+        }
+
+        return (
+            <>
+                {loading ? (
+                    <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
+                        <CircularProgress />
+                    </Box>
+                ) : (
+                    <Grid container spacing={3}>
+                        {requests.length === 0 ? (
+                            <Grid item xs={12}>
+                                <Paper sx={{ p: 3, textAlign: 'center' }}>
+                                    <Typography>No requests found</Typography>
+                                </Paper>
+                            </Grid>
+                        ) : (
+                            requests.map((request) => (
+                                <Grid item xs={12} sm={6} md={4} key={request.id}>
+                                    <Card>
+                                        <CardContent>
+                                            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+                                                <Typography variant="h6">
+                                                    Request #{request.id}
+                                                </Typography>
+                                                {getStatusChip(request.status)}
+                                            </Box>
+                                            {renderRequestDetails(request)}
+                                            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                                                <LocationOnIcon sx={{ mr: 1 }} />
+                                                <Typography noWrap>
+                                                    {request.pickup_address}
+                                                </Typography>
+                                            </Box>
+                                            <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end', mt: 2 }}>
+                                                <Button
+                                                    variant="outlined"
+                                                    startIcon={<VisibilityIcon />}
+                                                    onClick={() => {
+                                                        setSelectedRequest(request);
+                                                        setOpenDialog(true);
+                                                    }}
+                                                >
+                                                    Details
+                                                </Button>
+                                                {request.status === 'distributed' && (
+                                                    <Button
+                                                        variant="contained"
+                                                        color="primary"
+                                                        onClick={() => fetchDistributionDetails(request.id)}
+                                                    >
+                                                        View Distribution
+                                                    </Button>
+                                                )}
+                                            </Box>
+                                        </CardContent>
+                                    </Card>
+                                </Grid>
+                            ))
+                        )}
+                    </Grid>
+                )}
+            </>
+        );
+    };
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
@@ -414,8 +517,8 @@ const NGODashboard = () => {
                     '& .MuiDrawer-paper': {
                         width: drawerWidth,
                         boxSizing: 'border-box',
-                        mt: '64px',  // Match header height
-                        pt: 0,  // Remove top padding
+                        mt: '64px',
+                        pt: 0,
                         backgroundColor: (theme) => theme.palette.background.default,
                         borderRight: '1px solid',
                         borderColor: 'divider'
@@ -427,45 +530,47 @@ const NGODashboard = () => {
                         Filter by Status
                     </Typography>
                     <Divider sx={{ mb: 2 }} />
-                    <List>
-                        {filterButtons.map((btn) => (
-                            <ListItem 
-                                key={btn.value}
-                                disablePadding
-                                sx={{ mb: 1 }}
-                            >
-                                <ListItemButton
-                                    selected={filter === btn.value}
-                                    onClick={() => setFilter(btn.value)}
-                                    sx={{
-                                        borderRadius: 1,
-                                        '&.Mui-selected': {
-                                            backgroundColor: (theme) => theme.palette.primary.light,
-                                            color: (theme) => theme.palette.primary.contrastText,
-                                        },
-                                        '&:hover': {
-                                            backgroundColor: (theme) => theme.palette.primary.lighter,
-                                        }
-                                    }}
+                    {activeTab !== 4 && (
+                        <List>
+                            {filterButtons.map((btn) => (
+                                <ListItem 
+                                    key={btn.value}
+                                    disablePadding
+                                    sx={{ mb: 1 }}
                                 >
-                                    <ListItemText 
-                                        primary={btn.label}
-                                        primaryTypographyProps={{
-                                            color: filter === btn.value ? 'inherit' : 'textPrimary'
+                                    <ListItemButton
+                                        selected={filter === btn.value}
+                                        onClick={() => setFilter(btn.value)}
+                                        sx={{
+                                            borderRadius: 1,
+                                            '&.Mui-selected': {
+                                                backgroundColor: (theme) => theme.palette.primary.light,
+                                                color: (theme) => theme.palette.primary.contrastText,
+                                            },
+                                            '&:hover': {
+                                                backgroundColor: (theme) => theme.palette.primary.lighter,
+                                            }
                                         }}
-                                    />
-                                    <Chip 
-                                        size="small"
-                                        label={requests.filter(r => 
-                                            btn.value === 'all' ? true : r.status === btn.value
-                                        ).length}
-                                        color={filter === btn.value ? 'primary' : 'default'}
-                                        sx={{ ml: 1 }}
-                                    />
-                                </ListItemButton>
-                            </ListItem>
-                        ))}
-                    </List>
+                                    >
+                                        <ListItemText 
+                                            primary={btn.label}
+                                            primaryTypographyProps={{
+                                                color: filter === btn.value ? 'inherit' : 'textPrimary'
+                                            }}
+                                        />
+                                        <Chip 
+                                            size="small"
+                                            label={requests.filter(r => 
+                                                btn.value === 'all' ? true : r.status === btn.value
+                                            ).length}
+                                            color={filter === btn.value ? 'primary' : 'default'}
+                                            sx={{ ml: 1 }}
+                                        />
+                                    </ListItemButton>
+                                </ListItem>
+                            ))}
+                        </List>
+                    )}
                 </Box>
             </Drawer>
 
@@ -488,7 +593,10 @@ const NGODashboard = () => {
                 >
                     <Tabs 
                         value={activeTab} 
-                        onChange={(e, newValue) => setActiveTab(newValue)}
+                        onChange={(e, newValue) => {
+                            setActiveTab(newValue);
+                            setFilter('all');
+                        }}
                         sx={{ mb: 3 }}
                     >
                         <Tab 
@@ -511,81 +619,20 @@ const NGODashboard = () => {
                             label="School Supplies" 
                             iconPosition="start"
                         />
+                        <Tab 
+                            icon={<MoneyIcon />} 
+                            label="Money Requests" 
+                            iconPosition="start"
+                        />
                     </Tabs>
 
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
                         <Typography variant="h4" gutterBottom>
-                            {getRequestTypeTitle()}
+                            {activeTab === 4 ? 'Money Requests' : getRequestTypeTitle()}
                         </Typography>
                     </Box>
                     
-                    {loading ? (
-                        <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
-                            <CircularProgress />
-                        </Box>
-                    ) : (
-                        <Grid container spacing={3}>
-                            {requests.length === 0 ? (
-                                <Grid item xs={12}>
-                                    <Paper sx={{ p: 3, textAlign: 'center' }}>
-                                        <Typography>No requests found</Typography>
-                                    </Paper>
-                                </Grid>
-                            ) : (
-                                requests.map((request) => (
-                                    <Grid item xs={12} sm={6} md={4} key={request.id}>
-                                        <Card>
-                                            <CardContent>
-                                                {/* Request Header */}
-                                                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                                                    <Typography variant="h6">
-                                                        Request #{request.id}
-                                                    </Typography>
-                                                    {getStatusChip(request.status)}
-                                                </Box>
-
-                                                {/* Request Details */}
-                                                {renderRequestDetails(request)}
-
-                                                {/* Location */}
-                                                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                                                    <LocationOnIcon sx={{ mr: 1 }} />
-                                                    <Typography noWrap>
-                                                        {request.pickup_address}
-                                                    </Typography>
-                                                </Box>
-
-                                                {/* Action Buttons */}
-                                                <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end', mt: 2 }}>
-                                                    <Button
-                                                        variant="outlined"
-                                                        startIcon={<VisibilityIcon />}
-                                                        onClick={() => {
-                                                            setSelectedRequest(request);
-                                                            setOpenDialog(true);
-                                                        }}
-                                                    >
-                                                        Details
-                                                    </Button>
-                                                    
-                                                    {/* Add View Distribution Details button for distributed requests */}
-                                                    {request.status === 'distributed' && (
-                                                        <Button
-                                                            variant="contained"
-                                                            color="primary"
-                                                            onClick={() => fetchDistributionDetails(request.id)}
-                                                        >
-                                                            View Distribution
-                                                        </Button>
-                                                    )}
-                                                </Box>
-                                            </CardContent>
-                                        </Card>
-                                    </Grid>
-                                ))
-                            )}
-                        </Grid>
-                    )}
+                    {renderContent()}
                 </Box>
             </Box>
 
@@ -612,7 +659,7 @@ const NGODashboard = () => {
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setOpenDialog(false)}>Close</Button>
-                    {selectedRequest && activeTab === 0 && // Only show for food requests
+                    {selectedRequest && activeTab === 0 &&
                      (selectedRequest.status === 'collected' || selectedRequest.status === 'quality_issue') && (
                         <Button
                             variant="outlined"
@@ -622,7 +669,6 @@ const NGODashboard = () => {
                             View Quality Report
                         </Button>
                     )}
-                    {/* Add View Distribution Details button for distributed requests */}
                     {selectedRequest && selectedRequest.status === 'distributed' && (
                         <Button
                             variant="contained"
@@ -636,13 +682,11 @@ const NGODashboard = () => {
                 </DialogActions>
             </Dialog>
 
-            {activeTab === 0 && (
-                <QualityReportDialog
-                    open={showQualityReport}
-                    onClose={() => setShowQualityReport(false)}
-                    report={qualityReport}
-                />
-            )}
+            <QualityReportDialog
+                open={showQualityReport}
+                onClose={() => setShowQualityReport(false)}
+                report={qualityReport}
+            />
 
             <NGODistributionDetails
                 open={showDistributionDetails}

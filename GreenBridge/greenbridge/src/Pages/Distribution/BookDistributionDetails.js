@@ -13,6 +13,7 @@ import {
     Alert,
 } from '@mui/material';
 import { format } from 'date-fns';
+import axios from 'axios';
 
 const getStatusColor = (status) => {
     switch (status) {
@@ -51,9 +52,23 @@ const BookDistributionDetails = ({
         setError('');
         setLoading(true);
         try {
-            await onStartDistribution();
+            const token = localStorage.getItem('authToken');
+            const response = await axios.put(
+                `http://127.0.0.1:8000/api/v1/book/distribution/${distribution.id}/start/`,
+                {},
+                {
+                    headers: { Authorization: `Bearer ${token}` }
+                }
+            );
+            
+            if (response.data && response.data.status === 'in_progress') {
+                if (onStartDistribution) {
+                    await onStartDistribution();
+                }
+            }
         } catch (error) {
-            setError('Failed to start distribution. Please try again.');
+            console.error('Error starting distribution:', error);
+            setError(error.response?.data?.error || 'Failed to start distribution. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -63,9 +78,23 @@ const BookDistributionDetails = ({
         setError('');
         setLoading(true);
         try {
-            await onCompleteDistribution();
+            const token = localStorage.getItem('authToken');
+            const response = await axios.put(
+                `http://127.0.0.1:8000/api/v1/book/distribution/${distribution.id}/complete/`,
+                {},
+                {
+                    headers: { Authorization: `Bearer ${token}` }
+                }
+            );
+            
+            if (response.data && response.data.message) {
+                if (onCompleteDistribution) {
+                    await onCompleteDistribution();
+                }
+            }
         } catch (error) {
-            setError('Failed to complete distribution. Please try again.');
+            console.error('Error completing distribution:', error);
+            setError(error.response?.data?.error || 'Failed to complete distribution. Please try again.');
         } finally {
             setLoading(false);
         }

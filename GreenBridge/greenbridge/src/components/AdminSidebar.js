@@ -21,14 +21,16 @@ import {
     Group as UsersIcon,
     ExpandLess,
     ExpandMore,
-    Assessment as AnalyticsIcon
+    Assessment as AnalyticsIcon,
+    Business as NGOIcon,
+    Money as MoneyIcon
 } from '@mui/icons-material';
 
 const drawerWidth = 240;
 
 const AdminSidebar = ({ activeSection, setActiveSection, expandedMenu, setExpandedMenu }) => {
     const handleMenuClick = (menu) => {
-        if (expandedMenu === menu) {
+        if (menu === expandedMenu) {
             setExpandedMenu('');
         } else {
             setExpandedMenu(menu);
@@ -37,32 +39,37 @@ const AdminSidebar = ({ activeSection, setActiveSection, expandedMenu, setExpand
 
     const menuItems = [
         {
-            title: 'Dashboard',
+            text: 'Dashboard',
             icon: <DashboardIcon />,
             value: 'dashboard'
         },
         {
-            title: 'Requests',
-            icon: <PeopleIcon />,
+            text: 'Requests',
+            icon: <FoodIcon />,
             value: 'requests',
             subItems: [
-                { title: 'Food Requests', icon: <FoodIcon />, value: 'food-requests' },
-                { title: 'School Supplies', icon: <SchoolIcon />, value: 'school-supplies' },
-                { title: 'Book Donations', icon: <BookIcon />, value: 'book-requests' },
-                { title: 'Grocery Donations', icon: <GroceryIcon />, value: 'grocery-requests' }
+                { text: 'Food Requests', value: 'food-requests', icon: <FoodIcon /> },
+                { text: 'School Supplies', value: 'school-supplies', icon: <SchoolIcon /> },
+                { text: 'Book Requests', value: 'book-requests', icon: <BookIcon /> },
+                { text: 'Grocery Requests', value: 'grocery-requests', icon: <GroceryIcon /> }
             ]
         },
         {
-            title: 'NGO Management',
-            icon: <ApprovalIcon />,
-            value: 'ngo',
+            text: 'Money Requests',
+            icon: <MoneyIcon />,
+            value: 'money-requests'
+        },
+        {
+            text: 'NGO Management',
+            icon: <NGOIcon />,
+            value: 'ngo-management',
             subItems: [
-                { title: 'Pending NGOs', value: 'pending-ngos' },
-                { title: 'Approved NGOs', value: 'approved-ngos' }
+                { text: 'Pending NGOs', value: 'pending-ngos' },
+                { text: 'Approved NGOs', value: 'approved-ngos' }
             ]
         },
         {
-            title: 'User Management',
+            text: 'User Management',
             icon: <UsersIcon />,
             value: 'users'
         }
@@ -88,34 +95,46 @@ const AdminSidebar = ({ activeSection, setActiveSection, expandedMenu, setExpand
                 <List>
                     {menuItems.map((item) => (
                         <React.Fragment key={item.value}>
-                            <ListItem 
-                                button 
-                                onClick={() => item.subItems ? handleMenuClick(item.value) : setActiveSection(item.value)}
-                                selected={activeSection === item.value}
+                            <ListItem
+                                button
+                                onClick={() => {
+                                    if (item.subItems) {
+                                        handleMenuClick(item.value);
+                                    } else {
+                                        setActiveSection(item.value);
+                                        setExpandedMenu('');
+                                    }
+                                }}
+                                selected={!item.subItems && activeSection === item.value}
+                                sx={{
+                                    bgcolor: !item.subItems && activeSection === item.value ? 'action.selected' : 'transparent'
+                                }}
                             >
                                 <ListItemIcon>{item.icon}</ListItemIcon>
-                                <ListItemText primary={item.title} />
+                                <ListItemText primary={item.text} />
                                 {item.subItems && (expandedMenu === item.value ? <ExpandLess /> : <ExpandMore />)}
                             </ListItem>
-                            
                             {item.subItems && (
                                 <Collapse in={expandedMenu === item.value} timeout="auto" unmountOnExit>
                                     <List component="div" disablePadding>
                                         {item.subItems.map((subItem) => (
                                             <ListItem
-                                                key={subItem.value}
                                                 button
+                                                key={subItem.value}
                                                 sx={{ pl: 4 }}
-                                                onClick={() => setActiveSection(subItem.value)}
+                                                onClick={() => {
+                                                    setActiveSection(subItem.value);
+                                                }}
                                                 selected={activeSection === subItem.value}
                                             >
                                                 {subItem.icon && <ListItemIcon>{subItem.icon}</ListItemIcon>}
-                                                <ListItemText primary={subItem.title} />
+                                                <ListItemText primary={subItem.text} />
                                             </ListItem>
                                         ))}
                                     </List>
                                 </Collapse>
                             )}
+                            <Divider />
                         </React.Fragment>
                     ))}
                 </List>

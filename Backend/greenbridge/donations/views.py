@@ -2,8 +2,8 @@ from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from .models import Donation
-from .serializers import DonationSerializer
+from .models import Donation, NGOMoneyRequest, NGOMoneyRequestUpdate
+from .serializers import DonationSerializer, NGOMoneyRequestSerializer, NGOMoneyRequestUpdateSerializer
 import razorpay
 from django.conf import settings
 import json
@@ -92,4 +92,147 @@ def verify_donation(request):
 def get_user_donations(request):
     donations = Donation.objects.filter(user=request.user).order_by('-created_at')
     serializer = DonationSerializer(donations, many=True)
-    return Response(serializer.data) 
+    return Response(serializer.data)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_ngo_money_request(request):
+    if not request.user.is_ngo:
+        return Response({
+            'error': 'Only NGOs can create money requests'
+        }, status=status.HTTP_403_FORBIDDEN)
+
+    serializer = NGOMoneyRequestSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save(ngo=request.user)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_ngo_money_requests(request):
+    if not request.user.is_ngo:
+        return Response({
+            'error': 'Only NGOs can view their money requests'
+        }, status=status.HTTP_403_FORBIDDEN)
+
+    requests = NGOMoneyRequest.objects.filter(ngo=request.user).order_by('-created_at')
+    serializer = NGOMoneyRequestSerializer(requests, many=True)
+    return Response(serializer.data)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_all_money_requests(request):
+    if not request.user.is_superuser:
+        return Response({
+            'error': 'Only admin can view all money requests'
+        }, status=status.HTTP_403_FORBIDDEN)
+
+    status_filter = request.GET.get('status', None)
+    if status_filter:
+        requests = NGOMoneyRequest.objects.filter(status=status_filter)
+    else:
+        requests = NGOMoneyRequest.objects.all()
+    
+    requests = requests.order_by('-created_at')
+    serializer = NGOMoneyRequestSerializer(requests, many=True)
+    return Response(serializer.data)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_money_request_details(request, request_id):
+    try:
+        money_request = NGOMoneyRequest.objects.get(id=request_id)
+        
+        # Check if user has permission to view this request
+        if not (request.user.is_staff or request.user == money_request.ngo):
+            return Response({
+                'error': 'You do not have permission to view this request'
+            }, status=status.HTTP_403_FORBIDDEN)
+            
+        serializer = NGOMoneyRequestSerializer(money_request)
+        return Response(serializer.data)
+        
+    except NGOMoneyRequest.DoesNotExist:
+        return Response({
+            'error': 'Money request not found'
+        }, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_money_request_status(request, request_id):
+    if not request.user.is_superuser:
+        return Response({
+            'error': 'Only admin can update money request status'
+        }, status=status.HTTP_403_FORBIDDEN)
+
+    try:
+        money_request = NGOMoneyRequest.objects.get(id=request_id)
+        new_status = request.data.get('status')
+        admin_notes = request.data.get('admin_notes', '')
+        
+        valid_transitions = {
+            'pending': ['approved', 'rejected', 'cancelled'],
+            'approved': ['transferred', 'cancelled'],
+            'rejected': ['pending'],
+            'cancelled': ['pending'],
+            'transferred': []  # No further transitions allowed
+        }
+        
+        if new_status not in valid_transitions.get(money_request.status, []):
+            return Response({
+                'error': f'Invalid status transition from {money_request.status} to {new_status}'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        money_request.status = new_status
+        money_request.admin_notes = admin_notes
+        
+        if new_status == 'transferred':
+            money_request.transfer_date = timezone.now()
+            money_request.transfer_reference = request.data.get('transfer_reference')
+            
+        money_request.save()
+        
+        # Create an update record
+        NGOMoneyRequestUpdate.objects.create(
+            money_request=money_request,
+            message=f"Status updated to {new_status}. {admin_notes}",
+            created_by=request.user
+        )
+        
+        serializer = NGOMoneyRequestSerializer(money_request)
+        return Response(serializer.data)
+        
+    except NGOMoneyRequest.DoesNotExist:
+        return Response({
+            'error': 'Money request not found'
+        }, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def add_money_request_update(request, request_id):
+    try:
+        money_request = NGOMoneyRequest.objects.get(id=request_id)
+        
+        # Check if user has permission to add updates
+        if not (request.user.is_staff or request.user == money_request.ngo):
+            return Response({
+                'error': 'You do not have permission to add updates to this request'
+            }, status=status.HTTP_403_FORBIDDEN)
+            
+        serializer = NGOMoneyRequestUpdateSerializer(data={
+            'money_request': request_id,
+            'message': request.data.get('message'),
+            'created_by': request.user.id
+        })
+        
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+    except NGOMoneyRequest.DoesNotExist:
+        return Response({
+            'error': 'Money request not found'
+        }, status=status.HTTP_404_NOT_FOUND) 

@@ -63,7 +63,7 @@ const Login = ({ setIslogin }) => {
       // Redirect based on user role
       if (response.data.user.is_active) {
         if (response.data.user.is_superuser) {
-          navigate('/admin/admin'); 
+          navigate('/admin'); 
         } else if (response.data.user.is_shg) {
           navigate('/shg'); 
         } else if (response.data.user.is_ngo) { // Add check for NGO role

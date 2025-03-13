@@ -10,6 +10,7 @@ import axios from 'axios';
 import RequestsManagement from './components/RequestsManagement';
 import NGOManagement from './components/NGOManagement';
 import UserManagement from './components/UserManagement';
+import MoneyRequestManagement from './components/MoneyRequestManagement';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
@@ -19,7 +20,13 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [dashboardData, setDashboardData] = useState({
     requestStats: [],
-    monthlyActivity: []
+    monthlyActivity: [],
+    moneyRequests: {
+      pending: 0,
+      approved: 0,
+      transferred: 0,
+      total: 0
+    }
   });
   const [metrics, setMetrics] = useState({
     total_food: 0,
@@ -29,21 +36,43 @@ const AdminDashboard = () => {
   });
 
   useEffect(() => {
-    fetchDashboardData();
-    fetchMetrics();
-  }, []);
+    if (activeSection === 'dashboard') {
+      fetchDashboardData();
+      fetchMetrics();
+    }
+  }, [activeSection]);
 
   const fetchDashboardData = async () => {
     try {
       const token = localStorage.getItem('authToken');
       const headers = { Authorization: `Bearer ${token}` };
 
-      const [foodRes, schoolRes, bookRes, groceryRes] = await Promise.all([
+      // Separate money request fetch to handle it specifically
+      const moneyRequestPromise = axios.get('http://127.0.0.1:8000/api/v1/donations/ngo/money-request/all/', { headers })
+        .catch(error => {
+          console.error('Error fetching money requests:', error);
+          return { data: [] }; // Return empty array on error
+        });
+
+      const [foodRes, schoolRes, bookRes, groceryRes, moneyRes] = await Promise.all([
         axios.get('http://127.0.0.1:8000/api/v1/food/all/', { headers }),
         axios.get('http://127.0.0.1:8000/api/v1/school-supplies/all/', { headers }),
         axios.get('http://127.0.0.1:8000/api/v1/book/all/', { headers }),
-        axios.get('http://127.0.0.1:8000/api/v1/grocery/all/', { headers })
+        axios.get('http://127.0.0.1:8000/api/v1/grocery/all/', { headers }),
+        moneyRequestPromise
       ]);
+
+      console.log('Money requests response:', moneyRes.data); // Debug log
+
+      // Process money requests with null check
+      const moneyStats = {
+        pending: moneyRes.data?.filter(r => r.status === 'pending')?.length || 0,
+        approved: moneyRes.data?.filter(r => r.status === 'approved')?.length || 0,
+        transferred: moneyRes.data?.filter(r => r.status === 'transferred')?.length || 0,
+        total: moneyRes.data?.length || 0
+      };
+
+      console.log('Processed money stats:', moneyStats); // Debug log
 
       setDashboardData({
         requestStats: [
@@ -52,18 +81,49 @@ const AdminDashboard = () => {
           { name: 'Books', value: bookRes.data.length },
           { name: 'Grocery', value: groceryRes.data.length }
         ],
-        monthlyActivity: processMonthlyData([...foodRes.data, ...schoolRes.data, ...bookRes.data, ...groceryRes.data])
+        monthlyActivity: processMonthlyData([...foodRes.data, ...schoolRes.data, ...bookRes.data, ...groceryRes.data]),
+        moneyRequests: moneyStats
       });
       setLoading(false);
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
+      // Set default values on error
+      setDashboardData(prevState => ({
+        ...prevState,
+        moneyRequests: {
+          pending: 0,
+          approved: 0,
+          transferred: 0,
+          total: 0
+        }
+      }));
       setLoading(false);
     }
   };
 
   const processMonthlyData = (requests) => {
-    // Process requests to get monthly statistics
-    // Implementation here
+    // Group requests by month
+    const monthlyData = requests.reduce((acc, request) => {
+      const date = new Date(request.created_at);
+      const monthYear = date.toLocaleString('default', { month: 'short', year: 'numeric' });
+      
+      if (!acc[monthYear]) {
+        acc[monthYear] = {
+          name: monthYear,
+          requests: 0,
+          completed: 0
+        };
+      }
+      
+      acc[monthYear].requests++;
+      if (request.status === 'distributed') {
+        acc[monthYear].completed++;
+      }
+      
+      return acc;
+    }, {});
+
+    return Object.values(monthlyData);
   };
 
   const fetchMetrics = async () => {
@@ -85,19 +145,33 @@ const AdminDashboard = () => {
         {/* Statistics Cards */}
         <Grid item xs={12} md={3}>
           <Card>
-          <CardContent>
+            <CardContent>
               <Typography variant="h6">Total Requests</Typography>
               <Typography variant="h4">
                 {dashboardData.requestStats.reduce((acc, curr) => acc + curr.value, 0)}
-                </Typography>
-          </CardContent>
-        </Card>
-      </Grid>
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        <Grid item xs={12} md={3}>
+          <Card>
+            <CardContent>
+              <Typography variant="h6">Money Requests</Typography>
+              <Typography variant="h4">{dashboardData.moneyRequests.total}</Typography>
+              <Typography variant="body2" color="textSecondary">
+                Pending: {dashboardData.moneyRequests.pending} | 
+                Approved: {dashboardData.moneyRequests.approved} |
+                Transferred: {dashboardData.moneyRequests.transferred}
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
 
         {/* Request Distribution Chart */}
         <Grid item xs={12} md={6}>
           <Card>
-          <CardContent>
+            <CardContent>
               <Typography variant="h6">Request Distribution</Typography>
               <PieChart width={400} height={300}>
                 <Pie
@@ -105,45 +179,45 @@ const AdminDashboard = () => {
                   cx="50%"
                   cy="50%"
                   outerRadius={100}
-                    fill="#8884d8"
-                    dataKey="value"
+                  fill="#8884d8"
+                  dataKey="value"
                   label
-                  >
+                >
                   {dashboardData.requestStats.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                  <Legend />
-                </PieChart>
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+                <Legend />
+              </PieChart>
             </CardContent>
           </Card>
-          </Grid>
+        </Grid>
 
         {/* Monthly Activity Chart */}
         <Grid item xs={12}>
           <Card>
             <CardContent>
               <Typography variant="h6">Monthly Activity</Typography>
-                <BarChart
+              <BarChart
                 width={800}
                 height={300}
                 data={dashboardData.monthlyActivity}
                 margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
+              >
+                <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
+                <YAxis />
+                <Tooltip />
+                <Legend />
                 <Bar dataKey="requests" fill="#8884d8" name="Total Requests" />
                 <Bar dataKey="completed" fill="#82ca9d" name="Completed" />
-                </BarChart>
+              </BarChart>
             </CardContent>
           </Card>
         </Grid>
       </Grid>
-      </Box>
+    </Box>
   );
 
   const renderContent = () => {
@@ -155,6 +229,8 @@ const AdminDashboard = () => {
       case 'book-requests':
       case 'grocery-requests':
         return <RequestsManagement type={activeSection} />;
+      case 'money-requests':
+        return <MoneyRequestManagement />;
       case 'pending-ngos':
       case 'approved-ngos':
         return <NGOManagement type={activeSection} />;
@@ -237,7 +313,7 @@ const AdminDashboard = () => {
   };
 
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box sx={{ display: 'flex', height: '100vh' }}>
       <Header />
       <AdminSidebar 
         activeSection={activeSection}
@@ -245,10 +321,25 @@ const AdminDashboard = () => {
         expandedMenu={expandedMenu}
         setExpandedMenu={setExpandedMenu}
       />
-      <Box component="main" sx={{ flexGrow: 1, p: 3, mt: 8 }}>
-        {loading ? <CircularProgress /> : renderContent()}
+      <Box 
+        component="main" 
+        sx={{ 
+          flexGrow: 1, 
+          p: 3, 
+          mt: 8,
+          overflow: 'auto',
+          height: 'calc(100vh - 64px)' // Subtract AppBar height
+        }}
+      >
+        {loading && activeSection === 'dashboard' ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+            <CircularProgress />
+          </Box>
+        ) : (
+          renderContent()
+        )}
       </Box>
-      </Box>
+    </Box>
   );
 };
 

@@ -272,4 +272,37 @@ def submit_book_distribution_feedback(request, plan_id):
     except BookDistributionPlan.DoesNotExist:
         return Response({
             'error': 'Distribution plan not found'
+        }, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def start_book_distribution(request, plan_id):
+    try:
+        distribution_plan = BookDistributionPlan.objects.get(id=plan_id)
+        
+        # Verify current status is 'planned'
+        if distribution_plan.status != 'planned':
+            return Response({
+                'error': 'Distribution must be in planned status to start'
+            }, status=status.HTTP_400_BAD_REQUEST)
+            
+        # Update status to in_progress
+        distribution_plan.status = 'in_progress'
+        distribution_plan.save()
+        
+        # Award points for starting distribution
+        award_points(
+            request.user,
+            5,  # Points for starting distribution
+            f'Started book distribution #{plan_id}'
+        )
+        
+        return Response({
+            'message': 'Distribution started successfully',
+            'status': distribution_plan.status
+        })
+        
+    except BookDistributionPlan.DoesNotExist:
+        return Response({
+            'error': 'Distribution plan not found'
         }, status=status.HTTP_404_NOT_FOUND) 
