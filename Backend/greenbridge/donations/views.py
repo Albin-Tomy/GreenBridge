@@ -8,6 +8,9 @@ import razorpay
 from django.conf import settings
 import json
 from django.utils import timezone
+from rest_framework import viewsets, serializers
+from rest_framework.decorators import action
+from NGOs.models import NGOProfile
 
 # Initialize Razorpay client
 razorpay_client = razorpay.Client(auth=(settings.RAZORPAY_API_KEY, settings.RAZORPAY_API_SECRET))
@@ -235,4 +238,89 @@ def add_money_request_update(request, request_id):
     except NGOMoneyRequest.DoesNotExist:
         return Response({
             'error': 'Money request not found'
-        }, status=status.HTTP_404_NOT_FOUND) 
+        }, status=status.HTTP_404_NOT_FOUND)
+
+class NGOMoneyRequestViewSet(viewsets.ModelViewSet):
+    serializer_class = NGOMoneyRequestSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return NGOMoneyRequest.objects.filter(ngo=self.request.user)
+
+    def perform_create(self, serializer):
+        # Get the NGO user
+        ngo = self.request.user
+
+        # Check if NGO profile exists and has bank details
+        try:
+            profile = NGOProfile.objects.get(registration__email=ngo.email)
+            if not all([
+                profile.bank_account_name,
+                profile.bank_account_number,
+                profile.bank_name,
+                profile.bank_branch,
+                profile.ifsc_code
+            ]):
+                raise serializers.ValidationError({
+                    'bank_details': 'Please complete your NGO profile with all bank details before submitting a money request.'
+                })
+        except NGOProfile.DoesNotExist:
+            raise serializers.ValidationError({
+                'profile': 'NGO profile not found. Please complete your profile before submitting a money request.'
+            })
+
+        # Save the money request with the NGO user
+        serializer.save(ngo=ngo)
+
+    @action(detail=True, methods=['post'])
+    def update_status(self, request, pk=None):
+        if not request.user.is_superuser:
+            return Response(
+                {'error': 'Only admin can update request status'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        money_request = self.get_object()
+        new_status = request.data.get('status')
+        
+        if new_status not in dict(NGOMoneyRequest.STATUS_CHOICES):
+            return Response(
+                {'error': 'Invalid status'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        money_request.status = new_status
+        if new_status == 'transferred':
+            money_request.transfer_reference = request.data.get('transfer_reference')
+            money_request.transfer_date = timezone.now()
+        
+        money_request.admin_notes = request.data.get('admin_notes', '')
+        money_request.save()
+
+        # Create status update record
+        NGOMoneyRequestUpdate.objects.create(
+            money_request=money_request,
+            message=f"Status updated to {new_status}",
+            created_by=request.user
+        )
+
+        return Response(self.get_serializer(money_request).data)
+
+    @action(detail=True, methods=['get'])
+    def updates(self, request, pk=None):
+        money_request = self.get_object()
+        updates = NGOMoneyRequestUpdate.objects.filter(money_request=money_request)
+        serializer = NGOMoneyRequestUpdateSerializer(updates, many=True)
+        return Response(serializer.data)
+
+class NGOMoneyRequestUpdateViewSet(viewsets.ModelViewSet):
+    serializer_class = NGOMoneyRequestUpdateSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return NGOMoneyRequestUpdate.objects.filter(
+            money_request__ngo=self.request.user
+        ) if self.request.user.is_ngo else NGOMoneyRequestUpdate.objects.all()
+
+    def perform_create(self, serializer):
+        serializer.save(created_by=self.request.user) 

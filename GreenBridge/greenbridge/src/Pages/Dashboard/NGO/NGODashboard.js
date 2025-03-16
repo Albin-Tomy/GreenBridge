@@ -32,12 +32,14 @@ import MenuBookIcon from '@mui/icons-material/MenuBook';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import SchoolIcon from '@mui/icons-material/School';
 import MoneyIcon from '@mui/icons-material/Money';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import Header from '../../../components/Navbar';
 import axios from 'axios';
 import { format } from 'date-fns';
 import NGODistributionDetails from '../../Distribution/NGODistributionDetails';
 import NGOMoneyRequestForm from '../../NGO/NGOMoneyRequestForm';
 import NGOMoneyRequestList from '../../NGO/NGOMoneyRequestList';
+import NGOProfile from './NGOProfile';
 
 const drawerWidth = 240;
 
@@ -116,6 +118,7 @@ const NGODashboard = () => {
     const [selectedDistribution, setSelectedDistribution] = useState(null);
     const [error, setError] = useState(null);
     const [showMoneyRequestForm, setShowMoneyRequestForm] = useState(false);
+    const [showProfile, setShowProfile] = useState(false);
 
     useEffect(() => {
         if (activeTab !== 4) {
@@ -403,6 +406,10 @@ const NGODashboard = () => {
     ];
 
     const renderContent = () => {
+        if (showProfile) {
+            return <NGOProfile />;
+        }
+
         if (activeTab === 4) {
             return (
                 <Box>
@@ -525,12 +532,33 @@ const NGODashboard = () => {
                     },
                 }}
             >
-                <Box sx={{ px: 2, py: 2 }}>  <br></br>
+                <Box sx={{ px: 2, py: 2 }}>
+                    <List>
+                        <ListItem disablePadding sx={{ mb: 2 }}>
+                            <ListItemButton
+                                onClick={() => {
+                                    setShowProfile(true);
+                                    setActiveTab(-1);
+                                }}
+                                selected={showProfile}
+                                sx={{
+                                    borderRadius: 1,
+                                    '&.Mui-selected': {
+                                        backgroundColor: 'primary.light',
+                                        color: 'primary.contrastText',
+                                    }
+                                }}
+                            >
+                                <AccountCircleIcon sx={{ mr: 2 }} />
+                                <ListItemText primary="NGO Profile" />
+                            </ListItemButton>
+                        </ListItem>
+                    </List>
+                    <Divider sx={{ mb: 2 }} />
                     <Typography variant="h6" sx={{ mb: 2 }}>
                         Filter by Status
                     </Typography>
-                    <Divider sx={{ mb: 2 }} />
-                    {activeTab !== 4 && (
+                    {activeTab !== 4 && !showProfile && (
                         <List>
                             {filterButtons.map((btn) => (
                                 <ListItem 
@@ -591,46 +619,51 @@ const NGODashboard = () => {
                         width: '100%'
                     }}
                 >
-                    <Tabs 
-                        value={activeTab} 
-                        onChange={(e, newValue) => {
-                            setActiveTab(newValue);
-                            setFilter('all');
-                        }}
-                        sx={{ mb: 3 }}
-                    >
-                        <Tab 
-                            icon={<RestaurantIcon />} 
-                            label="Food Requests" 
-                            iconPosition="start"
-                        />
-                        <Tab 
-                            icon={<ShoppingBasketIcon />} 
-                            label="Grocery Requests" 
-                            iconPosition="start"
-                        />
-                        <Tab 
-                            icon={<MenuBookIcon />} 
-                            label="Book Requests" 
-                            iconPosition="start"
-                        />
-                        <Tab 
-                            icon={<SchoolIcon />} 
-                            label="School Supplies" 
-                            iconPosition="start"
-                        />
-                        <Tab 
-                            icon={<MoneyIcon />} 
-                            label="Money Requests" 
-                            iconPosition="start"
-                        />
-                    </Tabs>
+                    {!showProfile && (
+                        <Tabs 
+                            value={activeTab} 
+                            onChange={(e, newValue) => {
+                                setActiveTab(newValue);
+                                setFilter('all');
+                                setShowProfile(false);
+                            }}
+                            sx={{ mb: 3 }}
+                        >
+                            <Tab 
+                                icon={<RestaurantIcon />} 
+                                label="Food Requests" 
+                                iconPosition="start"
+                            />
+                            <Tab 
+                                icon={<ShoppingBasketIcon />} 
+                                label="Grocery Requests" 
+                                iconPosition="start"
+                            />
+                            <Tab 
+                                icon={<MenuBookIcon />} 
+                                label="Book Requests" 
+                                iconPosition="start"
+                            />
+                            <Tab 
+                                icon={<SchoolIcon />} 
+                                label="School Supplies" 
+                                iconPosition="start"
+                            />
+                            <Tab 
+                                icon={<MoneyIcon />} 
+                                label="Money Requests" 
+                                iconPosition="start"
+                            />
+                        </Tabs>
+                    )}
 
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-                        <Typography variant="h4" gutterBottom>
-                            {activeTab === 4 ? 'Money Requests' : getRequestTypeTitle()}
-                        </Typography>
-                    </Box>
+                    {!showProfile && (
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+                            <Typography variant="h4" gutterBottom>
+                                {activeTab === 4 ? 'Money Requests' : getRequestTypeTitle()}
+                            </Typography>
+                        </Box>
+                    )}
                     
                     {renderContent()}
                 </Box>

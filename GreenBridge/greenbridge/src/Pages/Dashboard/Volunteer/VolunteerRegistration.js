@@ -216,7 +216,7 @@ const VolunteerRegistration = () => {
                     {message && <div className="success-message">{message}</div>}
                     {error && <div className="error-message">{error}</div>}
 
-                    <button type="submit" className="submit-btn">
+                    <button type="submit" id="submit" className="submit-btn">
                         Register as Volunteer
                     </button>
                 </form>

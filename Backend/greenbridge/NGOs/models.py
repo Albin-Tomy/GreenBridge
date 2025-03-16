@@ -23,6 +23,19 @@ class NGOProfile(models.Model):
     contact_phone = models.CharField(max_length=20)
     address = models.TextField()
     website = models.URLField(blank=True, null=True)
+    
+    # Bank Details
+    bank_account_name = models.CharField(max_length=255, null=True, blank=True)
+    bank_account_number = models.CharField(max_length=50, null=True, blank=True)
+    bank_name = models.CharField(max_length=255, null=True, blank=True)
+    bank_branch = models.CharField(max_length=255, null=True, blank=True)
+    ifsc_code = models.CharField(max_length=20, null=True, blank=True)
+    
+    # Documents
+    registration_certificate = models.FileField(upload_to='ngo_documents/registration/', null=True, blank=True)
+    tax_exemption_certificate = models.FileField(upload_to='ngo_documents/tax/', null=True, blank=True)
+    annual_report = models.FileField(upload_to='ngo_documents/reports/', null=True, blank=True)
+    
     created_at = models.DateTimeField(auto_now_add=True)
     approved_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='approved_ngos')
 

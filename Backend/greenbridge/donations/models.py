@@ -59,14 +59,32 @@ class NGOMoneyRequest(models.Model):
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     purpose = models.CharField(max_length=50, choices=PURPOSE_CHOICES)
     description = models.TextField()
-    supporting_documents = models.FileField(upload_to='ngo_money_requests/', null=True, blank=True)
     
-    # Bank Details
-    bank_account_name = models.CharField(max_length=255)
-    bank_account_number = models.CharField(max_length=50)
-    bank_name = models.CharField(max_length=255)
-    bank_branch = models.CharField(max_length=255)
-    ifsc_code = models.CharField(max_length=20)
+    # Supporting Documents
+    necessity_certificate = models.FileField(
+        upload_to='ngo_money_requests/certificates/',
+        null=True,  # Make it optional in database
+        blank=True,  # Make it optional in forms
+        help_text='Upload certificate proving necessity of funds (Required for new requests)'
+    )
+    project_proposal = models.FileField(
+        upload_to='ngo_money_requests/proposals/',
+        null=True,
+        blank=True,
+        help_text='Project proposal if applicable'
+    )
+    budget_document = models.FileField(
+        upload_to='ngo_money_requests/budgets/',
+        null=True,  # Make it optional in database
+        blank=True,  # Make it optional in forms
+        help_text='Detailed budget breakdown (Required for new requests)'
+    )
+    additional_documents = models.FileField(
+        upload_to='ngo_money_requests/additional/',
+        null=True,
+        blank=True,
+        help_text='Any additional supporting documents'
+    )
     
     # Status and Admin Response
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')

@@ -61,30 +61,55 @@ const FoodRequestForm = () => {
         // Get current date and time
         const now = new Date();
         const expiryTime = new Date(formData.expiry_time);
+        const oneWeekFromNow = new Date();
+        oneWeekFromNow.setDate(oneWeekFromNow.getDate() + 7);
 
-        if (expiryTime < now) {
-            tempErrors.expiry_time = 'Best before time must be in the future';
+        // Check if all fields are filled
+        if (!formData.food_type.trim()) {
+            tempErrors.food_type = 'Food type is required';
             isValid = false;
         }
 
-        if (formData.food_type.trim() === '') {
-            tempErrors.food_type = 'Please select a food type';
+        if (!formData.quantity) {
+            tempErrors.quantity = 'Quantity is required';
             isValid = false;
-        }
-
-        if (formData.quantity <= 0) {
+        } else if (formData.quantity <= 0) {
             tempErrors.quantity = 'Quantity must be greater than 0';
             isValid = false;
         }
 
-        if (formData.pickup_address.trim().length < 10) {
+        if (!formData.expiry_time) {
+            tempErrors.expiry_time = 'Best before time is required';
+            isValid = false;
+        } else if (expiryTime < now) {
+            tempErrors.expiry_time = 'Best before time must be in the future';
+            isValid = false;
+        } else if (expiryTime > oneWeekFromNow) {
+            tempErrors.expiry_time = 'Best before time must be within one week from now';
+            isValid = false;
+        }
+
+        if (!formData.pickup_address) {
+            tempErrors.pickup_address = 'Pickup address is required';
+            isValid = false;
+        } else if (formData.pickup_address.trim().length < 10) {
             tempErrors.pickup_address = 'Please provide a detailed pickup address (minimum 10 characters)';
             isValid = false;
         }
 
-        const phoneRegex = /^[0-9]{10}$/;
-        if (!phoneRegex.test(formData.contact_number)) {
-            tempErrors.contact_number = 'Please enter a valid 10-digit contact number';
+        if (!formData.contact_number) {
+            tempErrors.contact_number = 'Contact number is required';
+            isValid = false;
+        } else {
+            const phoneRegex = /^[0-9]{10}$/;
+            if (!phoneRegex.test(formData.contact_number)) {
+                tempErrors.contact_number = 'Please enter a valid 10-digit contact number';
+                isValid = false;
+            }
+        }
+
+        if (!formData.additional_notes.trim()) {
+            tempErrors.additional_notes = 'Additional notes are required';
             isValid = false;
         }
 
@@ -98,6 +123,7 @@ const FoodRequestForm = () => {
         setSuccess('');
 
         if (!validateForm()) {
+            setGeneralError('Please fill in all required fields correctly');
             return;
         }
 
@@ -174,12 +200,13 @@ const FoodRequestForm = () => {
             <Header />
             <div className="food-request-container">
                 <h2>Food Redistribution Request</h2>
+                <p className="form-instruction">All fields are mandatory. Best before time must be within one week.</p>
                 <form onSubmit={handleSubmit} className="food-request-form">
                     {generalError && <div className="error-message">{generalError}</div>}
                     {success && <div className="success-message">{success}</div>}
                     
                     <div className="form-group">
-                        <label htmlFor="food_type">Food Type</label>
+                        <label htmlFor="food_type">Food Type *</label>
                         <select
                             id="food_type"
                             name="food_type"
@@ -198,7 +225,7 @@ const FoodRequestForm = () => {
                     </div>
 
                     <div className="form-group">
-                        <label htmlFor="quantity">Quantity (in kg/liters)</label>
+                        <label htmlFor="quantity">Quantity (in kg/liters) *</label>
                         <input
                             type="number"
                             id="quantity"
@@ -213,7 +240,7 @@ const FoodRequestForm = () => {
                     </div>
 
                     <div className="form-group">
-                        <label htmlFor="expiry_time">Best Before Time</label>
+                        <label htmlFor="expiry_time">Best Before Time *</label>
                         <input
                             type="datetime-local"
                             id="expiry_time"
@@ -221,26 +248,29 @@ const FoodRequestForm = () => {
                             value={formData.expiry_time}
                             onChange={handleChange}
                             required
+                            min={new Date().toISOString().slice(0, 16)}
+                            max={new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 16)}
                             className={errors.expiry_time ? 'error-input' : ''}
                         />
                         {errors.expiry_time && <div className="error-text">{errors.expiry_time}</div>}
                     </div>
 
                     <div className="form-group">
-                        <label htmlFor="pickup_address">Pickup Address</label>
+                        <label htmlFor="pickup_address">Pickup Address *</label>
                         <textarea
                             id="pickup_address"
                             name="pickup_address"
                             value={formData.pickup_address}
                             onChange={handleChange}
                             required
+                            placeholder="Enter detailed pickup address (minimum 10 characters)"
                             className={errors.pickup_address ? 'error-input' : ''}
                         />
                         {errors.pickup_address && <div className="error-text">{errors.pickup_address}</div>}
                     </div>
 
                     <div className="form-group">
-                        <label htmlFor="contact_number">Contact Number</label>
+                        <label htmlFor="contact_number">Contact Number *</label>
                         <input
                             type="tel"
                             id="contact_number"
@@ -248,6 +278,7 @@ const FoodRequestForm = () => {
                             value={formData.contact_number}
                             onChange={handleChange}
                             required
+                            placeholder="Enter 10-digit contact number"
                             pattern="[0-9]{10}"
                             title="Please enter a valid 10-digit phone number"
                             className={errors.contact_number ? 'error-input' : ''}
@@ -256,12 +287,14 @@ const FoodRequestForm = () => {
                     </div>
 
                     <div className="form-group">
-                        <label htmlFor="additional_notes">Additional Notes</label>
+                        <label htmlFor="additional_notes">Additional Notes *</label>
                         <textarea
                             id="additional_notes"
                             name="additional_notes"
                             value={formData.additional_notes}
                             onChange={handleChange}
+                            required
+                            placeholder="Enter any additional information about the food"
                             className={errors.additional_notes ? 'error-input' : ''}
                         />
                         {errors.additional_notes && <div className="error-text">{errors.additional_notes}</div>}

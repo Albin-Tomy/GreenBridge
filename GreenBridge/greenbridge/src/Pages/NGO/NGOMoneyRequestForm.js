@@ -1,331 +1,457 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Box,
-    Button,
-    TextField,
-    MenuItem,
-    Typography,
+    Container,
     Paper,
+    Typography,
+    TextField,
+    Button,
     Grid,
-    CircularProgress,
+    MenuItem,
     Alert,
-    FormControl,
-    InputLabel,
-    Select,
-    FormHelperText
+    CircularProgress,
+    Card,
+    CardContent
 } from '@mui/material';
+import { Upload as UploadIcon } from '@mui/icons-material';
 import axios from 'axios';
 
 const NGOMoneyRequestForm = () => {
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
+    const [ngoProfile, setNgoProfile] = useState(null);
     const [formData, setFormData] = useState({
         amount: '',
         purpose: '',
         description: '',
-        bank_account_name: '',
-        bank_account_number: '',
-        bank_name: '',
-        bank_branch: '',
-        ifsc_code: '',
+        necessity_certificate: null,
+        project_proposal: null,
+        budget_document: null,
+        additional_documents: null
     });
 
-    const [errors, setErrors] = useState({});
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
-    const [success, setSuccess] = useState(false);
+    useEffect(() => {
+        fetchNGOProfile();
+    }, []);
 
-    const PURPOSE_CHOICES = [
-        { value: 'operational_costs', label: 'Operational Costs' },
-        { value: 'emergency_relief', label: 'Emergency Relief' },
-        { value: 'project_funding', label: 'Project Funding' },
-        { value: 'infrastructure', label: 'Infrastructure Development' },
-        { value: 'education_program', label: 'Education Program' },
-        { value: 'healthcare_program', label: 'Healthcare Program' },
-        { value: 'food_distribution', label: 'Food Distribution Program' },
-        { value: 'other', label: 'Other' }
-    ];
+    const fetchNGOProfile = async () => {
+        try {
+            const token = localStorage.getItem('authToken');
+            const response = await axios.get('http://127.0.0.1:8000/api/v1/ngo/profile/', {
+                headers: { Authorization: `Bearer ${token}` }
+            });
 
-    const validateForm = () => {
-        const newErrors = {};
-
-        // Amount validation
-        if (!formData.amount) {
-            newErrors.amount = 'Amount is required';
-        } else if (isNaN(formData.amount)) {
-            newErrors.amount = 'Amount must be a number';
-        } else if (parseFloat(formData.amount) <= 0) {
-            newErrors.amount = 'Amount must be greater than 0';
-        } else if (parseFloat(formData.amount) > 1000000) {
-            newErrors.amount = 'Amount cannot exceed ₹10,00,000';
+            setNgoProfile(response.data);
+            setError(''); // Clear any existing errors
+            setLoading(false);
+        } catch (error) {
+            console.error('Profile fetch error:', error.response?.data || error);
+            setError('Failed to fetch NGO profile.');
+            setNgoProfile(null);
+            setLoading(false);
         }
-
-        // Purpose validation
-        if (!formData.purpose) {
-            newErrors.purpose = 'Purpose is required';
-        }
-
-        // Description validation
-        if (!formData.description) {
-            newErrors.description = 'Description is required';
-        } else if (formData.description.length < 50) {
-            newErrors.description = 'Description must be at least 50 characters';
-        } else if (formData.description.length > 1000) {
-            newErrors.description = 'Description cannot exceed 1000 characters';
-        }
-
-        // Bank account name validation
-        if (!formData.bank_account_name) {
-            newErrors.bank_account_name = 'Account holder name is required';
-        } else if (formData.bank_account_name.length < 3) {
-            newErrors.bank_account_name = 'Account holder name must be at least 3 characters';
-        }
-
-        // Bank account number validation
-        if (!formData.bank_account_number) {
-            newErrors.bank_account_number = 'Account number is required';
-        } else if (!/^\d{9,18}$/.test(formData.bank_account_number)) {
-            newErrors.bank_account_number = 'Enter a valid account number (9-18 digits)';
-        }
-
-        // Bank name validation
-        if (!formData.bank_name) {
-            newErrors.bank_name = 'Bank name is required';
-        } else if (formData.bank_name.length < 3) {
-            newErrors.bank_name = 'Bank name must be at least 3 characters';
-        }
-
-        // Branch name validation
-        if (!formData.bank_branch) {
-            newErrors.bank_branch = 'Branch name is required';
-        }
-
-        // IFSC code validation
-        if (!formData.ifsc_code) {
-            newErrors.ifsc_code = 'IFSC code is required';
-        } else if (!/^[A-Z]{4}0[A-Z0-9]{6}$/.test(formData.ifsc_code)) {
-            newErrors.ifsc_code = 'Enter a valid IFSC code (e.g., HDFC0123456)';
-        }
-
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
     };
 
-    const handleChange = (e) => {
+    const validateForm = () => {
+        // Check required basic fields
+        if (!formData.amount || isNaN(formData.amount) || parseFloat(formData.amount) <= 0) {
+            setError('Please enter a valid amount greater than 0');
+            return false;
+        }
+        if (!formData.purpose || !formData.purpose.trim()) {
+            setError('Please select a valid purpose');
+            return false;
+        }
+        if (!formData.description || !formData.description.trim()) {
+            setError('Please provide a detailed description');
+            return false;
+        }
+
+        // Check required documents
+        if (!formData.necessity_certificate) {
+            setError('Please upload the Necessity Certificate (Required)');
+            return false;
+        }
+        if (!formData.budget_document) {
+            setError('Please upload the Budget Document (Required)');
+            return false;
+        }
+
+        return true;
+    };
+
+    const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({
             ...prev,
             [name]: value
         }));
+    };
 
-        // Clear error when user starts typing
-        if (errors[name]) {
-            setErrors(prev => ({
-                ...prev,
-                [name]: ''
-            }));
-        }
+    const handleFileChange = (e) => {
+        const { name, files } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [name]: files[0]
+        }));
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError(null);
-        setSuccess(false);
+        setError('');
+        setSuccess('');
 
-        if (!validateForm()) {
-            return;
-        }
-
-        setLoading(true);
+        if (!validateForm()) return;
 
         try {
             const token = localStorage.getItem('authToken');
-            await axios.post(
-                'http://127.0.0.1:8000/api/v1/donations/ngo/money-request/create/',
-                formData,
+            const formDataToSend = new FormData();
+            
+            // Append basic fields with proper type conversion and validation
+            const amount = parseFloat(formData.amount);
+            if (isNaN(amount) || amount <= 0) {
+                setError('Please enter a valid amount greater than 0');
+                return;
+            }
+            formDataToSend.append('amount', amount.toString());
+            
+            if (!formData.purpose || !formData.purpose.trim()) {
+                setError('Please select a valid purpose');
+                return;
+            }
+            formDataToSend.append('purpose', formData.purpose.trim());
+            
+            if (!formData.description || !formData.description.trim()) {
+                setError('Please provide a detailed description');
+                return;
+            }
+            formDataToSend.append('description', formData.description.trim());
+
+            // Validate and append required documents
+            if (!(formData.necessity_certificate instanceof File)) {
+                setError('Please upload the Necessity Certificate (Required)');
+                return;
+            }
+            formDataToSend.append('necessity_certificate', formData.necessity_certificate);
+
+            if (!(formData.budget_document instanceof File)) {
+                setError('Please upload the Budget Document (Required)');
+                return;
+            }
+            formDataToSend.append('budget_document', formData.budget_document);
+
+            // Append optional documents only if they exist and are valid files
+            if (formData.project_proposal instanceof File) {
+                formDataToSend.append('project_proposal', formData.project_proposal);
+            }
+            if (formData.additional_documents instanceof File) {
+                formDataToSend.append('additional_documents', formData.additional_documents);
+            }
+
+            const response = await axios.post(
+                'http://127.0.0.1:8000/api/v1/donations/money-requests/',
+                formDataToSend,
                 {
-                    headers: { Authorization: `Bearer ${token}` }
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'multipart/form-data'
+                    }
                 }
             );
 
-            setSuccess(true);
-            setFormData({
-                amount: '',
-                purpose: '',
-                description: '',
-                bank_account_name: '',
-                bank_account_number: '',
-                bank_name: '',
-                bank_branch: '',
-                ifsc_code: '',
-            });
-            setErrors({});
-        } catch (err) {
-            setError(err.response?.data?.error || 'Failed to submit request. Please try again.');
-        } finally {
-            setLoading(false);
+            if (response.status === 201) {
+                setSuccess('Money request submitted successfully! Your request is now pending approval.');
+                // Reset form data
+                setFormData({
+                    amount: '',
+                    purpose: '',
+                    description: '',
+                    necessity_certificate: null,
+                    project_proposal: null,
+                    budget_document: null,
+                    additional_documents: null
+                });
+            }
+        } catch (error) {
+            console.error('Submission error:', error);
+            
+            // Handle different types of error responses
+            if (error.response?.data) {
+                const errorData = error.response.data;
+                if (typeof errorData === 'string') {
+                    setError(errorData);
+                } else if (typeof errorData === 'object') {
+                    // Handle non_field_errors specially
+                    if (errorData.non_field_errors) {
+                        setError(Array.isArray(errorData.non_field_errors) 
+                            ? errorData.non_field_errors.join(', ')
+                            : errorData.non_field_errors);
+                        return;
+                    }
+                    
+                    // Handle other field errors
+                    const errorMessages = [];
+                    for (const [field, message] of Object.entries(errorData)) {
+                        if (Array.isArray(message)) {
+                            errorMessages.push(`${field}: ${message.join(', ')}`);
+                        } else if (typeof message === 'string') {
+                            errorMessages.push(`${field}: ${message}`);
+                        }
+                    }
+                    setError(errorMessages.join('\n'));
+                }
+            } else {
+                setError('Failed to submit money request. Please try again later.');
+            }
         }
     };
 
+    if (loading) {
+        return (
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+                <CircularProgress />
+            </Box>
+        );
+    }
+
     return (
-        <Box sx={{ p: 3, maxWidth: 800, mx: 'auto' }}>
-            <Paper elevation={3} sx={{ p: 4 }}>
+        <Container maxWidth="md">
+            <Paper sx={{ p: 4, mt: 4 }}>
                 <Typography variant="h5" gutterBottom>
-                    Request Funds
+                    Submit Money Request
                 </Typography>
 
-                {error && (
-                    <Alert severity="error" sx={{ mb: 2 }}>
-                        {error}
-                    </Alert>
-                )}
+                {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+                {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
 
-                {success && (
-                    <Alert severity="success" sx={{ mb: 2 }}>
-                        Money request submitted successfully!
+                {!ngoProfile?.bank_account_number && (
+                    <Alert severity="warning" sx={{ mb: 2 }}>
+                        Please complete your NGO profile with bank details before submitting a money request.
                     </Alert>
                 )}
 
                 <form onSubmit={handleSubmit}>
                     <Grid container spacing={3}>
-                        <Grid item xs={12} sm={6}>
+                        <Grid item xs={12}>
                             <TextField
                                 fullWidth
                                 label="Amount (₹)"
                                 name="amount"
                                 type="number"
                                 value={formData.amount}
-                                onChange={handleChange}
+                                onChange={handleInputChange}
                                 required
-                                error={!!errors.amount}
-                                helperText={errors.amount}
-                                inputProps={{ 
-                                    min: 0,
-                                    max: 1000000,
-                                    step: "0.01"
-                                }}
                             />
-                        </Grid>
-
-                        <Grid item xs={12} sm={6}>
-                            <FormControl fullWidth required error={!!errors.purpose}>
-                                <InputLabel>Purpose</InputLabel>
-                                <Select
-                                    name="purpose"
-                                    value={formData.purpose}
-                                    onChange={handleChange}
-                                    label="Purpose"
-                                >
-                                    {PURPOSE_CHOICES.map((purpose) => (
-                                        <MenuItem key={purpose.value} value={purpose.value}>
-                                            {purpose.label}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                                {errors.purpose && (
-                                    <FormHelperText>{errors.purpose}</FormHelperText>
-                                )}
-                            </FormControl>
                         </Grid>
 
                         <Grid item xs={12}>
                             <TextField
                                 fullWidth
-                                label="Description"
-                                name="description"
+                                select
+                                label="Purpose"
+                                name="purpose"
+                                value={formData.purpose}
+                                onChange={handleInputChange}
+                                required
+                            >
+                                <MenuItem value="operational_costs">Operational Costs</MenuItem>
+                                <MenuItem value="emergency_relief">Emergency Relief</MenuItem>
+                                <MenuItem value="project_funding">Project Funding</MenuItem>
+                                <MenuItem value="infrastructure">Infrastructure Development</MenuItem>
+                                <MenuItem value="education_program">Education Program</MenuItem>
+                                <MenuItem value="healthcare_program">Healthcare Program</MenuItem>
+                                <MenuItem value="food_distribution">Food Distribution Program</MenuItem>
+                                <MenuItem value="other">Other</MenuItem>
+                            </TextField>
+                        </Grid>
+
+                        <Grid item xs={12}>
+                            <TextField
+                                fullWidth
                                 multiline
                                 rows={4}
+                                label="Description"
+                                name="description"
                                 value={formData.description}
-                                onChange={handleChange}
+                                onChange={handleInputChange}
                                 required
-                                error={!!errors.description}
-                                helperText={errors.description || 'Minimum 50 characters required'}
-                                inputProps={{
-                                    maxLength: 1000
-                                }}
                             />
-                            <Typography variant="caption" color="textSecondary">
-                                {formData.description.length}/1000 characters
-                            </Typography>
                         </Grid>
 
                         <Grid item xs={12}>
-                            <Typography variant="h6" gutterBottom sx={{ mt: 2 }}>
-                                Bank Details
+                            <Card variant="outlined">
+                                <CardContent>
+                                    <Typography variant="h6" gutterBottom>
+                                        Bank Details (Auto-filled from Profile)
+                                    </Typography>
+                                    <Grid container spacing={2}>
+                                        <Grid item xs={12} sm={6}>
+                                            <TextField
+                                                fullWidth
+                                                label="Account Holder Name"
+                                                value={ngoProfile?.bank_account_name || ''}
+                                                disabled
+                                            />
+                                        </Grid>
+                                        <Grid item xs={12} sm={6}>
+                                            <TextField
+                                                fullWidth
+                                                label="Account Number"
+                                                value={ngoProfile?.bank_account_number || ''}
+                                                disabled
+                                            />
+                                        </Grid>
+                                        <Grid item xs={12} sm={6}>
+                                            <TextField
+                                                fullWidth
+                                                label="Bank Name"
+                                                value={ngoProfile?.bank_name || ''}
+                                                disabled
+                                            />
+                                        </Grid>
+                                        <Grid item xs={12} sm={6}>
+                                            <TextField
+                                                fullWidth
+                                                label="Branch Name"
+                                                value={ngoProfile?.bank_branch || ''}
+                                                disabled
+                                            />
+                                        </Grid>
+                                        <Grid item xs={12} sm={6}>
+                                            <TextField
+                                                fullWidth
+                                                label="IFSC Code"
+                                                value={ngoProfile?.ifsc_code || ''}
+                                                disabled
+                                            />
+                                        </Grid>
+                                    </Grid>
+                                </CardContent>
+                            </Card>
+                        </Grid>
+
+                        <Grid item xs={12}>
+                            <Typography variant="h6" gutterBottom>
+                                Required Documents
                             </Typography>
-                        </Grid>
+                            <Grid container spacing={2}>
+                                <Grid item xs={12}>
+                                    <Box sx={{ border: '1px dashed grey', p: 3, borderRadius: 1 }}>
+                                        <input
+                                            accept="application/pdf"
+                                            style={{ display: 'none' }}
+                                            id="necessity-certificate-upload"
+                                            name="necessity_certificate"
+                                            type="file"
+                                            onChange={handleFileChange}
+                                        />
+                                        <label htmlFor="necessity-certificate-upload">
+                                            <Button
+                                                variant="outlined"
+                                                component="span"
+                                                startIcon={<UploadIcon />}
+                                                fullWidth
+                                                color={formData.necessity_certificate ? "success" : "primary"}
+                                            >
+                                                Upload Necessity Certificate (Required)
+                                            </Button>
+                                        </label>
+                                        {formData.necessity_certificate && (
+                                            <Typography variant="body2" sx={{ mt: 1 }}>
+                                                Selected: {formData.necessity_certificate.name}
+                                            </Typography>
+                                        )}
+                                    </Box>
+                                </Grid>
 
-                        <Grid item xs={12} sm={6}>
-                            <TextField
-                                fullWidth
-                                label="Account Holder Name"
-                                name="bank_account_name"
-                                value={formData.bank_account_name}
-                                onChange={handleChange}
-                                required
-                                error={!!errors.bank_account_name}
-                                helperText={errors.bank_account_name}
-                            />
-                        </Grid>
+                                <Grid item xs={12}>
+                                    <Box sx={{ border: '1px dashed grey', p: 3, borderRadius: 1 }}>
+                                        <input
+                                            accept="application/pdf"
+                                            style={{ display: 'none' }}
+                                            id="budget-document-upload"
+                                            name="budget_document"
+                                            type="file"
+                                            onChange={handleFileChange}
+                                        />
+                                        <label htmlFor="budget-document-upload">
+                                            <Button
+                                                variant="outlined"
+                                                component="span"
+                                                startIcon={<UploadIcon />}
+                                                fullWidth
+                                                color={formData.budget_document ? "success" : "primary"}
+                                            >
+                                                Upload Budget Document (Required)
+                                            </Button>
+                                        </label>
+                                        {formData.budget_document && (
+                                            <Typography variant="body2" sx={{ mt: 1 }}>
+                                                Selected: {formData.budget_document.name}
+                                            </Typography>
+                                        )}
+                                    </Box>
+                                </Grid>
 
-                        <Grid item xs={12} sm={6}>
-                            <TextField
-                                fullWidth
-                                label="Account Number"
-                                name="bank_account_number"
-                                value={formData.bank_account_number}
-                                onChange={handleChange}
-                                required
-                                error={!!errors.bank_account_number}
-                                helperText={errors.bank_account_number}
-                                inputProps={{
-                                    maxLength: 18
-                                }}
-                            />
-                        </Grid>
+                                <Grid item xs={12}>
+                                    <Box sx={{ border: '1px dashed grey', p: 3, borderRadius: 1 }}>
+                                        <input
+                                            accept="application/pdf"
+                                            style={{ display: 'none' }}
+                                            id="project-proposal-upload"
+                                            name="project_proposal"
+                                            type="file"
+                                            onChange={handleFileChange}
+                                        />
+                                        <label htmlFor="project-proposal-upload">
+                                            <Button
+                                                variant="outlined"
+                                                component="span"
+                                                startIcon={<UploadIcon />}
+                                                fullWidth
+                                                color={formData.project_proposal ? "success" : "primary"}
+                                            >
+                                                Upload Project Proposal (Optional)
+                                            </Button>
+                                        </label>
+                                        {formData.project_proposal && (
+                                            <Typography variant="body2" sx={{ mt: 1 }}>
+                                                Selected: {formData.project_proposal.name}
+                                            </Typography>
+                                        )}
+                                    </Box>
+                                </Grid>
 
-                        <Grid item xs={12} sm={6}>
-                            <TextField
-                                fullWidth
-                                label="Bank Name"
-                                name="bank_name"
-                                value={formData.bank_name}
-                                onChange={handleChange}
-                                required
-                                error={!!errors.bank_name}
-                                helperText={errors.bank_name}
-                            />
-                        </Grid>
-
-                        <Grid item xs={12} sm={6}>
-                            <TextField
-                                fullWidth
-                                label="Branch Name"
-                                name="bank_branch"
-                                value={formData.bank_branch}
-                                onChange={handleChange}
-                                required
-                                error={!!errors.bank_branch}
-                                helperText={errors.bank_branch}
-                            />
-                        </Grid>
-
-                        <Grid item xs={12} sm={6}>
-                            <TextField
-                                fullWidth
-                                label="IFSC Code"
-                                name="ifsc_code"
-                                value={formData.ifsc_code}
-                                onChange={(e) => {
-                                    const value = e.target.value.toUpperCase();
-                                    handleChange({ target: { name: 'ifsc_code', value } });
-                                }}
-                                required
-                                error={!!errors.ifsc_code}
-                                helperText={errors.ifsc_code || 'Format: ABCD0123456'}
-                                inputProps={{
-                                    maxLength: 11,
-                                    style: { textTransform: 'uppercase' }
-                                }}
-                            />
+                                <Grid item xs={12}>
+                                    <Box sx={{ border: '1px dashed grey', p: 3, borderRadius: 1 }}>
+                                        <input
+                                            accept="application/pdf"
+                                            style={{ display: 'none' }}
+                                            id="additional-documents-upload"
+                                            name="additional_documents"
+                                            type="file"
+                                            onChange={handleFileChange}
+                                        />
+                                        <label htmlFor="additional-documents-upload">
+                                            <Button
+                                                variant="outlined"
+                                                component="span"
+                                                startIcon={<UploadIcon />}
+                                                fullWidth
+                                                color={formData.additional_documents ? "success" : "primary"}
+                                            >
+                                                Upload Additional Documents (Optional)
+                                            </Button>
+                                        </label>
+                                        {formData.additional_documents && (
+                                            <Typography variant="body2" sx={{ mt: 1 }}>
+                                                Selected: {formData.additional_documents.name}
+                                            </Typography>
+                                        )}
+                                    </Box>
+                                </Grid>
+                            </Grid>
                         </Grid>
 
                         <Grid item xs={12}>
@@ -333,16 +459,17 @@ const NGOMoneyRequestForm = () => {
                                 type="submit"
                                 variant="contained"
                                 color="primary"
-                                disabled={loading}
-                                sx={{ mt: 2 }}
+                                fullWidth
+                                size="large"
+                                disabled={!ngoProfile?.bank_account_number}
                             >
-                                {loading ? <CircularProgress size={24} /> : 'Submit Request'}
+                                Submit Request
                             </Button>
                         </Grid>
                     </Grid>
                 </form>
             </Paper>
-        </Box>
+        </Container>
     );
 };
 
