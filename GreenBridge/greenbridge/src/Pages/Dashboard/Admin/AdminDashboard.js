@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Grid, Typography, Card, CardContent, CircularProgress } from '@mui/material';
+import { Box, Grid, Typography, Card, CardContent, CircularProgress, Chip } from '@mui/material';
 import Header from '../../../components/Header';
 import AdminSidebar from '../../../components/AdminSidebar';
 import {
@@ -22,10 +22,12 @@ const AdminDashboard = () => {
     requestStats: [],
     monthlyActivity: [],
     moneyRequests: {
-      pending: 0,
-      approved: 0,
-      transferred: 0,
-      total: 0
+      pending: [],
+      approved: [],
+      transferred: [],
+      total: 0,
+      totalAmount: 0,
+      transferredAmount: 0
     }
   });
   const [metrics, setMetrics] = useState({
@@ -47,11 +49,19 @@ const AdminDashboard = () => {
       const token = localStorage.getItem('authToken');
       const headers = { Authorization: `Bearer ${token}` };
 
-      // Separate money request fetch to handle it specifically
+      // Fetch money requests with detailed information
       const moneyRequestPromise = axios.get('http://127.0.0.1:8000/api/v1/donations/ngo/money-request/all/', { headers })
+        .then(response => {
+          // Process money requests without fetching NGO profiles individually
+          return response.data.map(request => ({
+            ...request,
+            // Use the NGO data that comes with the request
+            ngoProfile: request.ngo || {}
+          }));
+        })
         .catch(error => {
           console.error('Error fetching money requests:', error);
-          return { data: [] }; // Return empty array on error
+          return [];
         });
 
       const [foodRes, schoolRes, bookRes, groceryRes, moneyRes] = await Promise.all([
@@ -62,17 +72,17 @@ const AdminDashboard = () => {
         moneyRequestPromise
       ]);
 
-      console.log('Money requests response:', moneyRes.data); // Debug log
-
-      // Process money requests with null check
+      // Process money requests data
       const moneyStats = {
-        pending: moneyRes.data?.filter(r => r.status === 'pending')?.length || 0,
-        approved: moneyRes.data?.filter(r => r.status === 'approved')?.length || 0,
-        transferred: moneyRes.data?.filter(r => r.status === 'transferred')?.length || 0,
-        total: moneyRes.data?.length || 0
+        pending: moneyRes.filter(r => r.status === 'pending'),
+        approved: moneyRes.filter(r => r.status === 'approved'),
+        transferred: moneyRes.filter(r => r.status === 'transferred'),
+        total: moneyRes.length,
+        totalAmount: moneyRes.reduce((sum, r) => sum + (parseFloat(r.amount) || 0), 0),
+        transferredAmount: moneyRes
+          .filter(r => r.status === 'transferred')
+          .reduce((sum, r) => sum + (parseFloat(r.amount) || 0), 0)
       };
-
-      console.log('Processed money stats:', moneyStats); // Debug log
 
       setDashboardData({
         requestStats: [
@@ -87,14 +97,15 @@ const AdminDashboard = () => {
       setLoading(false);
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
-      // Set default values on error
       setDashboardData(prevState => ({
         ...prevState,
         moneyRequests: {
-          pending: 0,
-          approved: 0,
-          transferred: 0,
-          total: 0
+          pending: [],
+          approved: [],
+          transferred: [],
+          total: 0,
+          totalAmount: 0,
+          transferredAmount: 0
         }
       }));
       setLoading(false);
@@ -154,28 +165,74 @@ const AdminDashboard = () => {
           </Card>
         </Grid>
 
-        <Grid item xs={12} md={3}>
+        {/* Updated Money Requests Card */}
+        <Grid item xs={12} md={6}>
           <Card>
             <CardContent>
-              <Typography variant="h6">Money Requests</Typography>
-              <Typography variant="h4">{dashboardData.moneyRequests.total}</Typography>
-              <Typography variant="body2" color="textSecondary">
-                Pending: {dashboardData.moneyRequests.pending} | 
-                Approved: {dashboardData.moneyRequests.approved} |
-                Transferred: {dashboardData.moneyRequests.transferred}
-              </Typography>
+              <Typography variant="h6">Money Requests Overview</Typography>
+              <Grid container spacing={2}>
+                <Grid item xs={12} sm={6}>
+                  <Typography variant="body1">
+                    <strong>Total Requests:</strong> {dashboardData.moneyRequests.total}
+                  </Typography>
+                  <Typography variant="body1">
+                    <strong>Total Amount:</strong> {new Intl.NumberFormat('en-IN', {
+                      style: 'currency',
+                      currency: 'INR'
+                    }).format(dashboardData.moneyRequests.totalAmount)}
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <Typography variant="body1">
+                    <strong>Transferred Amount:</strong> {new Intl.NumberFormat('en-IN', {
+                      style: 'currency',
+                      currency: 'INR'
+                    }).format(dashboardData.moneyRequests.transferredAmount)}
+                  </Typography>
+                </Grid>
+              </Grid>
+              <Box sx={{ mt: 2 }}>
+                <Typography variant="subtitle2" color="textSecondary">Status Breakdown:</Typography>
+                <Grid container spacing={1}>
+                  <Grid item>
+                    <Chip 
+                      label={`Pending: ${dashboardData.moneyRequests.pending.length}`}
+                      color="warning"
+                      size="small"
+                    />
+                  </Grid>
+                  <Grid item>
+                    <Chip 
+                      label={`Approved: ${dashboardData.moneyRequests.approved.length}`}
+                      color="info"
+                      size="small"
+                    />
+                  </Grid>
+                  <Grid item>
+                    <Chip 
+                      label={`Transferred: ${dashboardData.moneyRequests.transferred.length}`}
+                      color="success"
+                      size="small"
+                    />
+                  </Grid>
+                </Grid>
+              </Box>
             </CardContent>
           </Card>
         </Grid>
 
-        {/* Request Distribution Chart */}
+        {/* Money Requests Chart */}
         <Grid item xs={12} md={6}>
           <Card>
             <CardContent>
-              <Typography variant="h6">Request Distribution</Typography>
+              <Typography variant="h6">Money Requests Distribution</Typography>
               <PieChart width={400} height={300}>
                 <Pie
-                  data={dashboardData.requestStats}
+                  data={[
+                    { name: 'Pending', value: dashboardData.moneyRequests.pending.length },
+                    { name: 'Approved', value: dashboardData.moneyRequests.approved.length },
+                    { name: 'Transferred', value: dashboardData.moneyRequests.transferred.length }
+                  ]}
                   cx="50%"
                   cy="50%"
                   outerRadius={100}

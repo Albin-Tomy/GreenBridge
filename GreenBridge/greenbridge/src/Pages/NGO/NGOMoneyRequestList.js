@@ -204,12 +204,7 @@ const NGOMoneyRequestList = ({ isAdmin = false }) => {
                                 <Typography variant="subtitle1">Description:</Typography>
                                 <Typography variant="body2" sx={{ mt: 1 }}>{selectedRequest.description}</Typography>
 
-                                <Typography variant="h6" sx={{ mt: 3, mb: 1 }}>Bank Details</Typography>
-                                <Typography variant="body2">Account Name: {selectedRequest.bank_account_name}</Typography>
-                                <Typography variant="body2">Account Number: {selectedRequest.bank_account_number}</Typography>
-                                <Typography variant="body2">Bank: {selectedRequest.bank_name}</Typography>
-                                <Typography variant="body2">Branch: {selectedRequest.bank_branch}</Typography>
-                                <Typography variant="body2">IFSC: {selectedRequest.ifsc_code}</Typography>
+                                
 
                                 {selectedRequest.admin_notes && (
                                     <Box sx={{ mt: 2 }}>

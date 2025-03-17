@@ -165,10 +165,10 @@ const VolunteerProfile = () => {
                         </div>
                         
                         <div className="profile-actions">
-                            <button onClick={() => setIsEditing(true)} className="edit-btn">
+                            <button id="edit-profile-btn" onClick={() => setIsEditing(true)} className="edit-btn">
                                 Edit Profile
                             </button>
-                            <button onClick={() => setShowQuitConfirm(true)} className="quit-btn">
+                            <button id="quit-volunteer-btn" onClick={() => setShowQuitConfirm(true)} className="quit-btn">
                                 Quit Volunteering
                             </button>
                         </div>
@@ -178,6 +178,7 @@ const VolunteerProfile = () => {
                         <div className="form-group">
                             <label>Interested Services:</label>
                             <select
+                                id="interested-services-select"
                                 name="interested_services"
                                 value={formData.interested_services}
                                 onChange={handleChange}
@@ -194,6 +195,7 @@ const VolunteerProfile = () => {
                         <div className="form-group">
                             <label>Availability:</label>
                             <select
+                                id="availability-select"
                                 name="availability"
                                 value={formData.availability}
                                 onChange={handleChange}
@@ -210,6 +212,7 @@ const VolunteerProfile = () => {
                         <div className="form-group">
                             <label>Additional Skills:</label>
                             <textarea
+                                id="additional-skills-input"
                                 name="additional_skills"
                                 value={formData.additional_skills}
                                 onChange={handleChange}
@@ -220,6 +223,7 @@ const VolunteerProfile = () => {
                         <div className="form-group">
                             <label>Experience:</label>
                             <textarea
+                                id="experience-input"
                                 name="experience"
                                 value={formData.experience}
                                 onChange={handleChange}
@@ -230,6 +234,7 @@ const VolunteerProfile = () => {
                         <div className="form-group">
                             <label>Preferred Location:</label>
                             <input
+                                id="preferred-location-input"
                                 type="text"
                                 name="preferred_location"
                                 value={formData.preferred_location}
@@ -239,10 +244,10 @@ const VolunteerProfile = () => {
                         </div>
 
                         <div className="form-actions">
-                            <button type="submit" className="save-btn">
+                            <button type="submit" id="save-profile-btn" className="save-btn">
                                 Save Changes
                             </button>
-                            <button type="button" onClick={() => setIsEditing(false)} className="cancel-btn">
+                            <button type="button" id="cancel-edit-btn" onClick={() => setIsEditing(false)} className="cancel-btn">
                                 Cancel
                             </button>
                         </div>

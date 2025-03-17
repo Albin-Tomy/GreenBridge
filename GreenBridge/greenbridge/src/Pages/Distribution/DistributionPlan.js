@@ -19,7 +19,7 @@ const BENEFICIARY_TYPES = [
     'Other'
 ];
 
-const DistributionPlan = ({ foodRequest, onSubmit, onClose }) => {
+const DistributionPlan = ({ foodRequest, foodRequestId, onSubmit, onClose }) => {
     const [formData, setFormData] = useState({
         distribution_date: null,
         distribution_location: '',
@@ -28,16 +28,42 @@ const DistributionPlan = ({ foodRequest, onSubmit, onClose }) => {
         beneficiary_contact: '',
         estimated_beneficiaries: '',
         notes: '',
-        status: 'planned'
     });
+
+    const resetForm = () => {
+        setFormData({
+            distribution_date: null,
+            distribution_location: '',
+            beneficiary_type: '',
+            beneficiary_name: '',
+            beneficiary_contact: '',
+            estimated_beneficiaries: '',
+            notes: '',
+        });
+        
+        if (onClose) {
+            onClose();
+        }
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        
+        // Prepare the data for submission
+        const submissionData = {
+            ...formData,
+            food_request_id: foodRequestId || (foodRequest && foodRequest.id),
+            distribution_date: formData.distribution_date ? formData.distribution_date.toISOString() : null,
+        };
+        
+        console.log('Submitting distribution plan data:', submissionData);
+        
         try {
-            await onSubmit(formData);
-            onClose();
+            await onSubmit(submissionData);
+            // Reset form after successful submission
+            resetForm();
         } catch (error) {
-            console.error('Error creating distribution plan:', error);
+            console.error('Error in distribution plan submission:', error);
         }
     };
 

@@ -11,6 +11,7 @@ from django.utils import timezone
 from rest_framework import viewsets, serializers
 from rest_framework.decorators import action
 from NGOs.models import NGOProfile
+from django.contrib.auth import get_user_model
 
 # Initialize Razorpay client
 razorpay_client = razorpay.Client(auth=(settings.RAZORPAY_API_KEY, settings.RAZORPAY_API_SECRET))
@@ -147,19 +148,20 @@ def get_money_request_details(request, request_id):
     try:
         money_request = NGOMoneyRequest.objects.get(id=request_id)
         
-        # Check if user has permission to view this request
-        if not (request.user.is_staff or request.user == money_request.ngo):
-            return Response({
-                'error': 'You do not have permission to view this request'
-            }, status=status.HTTP_403_FORBIDDEN)
-            
+        # Check if user is admin or the NGO that made the request
+        if not (request.user.is_superuser or request.user.role == 'admin' or request.user == money_request.ngo):
+            return Response(
+                {'error': 'You do not have permission to view this request'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
         serializer = NGOMoneyRequestSerializer(money_request)
         return Response(serializer.data)
-        
     except NGOMoneyRequest.DoesNotExist:
-        return Response({
-            'error': 'Money request not found'
-        }, status=status.HTTP_404_NOT_FOUND)
+        return Response(
+            {'error': 'Money request not found'},
+            status=status.HTTP_404_NOT_FOUND
+        )
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])

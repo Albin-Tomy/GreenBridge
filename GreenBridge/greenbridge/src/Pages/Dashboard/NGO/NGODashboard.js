@@ -126,6 +126,46 @@ const NGODashboard = () => {
         }
     }, [filter, activeTab]);
 
+    const checkAndHandleExpiredRequests = (requests, activeTab) => {
+        const currentDate = new Date();
+        return requests.map(request => {
+            // Handle food requests
+            if (activeTab === 0 && request.expiry_time) {
+                const expiryDate = new Date(request.expiry_time);
+                if (currentDate > expiryDate && request.status !== 'cancelled' && request.status !== 'distributed') {
+                    handleExpiredRequest(request.id, 'food');
+                    return { ...request, status: 'cancelled' };
+                }
+            }
+            // Handle grocery requests
+            else if (activeTab === 1 && request.expiry_date) {
+                const expiryDate = new Date(request.expiry_date);
+                if (currentDate > expiryDate && request.status !== 'cancelled' && request.status !== 'distributed') {
+                    handleExpiredRequest(request.id, 'grocery');
+                    return { ...request, status: 'cancelled' };
+                }
+            }
+            return request;
+        });
+    };
+
+    const handleExpiredRequest = async (requestId, type) => {
+        try {
+            const token = localStorage.getItem('authToken');
+            const endpoint = type === 'food' ? 'food' : 'grocery';
+            
+            await axios.put(
+                `http://127.0.0.1:8000/api/v1/${endpoint}/request/${requestId}/update-status/`,
+                { status: 'cancelled' },
+                {
+                    headers: { Authorization: `Bearer ${token}` }
+                }
+            );
+        } catch (error) {
+            console.error(`Error updating expired ${type} request:`, error);
+        }
+    };
+
     const fetchRequests = async () => {
         if (activeTab === 4) return;
         
@@ -153,13 +193,33 @@ const NGODashboard = () => {
                 headers: { Authorization: `Bearer ${token}` },
                 params: { status: filter !== 'all' ? filter : null }
             });
-            setRequests(response.data);
+
+            // Check for expired requests if food or grocery tab is active
+            if (activeTab === 0 || activeTab === 1) {
+                const updatedRequests = checkAndHandleExpiredRequests(response.data, activeTab);
+                setRequests(updatedRequests);
+            } else {
+                setRequests(response.data);
+            }
             setLoading(false);
         } catch (error) {
             console.error('Error fetching requests:', error);
             setLoading(false);
         }
     };
+
+    useEffect(() => {
+        const checkExpiryInterval = setInterval(() => {
+            if ((activeTab === 0 || activeTab === 1) && requests.length > 0) {
+                const updatedRequests = checkAndHandleExpiredRequests(requests, activeTab);
+                if (JSON.stringify(updatedRequests) !== JSON.stringify(requests)) {
+                    setRequests(updatedRequests);
+                }
+            }
+        }, 60000); // Check every minute
+
+        return () => clearInterval(checkExpiryInterval);
+    }, [activeTab, requests]);
 
     const handleStatusUpdate = async (id, newStatus) => {
         try {
@@ -300,6 +360,13 @@ const NGODashboard = () => {
     const renderRequestDetails = (request) => {
         if (!request) return null;
 
+        const isExpiringSoon = (expiryDate) => {
+            const now = new Date();
+            const expiry = new Date(expiryDate);
+            const hoursRemaining = (expiry - now) / (1000 * 60 * 60);
+            return hoursRemaining > 0 && hoursRemaining < 24;
+        };
+
         switch(activeTab) {
             case 0: // Food
                 return request.food_type ? (
@@ -312,8 +379,16 @@ const NGODashboard = () => {
                         </Box>
                         <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                             <AccessTimeIcon sx={{ mr: 1 }} />
-                            <Typography>
+                            <Typography color={isExpiringSoon(request.expiry_time) ? 'error' : 'textPrimary'}>
                                 Best Before: {format(new Date(request.expiry_time), 'dd/MM/yyyy HH:mm')}
+                                {isExpiringSoon(request.expiry_time) && (
+                                    <Chip 
+                                        label="Expiring Soon" 
+                                        color="error" 
+                                        size="small" 
+                                        sx={{ ml: 1 }}
+                                    />
+                                )}
                             </Typography>
                         </Box>
                     </>
@@ -330,8 +405,16 @@ const NGODashboard = () => {
                         </Box>
                         <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                             <AccessTimeIcon sx={{ mr: 1 }} />
-                            <Typography>
+                            <Typography color={isExpiringSoon(request.expiry_date) ? 'error' : 'textPrimary'}>
                                 Expiry Date: {format(new Date(request.expiry_date), 'dd/MM/yyyy')}
+                                {isExpiringSoon(request.expiry_date) && (
+                                    <Chip 
+                                        label="Expiring Soon" 
+                                        color="error" 
+                                        size="small" 
+                                        sx={{ ml: 1 }}
+                                    />
+                                )}
                             </Typography>
                         </Box>
                     </>
