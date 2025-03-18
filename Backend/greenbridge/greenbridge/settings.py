@@ -31,7 +31,7 @@ SECRET_KEY = 'django-insecure-eeap$8gx1=wu_isec2$-jy@%vtdo1f_(+f%yv%3u_a1^qeek5%
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["greenbridge.netlify.app","127.0.0.1:3000","localhost","127.0.0.1","*"]
+ALLOWED_HOSTS = ["greenbridge.netlify.app","127.0.0.1:3000","localhost","127.0.0.1","*",'https://greenbridgefrontend.onrender.com']
 
 
 
