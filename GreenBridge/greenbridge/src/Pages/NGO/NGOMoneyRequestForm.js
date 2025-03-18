@@ -18,6 +18,7 @@ import axios from 'axios';
 
 const NGOMoneyRequestForm = () => {
     const [loading, setLoading] = useState(true);
+    const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
     const [ngoProfile, setNgoProfile] = useState(null);
@@ -59,6 +60,18 @@ const NGOMoneyRequestForm = () => {
             setError('Please enter a valid amount greater than 0');
             return false;
         }
+        
+        // Check amount limits
+        const amount = parseFloat(formData.amount);
+        if (amount < 1000) {
+            setError('Minimum request amount is ₹1,000');
+            return false;
+        }
+        if (amount > 1000000) {
+            setError('Maximum request amount is ₹10,00,000 (10 Lakhs)');
+            return false;
+        }
+        
         if (!formData.purpose || !formData.purpose.trim()) {
             setError('Please select a valid purpose');
             return false;
@@ -101,8 +114,12 @@ const NGOMoneyRequestForm = () => {
         e.preventDefault();
         setError('');
         setSuccess('');
+        setSubmitting(true);
 
-        if (!validateForm()) return;
+        if (!validateForm()) {
+            setSubmitting(false);
+            return;
+        }
 
         try {
             const token = localStorage.getItem('authToken');
@@ -110,10 +127,16 @@ const NGOMoneyRequestForm = () => {
             
             // Append basic fields with proper type conversion and validation
             const amount = parseFloat(formData.amount);
-            if (isNaN(amount) || amount <= 0) {
-                setError('Please enter a valid amount greater than 0');
+            // Validate amount limits
+            if (amount < 1000) {
+                setError('Minimum request amount is ₹1,000');
                 return;
             }
+            if (amount > 1000000) {
+                setError('Maximum request amount is ₹10,00,000 (10 Lakhs)');
+                return;
+            }
+            
             formDataToSend.append('amount', amount.toString());
             
             if (!formData.purpose || !formData.purpose.trim()) {
@@ -149,8 +172,9 @@ const NGOMoneyRequestForm = () => {
                 formDataToSend.append('additional_documents', formData.additional_documents);
             }
 
+            // Use the correct API endpoint for NGO money requests
             const response = await axios.post(
-                'http://127.0.0.1:8000/api/v1/donations/money-requests/',
+                'http://127.0.0.1:8000/api/v1/donations/ngo/money-request/create/',
                 formDataToSend,
                 {
                     headers: {
@@ -172,6 +196,12 @@ const NGOMoneyRequestForm = () => {
                     budget_document: null,
                     additional_documents: null
                 });
+                
+                // Reset file input elements
+                document.getElementById('necessity-certificate-upload').value = '';
+                document.getElementById('budget-document-upload').value = '';
+                document.getElementById('project-proposal-upload').value = '';
+                document.getElementById('additional-documents-upload').value = '';
             }
         } catch (error) {
             console.error('Submission error:', error);
@@ -204,6 +234,8 @@ const NGOMoneyRequestForm = () => {
             } else {
                 setError('Failed to submit money request. Please try again later.');
             }
+        } finally {
+            setSubmitting(false);
         }
     };
 
@@ -242,6 +274,11 @@ const NGOMoneyRequestForm = () => {
                                 value={formData.amount}
                                 onChange={handleInputChange}
                                 required
+                                inputProps={{ 
+                                    min: 1000, 
+                                    max: 1000000
+                                }}
+                                helperText="Amount must be between ₹1,000 and ₹10,00,000 (10 Lakhs)"
                             />
                         </Grid>
 
@@ -461,9 +498,16 @@ const NGOMoneyRequestForm = () => {
                                 color="primary"
                                 fullWidth
                                 size="large"
-                                disabled={!ngoProfile?.bank_account_number}
+                                disabled={!ngoProfile?.bank_account_number || submitting}
                             >
-                                Submit Request
+                                {submitting ? (
+                                    <>
+                                        <CircularProgress size={24} sx={{ mr: 1 }} />
+                                        Submitting...
+                                    </>
+                                ) : (
+                                    'Submit Request'
+                                )}
                             </Button>
                         </Grid>
                     </Grid>

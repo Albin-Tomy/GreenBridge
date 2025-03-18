@@ -59,6 +59,7 @@ const VolunteerDashboard = () => {
     const [showBookDistributionPlan, setShowBookDistributionPlan] = useState(false);
     const [showBookDistributionDetails, setShowBookDistributionDetails] = useState(false);
     const [selectedBookDistribution, setSelectedBookDistribution] = useState(null);
+    const [isCancellationFlow, setIsCancellationFlow] = useState(false);
 
     useEffect(() => {
         fetchApprovedRequests();
@@ -108,6 +109,14 @@ const VolunteerDashboard = () => {
     // Function to initialize the quality form with default "good" report data
     const initializeQualityFormForCollection = (requestId) => {
         setSelectedRequest(requestId);
+        setIsCancellationFlow(false);
+        setShowQualityForm(true);
+    };
+
+    // Function to initialize quality form for cancellation
+    const initializeQualityFormForCancellation = (requestId) => {
+        setSelectedRequest(requestId);
+        setIsCancellationFlow(true);
         setShowQualityForm(true);
     };
 
@@ -152,6 +161,50 @@ const VolunteerDashboard = () => {
         }
     };
 
+    const handleCancelRequest = async (id) => {
+        // For food items, require quality report before cancelling
+        if (activeTab === 0) {
+            initializeQualityFormForCancellation(id);
+            return;
+        }
+        
+        // For non-food items, show a confirmation dialog
+        if (window.confirm('Are you sure you want to cancel this request?')) {
+            try {
+                const token = localStorage.getItem('authToken');
+                let endpoint;
+                switch(activeTab) {
+                    case 0:
+                        endpoint = 'food';
+                        break;
+                    case 1:
+                        endpoint = 'grocery';
+                        break;
+                    case 2:
+                        endpoint = 'book';
+                        break;
+                    case 3:
+                        endpoint = 'school-supplies';
+                        break;
+                    default:
+                        endpoint = 'food';
+                }
+                
+                await axios.put(
+                    `http://127.0.0.1:8000/api/v1/${endpoint}/request/${id}/update-status/`,
+                    { status: 'cancelled' },
+                    {
+                        headers: { Authorization: `Bearer ${token}` }
+                    }
+                );
+                fetchApprovedRequests();
+            } catch (error) {
+                console.error('Error cancelling request:', error);
+                setError('Failed to cancel request. Please try again later.');
+            }
+        }
+    };
+
     const handleQualityReportSubmit = async (reportData) => {
         try {
             setLoading(true);
@@ -187,10 +240,25 @@ const VolunteerDashboard = () => {
                 }
             );
 
-            // Then update status to collected
+            // Determine status based on flow and quality issues
+            let newStatus;
+            
+            if (isCancellationFlow) {
+                // In cancellation flow, always cancel
+                newStatus = 'cancelled';
+            } else {
+                // In collection flow, check for severe quality issues
+                const hasSevereIssue = reportData.issue_type === 'contaminated' || 
+                                      reportData.issue_type === 'expired' ||
+                                      reportData.issue_type === 'spoiled';
+                
+                newStatus = hasSevereIssue ? 'cancelled' : 'collected';
+            }
+            
+            // Then update status based on flow and quality report
             await axios.put(
                 `http://127.0.0.1:8000/api/v1/${endpoint}/request/${selectedRequest}/update-status/`,
-                { status: 'collected' },
+                { status: newStatus },
                 {
                 headers: { 
                     Authorization: `Bearer ${token}`,
@@ -202,6 +270,18 @@ const VolunteerDashboard = () => {
             setShowQualityForm(false);
             fetchApprovedRequests();
             setError(null);
+            
+            // Show appropriate message based on the outcome
+            if (isCancellationFlow) {
+                alert('Quality report submitted. Request has been cancelled.');
+            } else if (newStatus === 'cancelled') {
+                alert('Quality report submitted. Request has been cancelled due to severe quality issues.');
+            } else {
+                alert('Quality report submitted and food marked as collected successfully!');
+            }
+            
+            // Reset the cancellation flow flag
+            setIsCancellationFlow(false);
         } catch (error) {
             console.error('Error updating status:', error);
             setError('Failed to update status. Please try again.');
@@ -225,16 +305,20 @@ const VolunteerDashboard = () => {
 
             const token = localStorage.getItem('authToken');
             console.log(`Creating distribution plan for food request ID: ${selectedForDistribution}`);
-            console.log('Distribution plan data:', formData);
             
-            // First create the distribution plan with status 'planned'
+            // Prepare the distribution data
+            const distributionData = {
+                ...formData,
+                food_request_id: selectedForDistribution,
+                status: 'planned'  // Explicitly set the status to 'planned' as expected by the backend
+            };
+            
+            console.log('Distribution plan data to be sent:', distributionData);
+            
+            // First create the distribution plan
             const distributionResponse = await axios.post(
                 `http://127.0.0.1:8000/api/v1/food/request/${selectedForDistribution}/distribution/`,
-                {
-                    ...formData,
-                    food_request_id: selectedForDistribution,  // Explicitly include the ID
-                    status: 'planned'  // Explicitly set the initial status
-                },
+                distributionData,
                 {
                     headers: { 
                         Authorization: `Bearer ${token}`,
@@ -267,7 +351,12 @@ const VolunteerDashboard = () => {
             console.error('Error creating distribution plan:', error);
             const errorMessage = error.response?.data?.error || error.message;
             setError('Failed to create distribution plan: ' + errorMessage);
-            alert('Failed to create distribution plan. Please try again.');
+            
+            if (errorMessage === 'Invalid status value') {
+                alert('The system accepted your plan but reported an error. Please refresh the page to see your plan.');
+            } else {
+                alert('Failed to create distribution plan: ' + errorMessage + '. Please try again.');
+            }
         }
     };
 
@@ -611,6 +700,13 @@ const VolunteerDashboard = () => {
                                 Expires: {formatDate(request.expiry_time)}
                             </Typography>
                         </Box>
+                        {request.status === 'approved' && (
+                            <Alert severity="info" sx={{ mb: 2 }}>
+                                <Typography variant="body2">
+                                    A food quality report is required before collection or cancellation.
+                                </Typography>
+                            </Alert>
+                        )}
                     </>
                 );
 
@@ -707,20 +803,40 @@ const VolunteerDashboard = () => {
         switch (request.status) {
             case 'approved':
                 return (
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={() => {
-                            // Show dialog for food with quality report or directly mark collected for other types
-                            if (activeTab === 0) {
-                                initializeQualityFormForCollection(request.id);
-                            } else {
-                                handleMarkAsCollected(request.id);
-                            }
-                        }}
-                    >
-                        {activeTab === 0 ? 'Collect & Report Quality' : 'Mark as Collected'}
-                    </Button>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                        {activeTab === 0 && (
+                            <Box sx={{ mb: 1 }}>
+                                <Typography variant="caption" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                                    <ErrorIcon fontSize="small" sx={{ mr: 0.5 }} />
+                                    Quality report required
+                                </Typography>
+                            </Box>
+                        )}
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            fullWidth
+                            onClick={() => {
+                                // Show dialog for food with quality report or directly mark collected for other types
+                                if (activeTab === 0) {
+                                    initializeQualityFormForCollection(request.id);
+                                } else {
+                                    handleMarkAsCollected(request.id);
+                                }
+                            }}
+                        >
+                            {activeTab === 0 ? 'Collect & Report Quality' : 'Mark as Collected'}
+                        </Button>
+                        
+                        <Button
+                            variant="outlined"
+                            color="error"
+                            fullWidth
+                            onClick={() => handleCancelRequest(request.id)}
+                        >
+                            Cancel Request
+                        </Button>
+                    </Box>
                 );
             case 'collected':
                 let distributionComponent;
@@ -944,7 +1060,7 @@ const VolunteerDashboard = () => {
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setOpenDialog(false)}>Close</Button>
-                    {activeTab === 0 && selectedRequest && (
+                    {activeTab === 0 && selectedRequest && selectedRequest.status === 'approved' && (
                         <Button
                             variant="outlined"
                             color="primary"
@@ -956,7 +1072,7 @@ const VolunteerDashboard = () => {
                             Collect & Report Quality
                         </Button>
                     )}
-                    {activeTab !== 0 && selectedRequest && (
+                    {activeTab !== 0 && selectedRequest && selectedRequest.status === 'approved' && (
                         <Button 
                             variant="contained" 
                             color="success"
@@ -965,20 +1081,33 @@ const VolunteerDashboard = () => {
                             Mark as Collected
                         </Button>
                     )}
+                    
+                    {selectedRequest && selectedRequest.status === 'approved' && (
+                        <Button 
+                            variant="outlined" 
+                            color="error"
+                            onClick={() => handleCancelRequest(selectedRequest.id)}
+                        >
+                            Cancel Request
+                        </Button>
+                    )}
                 </DialogActions>
             </Dialog>
 
                 {/* Quality Report Form */}
                 {activeTab === 0 && (
-            <QualityReportForm
-                open={showQualityForm}
-                onClose={() => setShowQualityForm(false)}
-                requestId={selectedRequest}
-                onSubmitSuccess={(reportData) => {
-                    handleQualityReportSubmit(reportData);
-                    alert('Quality report submitted and food marked as collected successfully!');
-                }}
-            />
+                <QualityReportForm
+                    open={showQualityForm}
+                    onClose={() => {
+                        setShowQualityForm(false);
+                        setIsCancellationFlow(false);
+                    }}
+                    requestId={selectedRequest}
+                    isCancellation={isCancellationFlow}
+                    onSubmitSuccess={(reportData) => {
+                        handleQualityReportSubmit(reportData);
+                    }}
+                />
                 )}
 
                 {/* Add Distribution Plan Form Dialog */}
@@ -991,11 +1120,19 @@ const VolunteerDashboard = () => {
                     <DialogTitle>Create Food Distribution Plan</DialogTitle>
                     <DialogContent>
                         {selectedForDistribution ? (
-                            <DistributionPlan
-                                foodRequestId={selectedForDistribution}
-                                onSubmit={handleCreateDistribution}
-                                onClose={() => setShowDistributionForm(false)}
-                            />
+                            <>
+                                <Typography variant="subtitle1" gutterBottom>
+                                    Creating distribution plan for Food Request #{selectedForDistribution}
+                                </Typography>
+                                <DistributionPlan
+                                    foodRequestId={selectedForDistribution}
+                                    onSubmit={(data) => {
+                                        console.log("DistributionPlan submit callback with data:", data);
+                                        return handleCreateDistribution(data);
+                                    }}
+                                    onClose={() => setShowDistributionForm(false)}
+                                />
+                            </>
                         ) : (
                             <Typography color="error">
                                 Error: No food request selected. Please try again.

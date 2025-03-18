@@ -49,11 +49,44 @@ const DistributionPlan = ({ foodRequest, foodRequestId, onSubmit, onClose }) => 
     const handleSubmit = async (e) => {
         e.preventDefault();
         
+        // Validate required fields
+        if (!formData.distribution_date) {
+            alert('Please select a distribution date');
+            return;
+        }
+        
+        if (!formData.distribution_location) {
+            alert('Please enter a distribution location');
+            return;
+        }
+        
+        if (!formData.beneficiary_type) {
+            alert('Please select a beneficiary type');
+            return;
+        }
+        
+        if (!formData.beneficiary_name) {
+            alert('Please enter a beneficiary name');
+            return;
+        }
+        
+        if (!formData.beneficiary_contact) {
+            alert('Please enter a beneficiary contact');
+            return;
+        }
+        
+        if (!formData.estimated_beneficiaries) {
+            alert('Please enter the estimated number of beneficiaries');
+            return;
+        }
+        
         // Prepare the data for submission
         const submissionData = {
             ...formData,
             food_request_id: foodRequestId || (foodRequest && foodRequest.id),
             distribution_date: formData.distribution_date ? formData.distribution_date.toISOString() : null,
+            estimated_beneficiaries: Number(formData.estimated_beneficiaries),
+            status: 'planned'  // Explicitly set the status to 'planned'
         };
         
         console.log('Submitting distribution plan data:', submissionData);
@@ -64,6 +97,7 @@ const DistributionPlan = ({ foodRequest, foodRequestId, onSubmit, onClose }) => 
             resetForm();
         } catch (error) {
             console.error('Error in distribution plan submission:', error);
+            alert('Failed to create distribution plan: ' + (error.message || 'Unknown error'));
         }
     };
 

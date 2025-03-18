@@ -106,9 +106,27 @@ def create_ngo_money_request(request):
             'error': 'Only NGOs can create money requests'
         }, status=status.HTTP_403_FORBIDDEN)
 
-    serializer = NGOMoneyRequestSerializer(data=request.data)
+    print("Request Files:", request.FILES)  # Debug to see what files are coming in
+    
+    # Check if required files are in the request
+    if 'necessity_certificate' not in request.FILES:
+        return Response({
+            'error': 'Necessity certificate file is required'
+        }, status=status.HTTP_400_BAD_REQUEST)
+        
+    if 'budget_document' not in request.FILES:
+        return Response({
+            'error': 'Budget document file is required'
+        }, status=status.HTTP_400_BAD_REQUEST)
+    
+    serializer = NGOMoneyRequestSerializer(data=request.data, context={'request': request})
     if serializer.is_valid():
-        serializer.save(ngo=request.user)
+        money_request = serializer.save(ngo=request.user)
+        
+        # Debug log to verify file paths
+        print("Saved necessity_certificate:", money_request.necessity_certificate.path if money_request.necessity_certificate else "None")
+        print("Saved budget_document:", money_request.budget_document.path if money_request.budget_document else "None")
+        
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -155,7 +173,7 @@ def get_money_request_details(request, request_id):
                 status=status.HTTP_403_FORBIDDEN
             )
 
-        serializer = NGOMoneyRequestSerializer(money_request)
+        serializer = NGOMoneyRequestSerializer(money_request, context={'request': request})
         return Response(serializer.data)
     except NGOMoneyRequest.DoesNotExist:
         return Response(
@@ -205,7 +223,7 @@ def update_money_request_status(request, request_id):
             created_by=request.user
         )
         
-        serializer = NGOMoneyRequestSerializer(money_request)
+        serializer = NGOMoneyRequestSerializer(money_request, context={'request': request})
         return Response(serializer.data)
         
     except NGOMoneyRequest.DoesNotExist:

@@ -33,6 +33,12 @@ class NGOMoneyRequestSerializer(serializers.ModelSerializer):
     status_display = serializers.SerializerMethodField()
     purpose_display = serializers.SerializerMethodField()
     ngo_bank_details = serializers.SerializerMethodField()
+    
+    # Add absolute URL fields for documents
+    necessity_certificate_url = serializers.SerializerMethodField()
+    budget_document_url = serializers.SerializerMethodField()
+    project_proposal_url = serializers.SerializerMethodField()
+    additional_documents_url = serializers.SerializerMethodField()
 
     class Meta:
         model = NGOMoneyRequest
@@ -41,7 +47,8 @@ class NGOMoneyRequestSerializer(serializers.ModelSerializer):
             'necessity_certificate', 'project_proposal', 'budget_document', 'additional_documents',
             'status', 'admin_notes', 'transfer_reference', 'transfer_date',
             'created_at', 'updated_at', 'updates', 'status_display', 'purpose_display',
-            'ngo_bank_details'
+            'ngo_bank_details', 'necessity_certificate_url', 'budget_document_url',
+            'project_proposal_url', 'additional_documents_url'
         ]
         read_only_fields = [
             'ngo', 'status', 'admin_notes', 'transfer_reference', 'transfer_date',
@@ -67,6 +74,34 @@ class NGOMoneyRequestSerializer(serializers.ModelSerializer):
         except:
             return None
 
+    def get_necessity_certificate_url(self, obj):
+        if obj.necessity_certificate:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.necessity_certificate.url)
+        return None
+    
+    def get_budget_document_url(self, obj):
+        if obj.budget_document:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.budget_document.url)
+        return None
+    
+    def get_project_proposal_url(self, obj):
+        if obj.project_proposal:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.project_proposal.url)
+        return None
+    
+    def get_additional_documents_url(self, obj):
+        if obj.additional_documents:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.additional_documents.url)
+        return None
+
     def validate(self, data):
         if not self.instance:  # Only for new requests
             # Validate required documents
@@ -80,9 +115,20 @@ class NGOMoneyRequestSerializer(serializers.ModelSerializer):
                 })
 
             # Validate amount
-            if not data.get('amount') or float(data.get('amount', 0)) <= 0:
+            amount = float(data.get('amount', 0))
+            if not data.get('amount') or amount <= 0:
                 raise serializers.ValidationError({
                     'amount': 'Please enter a valid amount greater than 0.'
+                })
+            
+            # Validate amount limits
+            if amount < 1000:
+                raise serializers.ValidationError({
+                    'amount': 'Minimum request amount is ₹1,000.'
+                })
+            if amount > 1000000:
+                raise serializers.ValidationError({
+                    'amount': 'Maximum request amount is ₹10,00,000 (10 Lakhs).'
                 })
 
             # Validate purpose and description

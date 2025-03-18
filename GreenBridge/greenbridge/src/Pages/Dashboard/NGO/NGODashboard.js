@@ -46,24 +46,82 @@ const drawerWidth = 240;
 const QualityReportDialog = ({ open, onClose, report }) => {
     if (!report) return null;
 
+    // Format issue type for display
+    const formatIssueType = (type) => {
+        if (!type) return 'Unknown';
+        // Convert snake_case to Title Case
+        return type.split('_')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ');
+    };
+
+    // Determine status color
+    const getStatusColor = (status) => {
+        switch(status) {
+            case 'good':
+                return 'success';
+            case 'expired':
+            case 'contaminated':
+            case 'spoiled':
+                return 'error';
+            case 'temperature_issue':
+            case 'packaging_damaged':
+                return 'warning';
+            default:
+                return 'default';
+        }
+    };
+
+    // Determine if cancellation was due to quality issue
+    const isCancellationDueToQuality = report.issue_type === 'contaminated' || 
+                                       report.issue_type === 'expired' || 
+                                       report.issue_type === 'spoiled';
+
     return (
         <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-            <DialogTitle>Quality Report Details</DialogTitle>
+            <DialogTitle>
+                Food Quality Report
+                {report.request_id && <Typography variant="subtitle2" color="text.secondary">
+                    for Request #{report.request_id}
+                </Typography>}
+            </DialogTitle>
             <DialogContent>
                 <Box sx={{ p: 2 }}>
+                    {/* Display a warning banner if the report led to cancellation */}
+                    {isCancellationDueToQuality && (
+                        <Paper sx={{ p: 2, mb: 3, bgcolor: 'error.light', color: 'error.contrastText' }}>
+                            <Typography variant="subtitle1">
+                                This request was cancelled due to quality issues
+                            </Typography>
+                        </Paper>
+                    )}
+                    
                     <Grid container spacing={2}>
                         <Grid item xs={12} sm={6}>
-                            <Typography><strong>Issue Type:</strong> {report.issue_type}</Typography>
+                            <Typography><strong>Issue Type:</strong> <Chip 
+                                label={formatIssueType(report.issue_type)} 
+                                color={getStatusColor(report.issue_type)}
+                                size="small"
+                                sx={{ ml: 1 }}
+                            /></Typography>
                         </Grid>
                         <Grid item xs={12} sm={6}>
-                            <Typography><strong>Status:</strong> {report.status}</Typography>
+                            <Typography><strong>Reported On:</strong> {new Date(report.created_at).toLocaleString()}</Typography>
                         </Grid>
                         <Grid item xs={12}>
-                            <Typography><strong>Description:</strong> {report.description}</Typography>
+                            <Typography><strong>Description:</strong></Typography>
+                            <Paper sx={{ p: 2, bgcolor: 'background.default', mt: 1 }}>
+                                <Typography variant="body2">{report.description || 'No description provided'}</Typography>
+                            </Paper>
                         </Grid>
                         <Grid item xs={12} sm={6}>
-                            <Typography><strong>Temperature:</strong> {report.temperature}°C</Typography>
+                            <Typography><strong>Temperature:</strong> {report.temperature ? `${report.temperature}°C` : 'Not measured'}</Typography>
                         </Grid>
+                        {report.weight_check && (
+                            <Grid item xs={12} sm={6}>
+                                <Typography><strong>Weight Check:</strong> {report.weight_check} kg</Typography>
+                            </Grid>
+                        )}
                         <Grid item xs={12}>
                             <Typography variant="h6" sx={{ mt: 2, mb: 1 }}>Quality Checks</Typography>
                             <Grid container spacing={1}>
@@ -241,6 +299,7 @@ const NGODashboard = () => {
 
     const fetchQualityReport = async (requestId) => {
         try {
+            setLoading(true);
             const token = localStorage.getItem('authToken');
             const response = await axios.get(
                 `http://127.0.0.1:8000/api/v1/food/request/${requestId}/quality-report/view/`,
@@ -248,11 +307,22 @@ const NGODashboard = () => {
                     headers: { Authorization: `Bearer ${token}` }
                 }
             );
-            setQualityReport(response.data);
-            setShowQualityReport(true);
+            
+            if (response.data) {
+                setQualityReport(response.data);
+                setShowQualityReport(true);
+            } else {
+                setError('No quality report found for this request');
+            }
         } catch (error) {
             console.error('Error fetching quality report:', error);
-            alert('No quality report found for this request');
+            if (error.response?.status === 404) {
+                setError('No quality report available for this request');
+            } else {
+                setError(error.response?.data?.message || 'Failed to fetch quality report');
+            }
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -311,7 +381,7 @@ const NGODashboard = () => {
         const isFoodRequest = activeTab === 0;
         
         return (
-            <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end', mt: 2 }}>
+            <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end', mt: 2, flexWrap: 'wrap' }}>
                 <Button
                     variant="outlined"
                     startIcon={<VisibilityIcon />}
@@ -333,10 +403,13 @@ const NGODashboard = () => {
                     </Button>
                 )}
 
-                {isFoodRequest && (request.status === 'collected' || request.status === 'quality_issue') && (
+                {isFoodRequest && 
+                 (request.status === 'collected' || request.status === 'quality_issue' || 
+                  request.status === 'distributed' || request.status === 'cancelled') && (
                     <Button
                         variant="outlined"
                         startIcon={<AssignmentIcon />}
+                        color="secondary"
                         onClick={() => fetchQualityReport(request.id)}
                     >
                         View Quality Report
@@ -391,6 +464,23 @@ const NGODashboard = () => {
                                 )}
                             </Typography>
                         </Box>
+                        {(request.status === 'collected' || request.status === 'quality_issue' || 
+                          request.status === 'distributed' || request.status === 'cancelled') && (
+                            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                                <AssignmentIcon sx={{ mr: 1 }} color="primary" />
+                                <Typography variant="body2" color="primary">
+                                    Quality report available
+                                    {request.status === 'cancelled' && (
+                                        <Chip
+                                            label="Possible quality issue"
+                                            color="error"
+                                            size="small"
+                                            sx={{ ml: 1 }}
+                                        />
+                                    )}
+                                </Typography>
+                            </Box>
+                        )}
                     </>
                 ) : null;
 
@@ -574,6 +664,19 @@ const NGODashboard = () => {
                                                         onClick={() => fetchDistributionDetails(request.id)}
                                                     >
                                                         View Distribution
+                                                    </Button>
+                                                )}
+                                                {activeTab === 0 && 
+                                                 (request.status === 'collected' || request.status === 'quality_issue' || 
+                                                  request.status === 'distributed' || request.status === 'cancelled') && (
+                                                    <Button
+                                                        variant="outlined"
+                                                        startIcon={<AssignmentIcon />}
+                                                        color="secondary"
+                                                        onClick={() => fetchQualityReport(request.id)}
+                                                        size="small"
+                                                    >
+                                                        Quality Report
                                                     </Button>
                                                 )}
                                             </Box>
@@ -776,10 +879,12 @@ const NGODashboard = () => {
                 <DialogActions>
                     <Button onClick={() => setOpenDialog(false)}>Close</Button>
                     {selectedRequest && activeTab === 0 &&
-                     (selectedRequest.status === 'collected' || selectedRequest.status === 'quality_issue') && (
+                     (selectedRequest.status === 'collected' || selectedRequest.status === 'quality_issue' || 
+                      selectedRequest.status === 'distributed' || selectedRequest.status === 'cancelled') && (
                         <Button
                             variant="outlined"
                             startIcon={<AssignmentIcon />}
+                            color="secondary"
                             onClick={() => fetchQualityReport(selectedRequest.id)}
                         >
                             View Quality Report

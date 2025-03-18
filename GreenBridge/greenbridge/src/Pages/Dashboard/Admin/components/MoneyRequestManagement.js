@@ -46,6 +46,12 @@ const MoneyRequestManagement = () => {
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             console.log('Money requests:', response.data); // Debug log
+            
+            // Log the first NGO structure if available
+            if (response.data && response.data.length > 0 && response.data[0].ngo) {
+                console.log('NGO data structure:', response.data[0].ngo);
+            }
+            
             setRequests(response.data);
             setLoading(false);
         } catch (err) {
@@ -65,7 +71,7 @@ const MoneyRequestManagement = () => {
                 { headers: { Authorization: `Bearer ${token}` } }
             );
 
-            // Fetch NGO profile details using the NGO's email
+            // Fetch NGO profile details using the NGO's email from the request
             const ngoProfileResponse = await axios.get(
                 `http://127.0.0.1:8000/api/v1/ngo/profile/${requestResponse.data.ngo.email}/`,
                 { headers: { Authorization: `Bearer ${token}` } }
@@ -143,12 +149,45 @@ const MoneyRequestManagement = () => {
     };
 
     const handleDocumentDownload = (documentUrl, documentName) => {
-        const link = document.createElement('a');
-        link.href = documentUrl;
-        link.download = documentName;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        if (!documentUrl) {
+            setError('Document URL is missing or invalid');
+            return;
+        }
+        
+        // Check if the URL is already absolute
+        let fullUrl = documentUrl;
+        if (!documentUrl.startsWith('http')) {
+            // Add backend base URL if the path is relative
+            fullUrl = `http://127.0.0.1:8000${documentUrl}`;
+        }
+        
+        console.log('Downloading from:', fullUrl);
+        
+        // Use fetch API to download the file without navigating away
+        fetch(fullUrl)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Failed to download file: ${response.status} ${response.statusText}`);
+                }
+                return response.blob();
+            })
+            .then(blob => {
+                // Create a blob URL and trigger download
+                const blobUrl = window.URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = blobUrl;
+                link.download = documentName;
+                document.body.appendChild(link);
+                link.click();
+                
+                // Clean up
+                document.body.removeChild(link);
+                window.URL.revokeObjectURL(blobUrl);
+            })
+            .catch(error => {
+                console.error('Download error:', error);
+                setError(`Failed to download document: ${error.message}`);
+            });
     };
 
     if (loading) {
@@ -175,7 +214,6 @@ const MoneyRequestManagement = () => {
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell>Request ID</TableCell>
                             <TableCell>NGO Name</TableCell>
                             <TableCell>Amount</TableCell>
                             <TableCell>Purpose</TableCell>
@@ -187,8 +225,11 @@ const MoneyRequestManagement = () => {
                     <TableBody>
                         {requests.map((request) => (
                             <TableRow key={request.id}>
-                                <TableCell>#{request.id}</TableCell>
-                                <TableCell>{request.ngo?.name || 'N/A'}</TableCell>
+                                <TableCell>
+                                    {request.ngo?.name || 
+                                     (request.ngo && typeof request.ngo === 'object' ? 
+                                      request.ngo.username || request.ngo.email || 'Unknown NGO' : 'N/A')}
+                                </TableCell>
                                 <TableCell>{formatAmount(request.amount)}</TableCell>
                                 <TableCell>{request.purpose_display || request.purpose}</TableCell>
                                 <TableCell>
@@ -227,90 +268,112 @@ const MoneyRequestManagement = () => {
                 {selectedRequest && (
                     <>
                         <DialogTitle>
-                            Money Request Details - #{selectedRequest.id}
+                            Money Request Details
                         </DialogTitle>
                         <DialogContent>
                             <Box sx={{ p: 2 }}>
                                 <Grid container spacing={2}>
+                                    {/* Basic Request Details */}
                                     <Grid item xs={12}>
-                                        <Typography variant="h6" gutterBottom>Basic Details</Typography>
-                                    </Grid>
-                                    <Grid item xs={12} sm={6}>
-                                        <Typography><strong>NGO:</strong> {selectedRequest.ngo?.name || 'N/A'}</Typography>
-                                    </Grid>
-                                    <Grid item xs={12} sm={6}>
-                                        <Typography><strong>Amount:</strong> {formatAmount(selectedRequest.amount)}</Typography>
-                                    </Grid>
-                                    <Grid item xs={12} sm={6}>
-                                        <Typography><strong>Purpose:</strong> {selectedRequest.purpose_display || selectedRequest.purpose}</Typography>
-                                    </Grid>
-                                    <Grid item xs={12} sm={6}>
-                                        <Typography><strong>Status:</strong> {selectedRequest.status_display || selectedRequest.status}</Typography>
-                                    </Grid>
-                                    <Grid item xs={12}>
-                                        <Typography><strong>Description:</strong></Typography>
-                                        <Typography variant="body2">{selectedRequest.description}</Typography>
+                                        <Typography variant="h6" gutterBottom>Request Details</Typography>
+                                        <Paper sx={{ p: 2, mb: 2 }}>
+                                            <Grid container spacing={2}>
+                                                <Grid item xs={12} sm={6}>
+                                                    <Typography><strong>Amount:</strong> {formatAmount(selectedRequest.amount)}</Typography>
+                                                </Grid>
+                                                <Grid item xs={12} sm={6}>
+                                                    <Typography><strong>Purpose:</strong> {selectedRequest.purpose_display || selectedRequest.purpose}</Typography>
+                                                </Grid>
+                                                <Grid item xs={12} sm={6}>
+                                                    <Typography><strong>Status:</strong> {selectedRequest.status_display || selectedRequest.status}</Typography>
+                                                </Grid>
+                                                <Grid item xs={12} sm={6}>
+                                                    <Typography><strong>Date:</strong> {new Date(selectedRequest.created_at).toLocaleDateString()}</Typography>
+                                                </Grid>
+                                                <Grid item xs={12}>
+                                                    <Typography><strong>Description:</strong></Typography>
+                                                    <Typography variant="body2">{selectedRequest.description}</Typography>
+                                                </Grid>
+                                            </Grid>
+                                        </Paper>
                                     </Grid>
 
+                                    {/* NGO Details */}
                                     <Grid item xs={12}>
-                                        <Typography variant="h6" sx={{ mt: 2, mb: 1 }}>NGO Profile Details</Typography>
+                                        <Typography variant="h6" gutterBottom>NGO Details</Typography>
+                                        <Paper sx={{ p: 2, mb: 2 }}>
+                                            <Grid container spacing={2}>
+                                                <Grid item xs={12} sm={6}>
+                                                    <Typography><strong>NGO Name:</strong> {
+                                                        ngoProfile?.ngo_name || 
+                                                        selectedRequest?.ngo?.name || 
+                                                        (selectedRequest?.ngo && typeof selectedRequest.ngo === 'object' ? 
+                                                            selectedRequest.ngo.username || selectedRequest.ngo.email : 'N/A')
+                                                    }</Typography>
+                                                </Grid>
+                                                <Grid item xs={12} sm={6}>
+                                                    <Typography><strong>Registration Number:</strong> {ngoProfile?.registration_number || 'N/A'}</Typography>
+                                                </Grid>
+                                                <Grid item xs={12} sm={6}>
+                                                    <Typography><strong>Contact Person:</strong> {ngoProfile?.contact_person || 'N/A'}</Typography>
+                                                </Grid>
+                                                <Grid item xs={12} sm={6}>
+                                                    <Typography><strong>Contact Phone:</strong> {ngoProfile?.contact_phone || 'N/A'}</Typography>
+                                                </Grid>
+                                                <Grid item xs={12}>
+                                                    <Typography><strong>Address:</strong> {ngoProfile?.address || 'N/A'}</Typography>
+                                                </Grid>
+                                                <Grid item xs={12}>
+                                                    <Typography><strong>Description:</strong> {ngoProfile?.description || 'N/A'}</Typography>
+                                                </Grid>
+                                            </Grid>
+                                        </Paper>
                                     </Grid>
-                                    {ngoProfile && (
-                                        <>
-                                            <Grid item xs={12} sm={6}>
-                                                <Typography><strong>Contact Person:</strong> {ngoProfile.contact_person}</Typography>
-                                            </Grid>
-                                            <Grid item xs={12} sm={6}>
-                                                <Typography><strong>Contact Phone:</strong> {ngoProfile.contact_phone}</Typography>
-                                            </Grid>
-                                            <Grid item xs={12}>
-                                                <Typography><strong>Address:</strong> {ngoProfile.address}</Typography>
-                                            </Grid>
-                                        </>
-                                    )}
 
+                                    {/* Bank Details */}
                                     <Grid item xs={12}>
-                                        <Typography variant="h6" sx={{ mt: 2, mb: 1 }}>Bank Details</Typography>
+                                        <Typography variant="h6" gutterBottom>Bank Details</Typography>
+                                        <Paper sx={{ p: 2, mb: 2 }}>
+                                            <Grid container spacing={2}>
+                                                <Grid item xs={12} sm={6}>
+                                                    <Typography><strong>Account Name:</strong> {ngoProfile?.bank_account_name || 'N/A'}</Typography>
+                                                </Grid>
+                                                <Grid item xs={12} sm={6}>
+                                                    <Typography><strong>Account Number:</strong> {ngoProfile?.bank_account_number || 'N/A'}</Typography>
+                                                </Grid>
+                                                <Grid item xs={12} sm={6}>
+                                                    <Typography><strong>Bank Name:</strong> {ngoProfile?.bank_name || 'N/A'}</Typography>
+                                                </Grid>
+                                                <Grid item xs={12} sm={6}>
+                                                    <Typography><strong>Bank Branch:</strong> {ngoProfile?.bank_branch || 'N/A'}</Typography>
+                                                </Grid>
+                                                <Grid item xs={12} sm={6}>
+                                                    <Typography><strong>IFSC Code:</strong> {ngoProfile?.ifsc_code || 'N/A'}</Typography>
+                                                </Grid>
+                                            </Grid>
+                                        </Paper>
                                     </Grid>
-                                    {ngoProfile && (
-                                        <>
-                                            <Grid item xs={12} sm={6}>
-                                                <Typography><strong>Account Name:</strong> {ngoProfile.bank_account_name}</Typography>
-                                            </Grid>
-                                            <Grid item xs={12} sm={6}>
-                                                <Typography><strong>Account Number:</strong> {ngoProfile.bank_account_number}</Typography>
-                                            </Grid>
-                                            <Grid item xs={12} sm={6}>
-                                                <Typography><strong>Bank:</strong> {ngoProfile.bank_name}</Typography>
-                                            </Grid>
-                                            <Grid item xs={12} sm={6}>
-                                                <Typography><strong>Branch:</strong> {ngoProfile.bank_branch}</Typography>
-                                            </Grid>
-                                            <Grid item xs={12} sm={6}>
-                                                <Typography><strong>IFSC Code:</strong> {ngoProfile.ifsc_code}</Typography>
-                                            </Grid>
-                                        </>
-                                    )}
 
+                                    {/* Required Documents */}
                                     <Grid item xs={12}>
-                                        <Typography variant="h6" sx={{ mt: 2, mb: 1 }}>Required Documents</Typography>
-                                    </Grid>
-                                    <Grid item xs={12}>
+                                        <Typography variant="h6" gutterBottom>Required Documents</Typography>
                                         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                                             <Paper sx={{ p: 2 }}>
                                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                                     <Typography><strong>Necessity Certificate</strong></Typography>
-                                                    {selectedRequest.necessity_certificate && (
+                                                    {selectedRequest.necessity_certificate_url ? (
                                                         <Button
                                                             variant="outlined"
                                                             startIcon={<DownloadIcon />}
                                                             onClick={() => handleDocumentDownload(
-                                                                selectedRequest.necessity_certificate,
+                                                                selectedRequest.necessity_certificate_url,
                                                                 `necessity_certificate_${selectedRequest.id}.pdf`
                                                             )}
                                                         >
                                                             Download
                                                         </Button>
+                                                    ) : (
+                                                        <Typography color="text.secondary">No file available</Typography>
                                                     )}
                                                 </Box>
                                             </Paper>
@@ -318,59 +381,62 @@ const MoneyRequestManagement = () => {
                                             <Paper sx={{ p: 2 }}>
                                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                                     <Typography><strong>Budget Document</strong></Typography>
-                                                    {selectedRequest.budget_document && (
+                                                    {selectedRequest.budget_document_url ? (
                                                         <Button
                                                             variant="outlined"
                                                             startIcon={<DownloadIcon />}
                                                             onClick={() => handleDocumentDownload(
-                                                                selectedRequest.budget_document,
+                                                                selectedRequest.budget_document_url,
                                                                 `budget_document_${selectedRequest.id}.pdf`
                                                             )}
                                                         >
                                                             Download
                                                         </Button>
+                                                    ) : (
+                                                        <Typography color="text.secondary">No file available</Typography>
                                                     )}
                                                 </Box>
                                             </Paper>
 
-                                            {selectedRequest.project_proposal && (
-                                                <Paper sx={{ p: 2 }}>
-                                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                                        <Typography><strong>Project Proposal</strong></Typography>
-                                                        <Button
-                                                            variant="outlined"
-                                                            startIcon={<DownloadIcon />}
-                                                            onClick={() => handleDocumentDownload(
-                                                                selectedRequest.project_proposal,
-                                                                `project_proposal_${selectedRequest.id}.pdf`
-                                                            )}
-                                                        >
-                                                            Download
-                                                        </Button>
-                                                    </Box>
-                                                </Paper>
-                                            )}
+                                                    {selectedRequest.project_proposal_url && (
+                                                        <Paper sx={{ p: 2 }}>
+                                                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                                <Typography><strong>Project Proposal</strong></Typography>
+                                                                <Button
+                                                                    variant="outlined"
+                                                                    startIcon={<DownloadIcon />}
+                                                                    onClick={() => handleDocumentDownload(
+                                                                        selectedRequest.project_proposal_url,
+                                                                        `project_proposal_${selectedRequest.id}.pdf`
+                                                                    )}
+                                                                >
+                                                                    Download
+                                                                </Button>
+                                                            </Box>
+                                                        </Paper>
+                                                    )}
 
-                                            {selectedRequest.additional_documents && (
-                                                <Paper sx={{ p: 2 }}>
-                                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                                        <Typography><strong>Additional Documents</strong></Typography>
-                                                        <Button
-                                                            variant="outlined"
-                                                            startIcon={<DownloadIcon />}
-                                                            onClick={() => handleDocumentDownload(
-                                                                selectedRequest.additional_documents,
-                                                                `additional_documents_${selectedRequest.id}.pdf`
-                                                            )}
-                                                        >
-                                                            Download
-                                                        </Button>
-                                                    </Box>
-                                                </Paper>
-                                            )}
+                                                    {selectedRequest.additional_documents_url && (
+                                                        <Paper sx={{ p: 2 }}>
+                                                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                                <Typography><strong>Additional Documents</strong></Typography>
+                                                                <Button
+                                                                    variant="outlined"
+                                                                    startIcon={<DownloadIcon />}
+                                                                    onClick={() => handleDocumentDownload(
+                                                                        selectedRequest.additional_documents_url,
+                                                                        `additional_documents_${selectedRequest.id}.pdf`
+                                                                    )}
+                                                                >
+                                                                    Download
+                                                                </Button>
+                                                            </Box>
+                                                        </Paper>
+                                                    )}
                                         </Box>
                                     </Grid>
 
+                                    {/* Admin Notes and Transfer Reference */}
                                     {selectedRequest.status === 'pending' && (
                                         <Grid item xs={12}>
                                             <TextField

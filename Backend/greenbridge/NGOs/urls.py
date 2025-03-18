@@ -10,6 +10,7 @@ urlpatterns = [
     
     # NGO Profile endpoints
     path('profile/', views.get_ngo_profile, name='get-ngo-profile'),
+    path('profile/<str:email>/', views.get_ngo_profile_by_email, name='get-ngo-profile-by-email'),
     path('profile/create/', views.create_ngo_profile, name='create-ngo-profile'),
     path('profile/update/', views.update_ngo_profile, name='update-ngo-profile'),
     path('upload-document/<str:document_type>/', views.upload_document, name='upload-document'),

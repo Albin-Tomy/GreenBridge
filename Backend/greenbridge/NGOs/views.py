@@ -327,4 +327,49 @@ def upload_document(request, document_type):
         return Response(
             {'error': str(e)},
             status=status.HTTP_400_BAD_REQUEST
+        )
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_ngo_profile_by_email(request, email):
+    try:
+        # Get the NGO registration associated with the email
+        ngo_registration = NGORegistration.objects.get(email=email)
+        
+        # Get or create the NGO profile with registration details
+        profile, created = NGOProfile.objects.get_or_create(
+            registration=ngo_registration,
+            defaults={
+                'contact_person': ngo_registration.name,
+                'contact_phone': '',
+                'address': '',
+                'description': f'NGO registered with number: {ngo_registration.registration_number}',
+            }
+        )
+
+        # Update profile with registration details if they're missing
+        if not created and (not profile.contact_person or not profile.description):
+            profile.contact_person = profile.contact_person or ngo_registration.name
+            profile.description = profile.description or f'NGO registered with number: {ngo_registration.registration_number}'
+            profile.save()
+        
+        # Include registration details in the response
+        serializer = NGOProfileSerializer(profile)
+        data = serializer.data
+        data.update({
+            'registration_number': ngo_registration.registration_number,
+            'ngo_name': ngo_registration.name,
+            'registration_status': ngo_registration.status
+        })
+        
+        return Response(data, status=status.HTTP_200_OK)
+    except NGORegistration.DoesNotExist:
+        return Response(
+            {'error': 'NGO registration not found'},
+            status=status.HTTP_404_NOT_FOUND
+        )
+    except Exception as e:
+        return Response(
+            {'error': str(e)},
+            status=status.HTTP_400_BAD_REQUEST
         ) 
