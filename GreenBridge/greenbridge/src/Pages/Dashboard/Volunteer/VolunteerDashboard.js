@@ -17,6 +17,15 @@ import {
     Tab,
     Alert
 } from '@mui/material';
+import {
+    Timeline,
+    TimelineItem,
+    TimelineSeparator,
+    TimelineConnector,
+    TimelineContent,
+    TimelineDot,
+    TimelineOppositeContent
+} from '@mui/lab';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
@@ -25,6 +34,8 @@ import ShoppingBasketIcon from '@mui/icons-material/ShoppingBasket';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
 import SchoolIcon from '@mui/icons-material/School';
 import ErrorIcon from '@mui/icons-material/Error';
+import HistoryIcon from '@mui/icons-material/History';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import Header from '../../../components/Header';
 import axios from 'axios';
 import { format } from 'date-fns';
@@ -37,6 +48,172 @@ import SchoolSuppliesDistributionPlan from '../../Distribution/SchoolSuppliesDis
 import SchoolSuppliesDistributionDetails from '../../Distribution/SchoolSuppliesDistributionDetails';
 import BookDistributionPlan from '../../Distribution/BookDistributionPlan';
 import BookDistributionDetails from '../../Distribution/BookDistributionDetails';
+
+const ActivityHistory = ({ activities }) => {
+    const [filterType, setFilterType] = useState('all'); // all, collected, distributed
+    const [selectedActivity, setSelectedActivity] = useState(null);
+    const [showDetails, setShowDetails] = useState(false);
+
+    const getActivityIcon = (type) => {
+        switch(type) {
+            case 'food':
+                return <RestaurantIcon />;
+            case 'grocery':
+                return <ShoppingBasketIcon />;
+            case 'book':
+                return <MenuBookIcon />;
+            case 'school_supplies':
+                return <SchoolIcon />;
+            default:
+                return <HistoryIcon />;
+        }
+    };
+
+    const getActivityColor = (action) => {
+        switch(action) {
+            case 'collected':
+                return 'primary';
+            case 'distributed':
+                return 'success';
+            case 'cancelled':
+                return 'error';
+            default:
+                return 'grey';
+        }
+    };
+
+    const filteredActivities = activities.filter(activity => 
+        filterType === 'all' || activity.action === filterType
+    );
+
+    const handleActivityClick = (activity) => {
+        setSelectedActivity(activity);
+        setShowDetails(true);
+    };
+
+    return (
+        <Box>
+            {/* Filter Controls */}
+            <Box sx={{ mb: 3, display: 'flex', justifyContent: 'center', gap: 2 }}>
+                <Button 
+                    variant={filterType === 'all' ? 'contained' : 'outlined'}
+                    onClick={() => setFilterType('all')}
+                >
+                    All Activities
+                </Button>
+                <Button 
+                    variant={filterType === 'collected' ? 'contained' : 'outlined'}
+                    onClick={() => setFilterType('collected')}
+                    startIcon={<VisibilityIcon />}
+                >
+                    Collected Requests
+                </Button>
+                <Button 
+                    variant={filterType === 'distributed' ? 'contained' : 'outlined'}
+                    onClick={() => setFilterType('distributed')}
+                    startIcon={<CheckCircleIcon />}
+                >
+                    Distributed Requests
+                </Button>
+            </Box>
+
+            {/* Activity Timeline */}
+            <Timeline position="alternate">
+                {filteredActivities.map((activity, index) => (
+                    <TimelineItem key={index}>
+                        <TimelineOppositeContent color="text.secondary">
+                            {new Date(activity.timestamp * 1000).toLocaleString()}
+                        </TimelineOppositeContent>
+                        <TimelineSeparator>
+                            <TimelineDot color={getActivityColor(activity.action)}>
+                                {getActivityIcon(activity.details.type)}
+                            </TimelineDot>
+                            {index < activities.length - 1 && <TimelineConnector />}
+                        </TimelineSeparator>
+                        <TimelineContent>
+                            <Paper 
+                                elevation={3} 
+                                sx={{ 
+                                    p: 2, 
+                                    bgcolor: 'background.paper',
+                                    cursor: 'pointer',
+                                    '&:hover': {
+                                        bgcolor: 'action.hover'
+                                    }
+                                }}
+                                onClick={() => handleActivityClick(activity)}
+                            >
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <Typography variant="h6" component="h3">
+                                        {activity.action.charAt(0).toUpperCase() + activity.action.slice(1)}
+                                    </Typography>
+                                    <Chip 
+                                        label={activity.status.toUpperCase()}
+                                        color={getActivityColor(activity.action)}
+                                        size="small"
+                                    />
+                                </Box>
+                                <Typography>
+                                    {activity.details.type.charAt(0).toUpperCase() + activity.details.type.slice(1)} Request #{activity.details.request_id}
+                                </Typography>
+                                {activity.details.description && (
+                                    <Typography variant="body2" color="text.secondary">
+                                        {activity.details.description}
+                                    </Typography>
+                                )}
+                            </Paper>
+                        </TimelineContent>
+                    </TimelineItem>
+                ))}
+            </Timeline>
+
+            {/* Activity Details Dialog */}
+            <Dialog
+                open={showDetails}
+                onClose={() => setShowDetails(false)}
+                maxWidth="sm"
+                fullWidth
+            >
+                {selectedActivity && (
+                    <>
+                        <DialogTitle>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                {getActivityIcon(selectedActivity.details.type)}
+                                {selectedActivity.details.type.charAt(0).toUpperCase() + 
+                                 selectedActivity.details.type.slice(1)} Request Details
+                            </Box>
+                        </DialogTitle>
+                        <DialogContent>
+                            <Box sx={{ mt: 2 }}>
+                                <Typography variant="subtitle1" gutterBottom>
+                                    <strong>Request ID:</strong> #{selectedActivity.details.request_id}
+                                </Typography>
+                                <Typography variant="subtitle1" gutterBottom>
+                                    <strong>Action:</strong> {selectedActivity.action.charAt(0).toUpperCase() + 
+                                    selectedActivity.action.slice(1)}
+                                </Typography>
+                                <Typography variant="subtitle1" gutterBottom>
+                                    <strong>Status:</strong> {selectedActivity.status}
+                                </Typography>
+                                <Typography variant="subtitle1" gutterBottom>
+                                    <strong>Date:</strong> {new Date(selectedActivity.timestamp * 1000).toLocaleString()}
+                                </Typography>
+                                {selectedActivity.details.description && (
+                                    <Typography variant="subtitle1" gutterBottom>
+                                        <strong>Description:</strong> {selectedActivity.details.description}
+                                    </Typography>
+                                )}
+                            </Box>
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={() => setShowDetails(false)}>Close</Button>
+                        </DialogActions>
+                    </>
+                )}
+            </Dialog>
+        </Box>
+    );
+};
 
 const VolunteerDashboard = () => {
     const [activeTab, setActiveTab] = useState(0);
@@ -60,9 +237,13 @@ const VolunteerDashboard = () => {
     const [showBookDistributionDetails, setShowBookDistributionDetails] = useState(false);
     const [selectedBookDistribution, setSelectedBookDistribution] = useState(null);
     const [isCancellationFlow, setIsCancellationFlow] = useState(false);
+    const [activities, setActivities] = useState([]);
+    const [showActivities, setShowActivities] = useState(false);
+    const [loadingActivities, setLoadingActivities] = useState(false);
 
     useEffect(() => {
         fetchApprovedRequests();
+        fetchVolunteerActivities();
     }, [activeTab]);
 
     const fetchApprovedRequests = async () => {
@@ -106,6 +287,25 @@ const VolunteerDashboard = () => {
         }
     };
 
+    const fetchVolunteerActivities = async () => {
+        try {
+            setLoadingActivities(true);
+            const token = localStorage.getItem('authToken');
+            const response = await axios.get(
+                'http://127.0.0.1:8000/api/v1/volunteer/activities/',
+                {
+                    headers: { Authorization: `Bearer ${token}` }
+                }
+            );
+            setActivities(response.data);
+        } catch (error) {
+            console.error('Error fetching volunteer activities:', error);
+            setError('Failed to fetch activity history');
+        } finally {
+            setLoadingActivities(false);
+        }
+    };
+
     // Function to initialize the quality form with default "good" report data
     const initializeQualityFormForCollection = (requestId) => {
         setSelectedRequest(requestId);
@@ -130,34 +330,47 @@ const VolunteerDashboard = () => {
         // For non-food items, proceed with the original logic
         try {
             const token = localStorage.getItem('authToken');
-            let endpoint;
+            let requestType;
             switch(activeTab) {
                 case 0:
-                    endpoint = 'food';
+                    requestType = 'food';
                     break;
                 case 1:
-                    endpoint = 'grocery';
+                    requestType = 'grocery';
                     break;
                 case 2:
-                    endpoint = 'book';
+                    requestType = 'book';
                     break;
                 case 3:
-                    endpoint = 'school-supplies';
+                    requestType = 'school-supplies';
                     break;
                 default:
-                    endpoint = 'food';
+                    requestType = 'food';
             }
             
+            // First mark the request as collected in the volunteer activity system
             await axios.put(
-                `http://127.0.0.1:8000/api/v1/${endpoint}/request/${id}/update-status/`,
+                `http://127.0.0.1:8000/api/v1/volunteer/request/${id}/${requestType}/collect/`,
+                {},
+                {
+                    headers: { Authorization: `Bearer ${token}` }
+                }
+            );
+
+            // Then update the request status
+            await axios.put(
+                `http://127.0.0.1:8000/api/v1/${requestType}/request/${id}/update-status/`,
                 { status: 'collected' },
                 {
                     headers: { Authorization: `Bearer ${token}` }
                 }
             );
+            
             fetchApprovedRequests();
+            fetchVolunteerActivities();
         } catch (error) {
             console.error('Error marking request as collected:', error);
+            setError('Failed to mark request as collected');
         }
     };
 
@@ -386,47 +599,50 @@ const VolunteerDashboard = () => {
         }
     };
 
-    const handleDistributionStatusUpdate = async (newStatus) => {
+    const handleDistributionStatusUpdate = async (newStatus, distributionId, requestId, requestType) => {
         try {
             const token = localStorage.getItem('authToken');
             
-            // First update the distribution plan status
+            // Update distribution status
             await axios.put(
-                `http://127.0.0.1:8000/api/v1/food/distribution/${selectedDistribution.id}/update-status/`,
+                `http://127.0.0.1:8000/api/v1/${requestType}/distribution/${distributionId}/update-status/`,
                 { status: newStatus },
                 {
-                    headers: { 
-                        Authorization: `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    }
+                    headers: { Authorization: `Bearer ${token}` }
                 }
             );
 
-            // If distribution is completed, update the food request status
+            // If distribution is completed, update both the request status and volunteer activity
             if (newStatus === 'completed') {
+                // Record the distribution in volunteer activity
                 await axios.put(
-                    `http://127.0.0.1:8000/api/v1/food/request/${selectedDistribution.food_request}/update-status/`,
+                    `http://127.0.0.1:8000/api/v1/volunteer/request/${requestId}/${requestType}/distribute/`,
+                    {},
+                    {
+                        headers: { Authorization: `Bearer ${token}` }
+                    }
+                );
+
+                // Update request status
+                await axios.put(
+                    `http://127.0.0.1:8000/api/v1/${requestType}/request/${requestId}/update-status/`,
                     { 
                         status: 'distributed',
-                        distribution_id: selectedDistribution.id  // Pass the distribution ID
+                        distribution_id: distributionId
                     },
                     {
-                        headers: { 
-                            Authorization: `Bearer ${token}`,
-                            'Content-Type': 'application/json'
-                        }
+                        headers: { Authorization: `Bearer ${token}` }
                     }
                 );
             }
             
-            // Refresh the details
-            await fetchDistributionDetails(selectedDistribution.food_request);
+            // Refresh the data
             fetchApprovedRequests();
+            fetchVolunteerActivities();
             setError(null);
         } catch (error) {
             console.error('Error updating distribution status:', error);
-            const errorMessage = error.response?.data?.error || error.message;
-            setError('Failed to update distribution status: ' + errorMessage);
+            setError('Failed to update distribution status');
         }
     };
 
@@ -942,9 +1158,22 @@ const VolunteerDashboard = () => {
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-                <Header />
+            <Header />
 
             <Box component="main" sx={{ flexGrow: 1, p: 3, mt: 8 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+                    <Typography variant="h4" gutterBottom>
+                        Volunteer Dashboard
+                    </Typography>
+                    <Button
+                        variant="outlined"
+                        startIcon={<HistoryIcon />}
+                        onClick={() => setShowActivities(true)}
+                    >
+                        View Activity History
+                    </Button>
+                </Box>
+
                 <Tabs 
                     value={activeTab} 
                     onChange={(e, newValue) => setActiveTab(newValue)}
@@ -1032,7 +1261,38 @@ const VolunteerDashboard = () => {
                     </Grid>
                 )}
 
-            {/* Details Dialog */}
+                {/* Activity History Dialog */}
+                <Dialog
+                    open={showActivities}
+                    onClose={() => setShowActivities(false)}
+                    maxWidth="md"
+                    fullWidth
+                >
+                    <DialogTitle>
+                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                            <HistoryIcon sx={{ mr: 1 }} />
+                            Your Activity History
+                        </Box>
+                    </DialogTitle>
+                    <DialogContent>
+                        {loadingActivities ? (
+                            <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
+                                <CircularProgress />
+                            </Box>
+                        ) : activities.length > 0 ? (
+                            <ActivityHistory activities={activities} />
+                        ) : (
+                            <Typography sx={{ textAlign: 'center', py: 3 }}>
+                                No activities recorded yet.
+                            </Typography>
+                        )}
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={() => setShowActivities(false)}>Close</Button>
+                    </DialogActions>
+                </Dialog>
+
+                {/* Details Dialog */}
                 <Dialog 
                     open={openDialog} 
                     onClose={() => setOpenDialog(false)}
@@ -1149,7 +1409,7 @@ const VolunteerDashboard = () => {
                     open={showDistributionDetails}
                     onClose={() => setShowDistributionDetails(false)}
                     distribution={selectedDistribution}
-                    onStatusUpdate={handleDistributionStatusUpdate}
+                    onStatusUpdate={(newStatus) => handleDistributionStatusUpdate(newStatus, selectedDistribution.id, selectedDistribution.food_request, 'food')}
                 />
 
                 {/* Add Grocery Distribution Plan Form Dialog */}
@@ -1173,7 +1433,7 @@ const VolunteerDashboard = () => {
                     open={showGroceryDistributionDetails}
                     onClose={() => setShowGroceryDistributionDetails(false)}
                     distribution={selectedGroceryDistribution}
-                    onStatusUpdate={handleGroceryDistributionStatusUpdate}
+                    onStatusUpdate={(newStatus) => handleDistributionStatusUpdate(newStatus, selectedGroceryDistribution.id, selectedGroceryDistribution.grocery_request, 'grocery')}
                 />
 
                 {showSchoolSuppliesDistributionPlan && selectedRequest && (
@@ -1190,7 +1450,7 @@ const VolunteerDashboard = () => {
                     open={showSchoolSuppliesDistributionDetails}
                     onClose={() => setShowSchoolSuppliesDistributionDetails(false)}
                     distribution={selectedSchoolSuppliesDistribution}
-                    onStatusUpdate={handleSchoolSuppliesDistributionStatusUpdate}
+                    onStatusUpdate={(newStatus) => handleDistributionStatusUpdate(newStatus, selectedSchoolSuppliesDistribution.id, selectedSchoolSuppliesDistribution.school_supplies_request, 'school-supplies')}
                 />
 
                 {/* Add Book Distribution Plan Dialog */}
@@ -1209,7 +1469,7 @@ const VolunteerDashboard = () => {
                     open={showBookDistributionDetails}
                     onClose={() => setShowBookDistributionDetails(false)}
                     distribution={selectedBookDistribution}
-                    onStatusUpdate={handleBookDistributionStatusUpdate}
+                    onStatusUpdate={(newStatus) => handleDistributionStatusUpdate(newStatus, selectedBookDistribution.id, selectedBookDistribution.book_request, 'book')}
                 />
             </Box>
         </Box>

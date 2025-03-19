@@ -3,7 +3,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes, parser_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from .models import VolunteerRegistration, BlockchainBlock
+from .models import VolunteerRegistration, BlockchainBlock, VolunteerActivity
 from .serializers import VolunteerRegistrationSerializer
 from authentication.models import User_profile
 from .blockchain import VolunteerBlockchain
@@ -12,6 +12,7 @@ from time import time
 from django.utils import timezone
 from rest_framework.parsers import MultiPartParser, FormParser
 from django.core.files.storage import default_storage
+from datetime import datetime
 
 # Create your views here.
 
@@ -283,3 +284,109 @@ def get_quality_reports(request):
         return Response({
             'error': str(e)
         }, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_volunteer_activities(request):
+    """
+    Get all activities of the logged-in volunteer
+    """
+    try:
+        volunteer_id = request.user.id
+        activities = VolunteerActivity.objects.filter(volunteer_id=volunteer_id).order_by('-timestamp')
+        
+        activity_data = []
+        for activity in activities:
+            data = {
+                'id': activity.id,
+                'timestamp': activity.timestamp.timestamp(),
+                'action': activity.action,
+                'request_type': activity.request_type,
+                'request_id': activity.request_id,
+                'status': activity.status,
+                'details': {
+                    'type': activity.request_type,
+                    'request_id': activity.request_id,
+                    'description': activity.description
+                }
+            }
+            activity_data.append(data)
+        
+        return Response(activity_data, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response(
+            {'error': str(e)},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def mark_request_collected(request, request_id, request_type):
+    """
+    Mark a request as collected and store volunteer information
+    """
+    try:
+        volunteer_id = request.user.id
+        
+        # Create activity record
+        VolunteerActivity.objects.create(
+            volunteer_id=volunteer_id,
+            request_id=request_id,
+            request_type=request_type,
+            action='collected',
+            status='collected',
+            description=f'Collected {request_type} request #{request_id}'
+        )
+        
+        # Add to blockchain
+        blockchain = VolunteerBlockchain()
+        blockchain.add_block({
+            'volunteer_id': volunteer_id,
+            'action': 'collected',
+            'type': request_type,
+            'request_id': request_id,
+            'timestamp': datetime.now().timestamp()
+        })
+        
+        return Response({'status': 'success'}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response(
+            {'error': str(e)},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def mark_request_distributed(request, request_id, request_type):
+    """
+    Mark a request as distributed and update volunteer activity
+    """
+    try:
+        volunteer_id = request.user.id
+        
+        # Create activity record
+        VolunteerActivity.objects.create(
+            volunteer_id=volunteer_id,
+            request_id=request_id,
+            request_type=request_type,
+            action='distributed',
+            status='distributed',
+            description=f'Distributed {request_type} request #{request_id}'
+        )
+        
+        # Add to blockchain
+        blockchain = VolunteerBlockchain()
+        blockchain.add_block({
+            'volunteer_id': volunteer_id,
+            'action': 'distributed',
+            'type': request_type,
+            'request_id': request_id,
+            'timestamp': datetime.now().timestamp()
+        })
+        
+        return Response({'status': 'success'}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response(
+            {'error': str(e)},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )

@@ -104,6 +104,7 @@ MIDDLEWARE = [
     
 ]
 
+
 AUTH_USER_MODEL = 'authentication.User'
 
 ROOT_URLCONF = 'greenbridge.urls'
@@ -114,12 +115,14 @@ REST_FRAMEWORK = {
     ],
 }
 
+CSRF_TRUSTED_ORIGINS = ["https://greenbridgefrontend.onrender.com"]
 
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
     "https://greenbridge.netlify.app",
+    "https://greenbridgefrontend.onrender.com"
      # Your React frontend URL
 ]
 

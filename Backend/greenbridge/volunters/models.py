@@ -1,5 +1,6 @@
 from django.db import models
 from authentication.models import User, User_profile
+from django.utils import timezone
 
 class VolunteerRegistration(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='volunteer')
@@ -58,3 +59,18 @@ class BlockchainBlock(models.Model):
 
     def __str__(self):
         return f"Block #{self.index}"
+
+class VolunteerActivity(models.Model):
+    volunteer_id = models.IntegerField()
+    request_id = models.IntegerField()
+    request_type = models.CharField(max_length=50)  # food, grocery, book, school_supplies
+    action = models.CharField(max_length=50)  # collected, distributed, cancelled
+    status = models.CharField(max_length=50)
+    description = models.TextField(null=True, blank=True)
+    timestamp = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        ordering = ['-timestamp']
+
+    def __str__(self):
+        return f"{self.action} - {self.request_type} #{self.request_id} by Volunteer #{self.volunteer_id}"

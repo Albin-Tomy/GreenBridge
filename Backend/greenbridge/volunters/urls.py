@@ -10,4 +10,7 @@ urlpatterns = [
     path('blockchain/', views.get_blockchain_details, name='blockchain-details'),
     path('quality-report/', views.report_food_quality, name='report-food-quality'),
     path('quality-reports/', views.get_quality_reports, name='get-quality-reports'),
+    path('activities/', views.get_volunteer_activities, name='volunteer-activities'),
+    path('request/<int:request_id>/<str:request_type>/collect/', views.mark_request_collected, name='mark-request-collected'),
+    path('request/<int:request_id>/<str:request_type>/distribute/', views.mark_request_distributed, name='mark-request-distributed'),
 ]
