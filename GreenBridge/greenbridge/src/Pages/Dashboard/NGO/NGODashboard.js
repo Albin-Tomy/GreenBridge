@@ -40,6 +40,10 @@ import NGODistributionDetails from '../../Distribution/NGODistributionDetails';
 import NGOMoneyRequestForm from '../../NGO/NGOMoneyRequestForm';
 import NGOMoneyRequestList from '../../NGO/NGOMoneyRequestList';
 import NGOProfile from './NGOProfile';
+import DistributionPlan from '../../Distribution/DistributionPlan';
+import GroceryDistributionPlan from '../../Distribution/GroceryDistributionPlan';
+import BookDistributionPlan from '../../Distribution/BookDistributionPlan';
+import SchoolSuppliesDistributionPlan from '../../Distribution/SchoolSuppliesDistributionPlan';
 
 const drawerWidth = 240;
 
@@ -177,6 +181,11 @@ const NGODashboard = () => {
     const [error, setError] = useState(null);
     const [showMoneyRequestForm, setShowMoneyRequestForm] = useState(false);
     const [showProfile, setShowProfile] = useState(false);
+    const [showDistributionForm, setShowDistributionForm] = useState(false);
+    const [showGroceryDistributionForm, setShowGroceryDistributionForm] = useState(false);
+    const [showBookDistributionPlan, setShowBookDistributionPlan] = useState(false);
+    const [showSchoolSuppliesDistributionPlan, setShowSchoolSuppliesDistributionPlan] = useState(false);
+    const [selectedForDistribution, setSelectedForDistribution] = useState(null);
 
     useEffect(() => {
         if (activeTab !== 4) {
@@ -376,6 +385,162 @@ const NGODashboard = () => {
         return <Chip label={config.label} color={config.color} size="small" />;
     };
 
+    const handleCreateDistribution = async (formData) => {
+        try {
+            if (!selectedForDistribution) {
+                setError('No request selected for distribution plan');
+                return;
+            }
+
+            const token = localStorage.getItem('authToken');
+            
+            // Prepare the distribution data
+            const distributionData = {
+                ...formData,
+                food_request_id: selectedForDistribution,
+                status: 'planned'
+            };
+            
+            // Create the distribution plan
+            await axios.post(
+                `http://127.0.0.1:8000/api/v1/food/request/${selectedForDistribution}/distribution/`,
+                distributionData,
+                {
+                    headers: { 
+                        Authorization: `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                }
+            );
+
+            // Update the request status
+            await axios.put(
+                `http://127.0.0.1:8000/api/v1/food/request/${selectedForDistribution}/update-status/`,
+                { 
+                    status: 'distribution_planned'
+                },
+                {
+                    headers: { 
+                        Authorization: `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                }
+            );
+
+            setShowDistributionForm(false);
+            fetchRequests();
+            alert('Distribution plan created successfully!');
+        } catch (error) {
+            console.error('Error creating distribution plan:', error);
+            setError('Failed to create distribution plan: ' + (error.response?.data?.error || error.message));
+        }
+    };
+
+    const handleCreateGroceryDistribution = async (formData) => {
+        try {
+            const token = localStorage.getItem('authToken');
+            await axios.post(
+                `http://127.0.0.1:8000/api/v1/grocery/request/${selectedForDistribution}/distribution/`,
+                {
+                    ...formData,
+                    status: 'planned'
+                },
+                {
+                    headers: { 
+                        Authorization: `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                }
+            );
+
+            await axios.put(
+                `http://127.0.0.1:8000/api/v1/grocery/request/${selectedForDistribution}/update-status/`,
+                { 
+                    status: 'distribution_planned'
+                },
+                {
+                    headers: { 
+                        Authorization: `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                }
+            );
+
+            setShowGroceryDistributionForm(false);
+            fetchRequests();
+            alert('Grocery distribution plan created successfully!');
+        } catch (error) {
+            console.error('Error creating grocery distribution plan:', error);
+            setError('Failed to create grocery distribution plan: ' + (error.response?.data?.error || error.message));
+        }
+    };
+
+    const handleCreateBookDistribution = async (formData) => {
+        try {
+            const token = localStorage.getItem('authToken');
+            await axios.post(
+                `http://127.0.0.1:8000/api/v1/book/request/${selectedForDistribution}/distribution/`,
+                {
+                    ...formData,
+                    status: 'planned'
+                },
+                {
+                    headers: { Authorization: `Bearer ${token}` }
+                }
+            );
+
+            await axios.put(
+                `http://127.0.0.1:8000/api/v1/book/request/${selectedForDistribution}/update-status/`,
+                { 
+                    status: 'distribution_planned'
+                },
+                {
+                    headers: { Authorization: `Bearer ${token}` }
+                }
+            );
+
+            setShowBookDistributionPlan(false);
+            fetchRequests();
+            alert('Book distribution plan created successfully!');
+        } catch (error) {
+            console.error('Error creating book distribution plan:', error);
+            setError('Failed to create book distribution plan');
+        }
+    };
+
+    const handleCreateSchoolSuppliesDistribution = async (formData) => {
+        try {
+            const token = localStorage.getItem('authToken');
+            await axios.post(
+                `http://127.0.0.1:8000/api/v1/school-supplies/request/${selectedForDistribution}/distribution/`,
+                {
+                    ...formData,
+                    status: 'planned'
+                },
+                {
+                    headers: { Authorization: `Bearer ${token}` }
+                }
+            );
+
+            await axios.put(
+                `http://127.0.0.1:8000/api/v1/school-supplies/request/${selectedForDistribution}/update-status/`,
+                { 
+                    status: 'distribution_planned'
+                },
+                {
+                    headers: { Authorization: `Bearer ${token}` }
+                }
+            );
+
+            setShowSchoolSuppliesDistributionPlan(false);
+            fetchRequests();
+            alert('School supplies distribution plan created successfully!');
+        } catch (error) {
+            console.error('Error creating school supplies distribution plan:', error);
+            setError('Failed to create school supplies distribution plan');
+        }
+    };
+
     const getActionButtons = (request) => {
         const actions = statusActions[request.status] || [];
         const isFoodRequest = activeTab === 0;
@@ -392,6 +557,34 @@ const NGODashboard = () => {
                 >
                     Details
                 </Button>
+
+                {request.status === 'collected' && (
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={() => {
+                            setSelectedForDistribution(request.id);
+                            switch(activeTab) {
+                                case 0:
+                                    setShowDistributionForm(true);
+                                    break;
+                                case 1:
+                                    setShowGroceryDistributionForm(true);
+                                    break;
+                                case 2:
+                                    setShowBookDistributionPlan(true);
+                                    break;
+                                case 3:
+                                    setShowSchoolSuppliesDistributionPlan(true);
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }}
+                    >
+                        Create Distribution Plan
+                    </Button>
+                )}
 
                 {request.status === 'distributed' && (
                     <Button
@@ -914,6 +1107,88 @@ const NGODashboard = () => {
                 onClose={() => setShowDistributionDetails(false)}
                 distribution={selectedDistribution}
             />
+
+            <Dialog
+                open={showDistributionForm}
+                onClose={() => setShowDistributionForm(false)}
+                maxWidth="md"
+                fullWidth
+            >
+                <DialogTitle>Create Food Distribution Plan</DialogTitle>
+                <DialogContent>
+                    {selectedForDistribution ? (
+                        <>
+                            <Typography variant="subtitle1" gutterBottom>
+                                Creating distribution plan for Food Request #{selectedForDistribution}
+                            </Typography>
+                            <DistributionPlan
+                                foodRequestId={selectedForDistribution}
+                                onSubmit={handleCreateDistribution}
+                                onClose={() => setShowDistributionForm(false)}
+                            />
+                        </>
+                    ) : (
+                        <Typography color="error">
+                            Error: No food request selected. Please try again.
+                        </Typography>
+                    )}
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setShowDistributionForm(false)}>Cancel</Button>
+                </DialogActions>
+            </Dialog>
+
+            <Dialog
+                open={showGroceryDistributionForm}
+                onClose={() => setShowGroceryDistributionForm(false)}
+                maxWidth="md"
+                fullWidth
+            >
+                <DialogTitle>Create Grocery Distribution Plan</DialogTitle>
+                <DialogContent>
+                    <GroceryDistributionPlan
+                        groceryRequest={selectedForDistribution}
+                        onSubmit={handleCreateGroceryDistribution}
+                        onClose={() => setShowGroceryDistributionForm(false)}
+                    />
+                </DialogContent>
+            </Dialog>
+
+            {showBookDistributionPlan && selectedForDistribution && (
+                <Dialog 
+                    open={showBookDistributionPlan} 
+                    onClose={() => setShowBookDistributionPlan(false)} 
+                    maxWidth="md" 
+                    fullWidth
+                >
+                    <DialogTitle>Create Book Distribution Plan</DialogTitle>
+                    <DialogContent>
+                        <BookDistributionPlan
+                            bookRequest={selectedForDistribution}
+                            onSubmit={handleCreateBookDistribution}
+                            onClose={() => setShowBookDistributionPlan(false)}
+                        />
+                    </DialogContent>
+                </Dialog>
+            )}
+
+            {showSchoolSuppliesDistributionPlan && selectedForDistribution && (
+                <Dialog 
+                    open={showSchoolSuppliesDistributionPlan} 
+                    onClose={() => setShowSchoolSuppliesDistributionPlan(false)} 
+                    maxWidth="md" 
+                    fullWidth
+                >
+                    <DialogTitle>Create School Supplies Distribution Plan</DialogTitle>
+                    <DialogContent>
+                        <SchoolSuppliesDistributionPlan
+                            suppliesRequest={selectedForDistribution}
+                            onSubmit={handleCreateSchoolSuppliesDistribution}
+                            onClose={() => setShowSchoolSuppliesDistributionPlan(false)}
+                        />
+                    </DialogContent>
+                </Dialog>
+            )}
         </Box>
     );
 };
