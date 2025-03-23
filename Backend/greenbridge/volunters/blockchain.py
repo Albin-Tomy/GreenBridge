@@ -100,4 +100,47 @@ class VolunteerBlockchain:
                     'details': block.data.get('details'),
                     'hash': block.hash
                 })
+        return history
+
+    def add_donation_block(self, donation_data: Dict) -> Block:
+        """
+        Add a new block specifically for donation records
+        
+        Args:
+            donation_data: Dictionary containing donation information
+            
+        Returns:
+            The newly created block
+        """
+        # Ensure the donation data has a type marker
+        donation_data['record_type'] = 'donation'
+        
+        # Add the block using the existing method
+        return self.add_block(donation_data)
+        
+    def get_donation_history(self, user_id: int = None) -> List[Dict]:
+        """
+        Get history of donation transactions from the blockchain
+        
+        Args:
+            user_id: Optional filter by user ID
+            
+        Returns:
+            List of donation records
+        """
+        history = []
+        for block in self.chain[1:]:  # Skip genesis block
+            if block.data.get('record_type') == 'donation':
+                # If user_id is provided, filter by it
+                if user_id is not None and block.data.get('user_id') != user_id:
+                    continue
+                    
+                history.append({
+                    'timestamp': block.timestamp,
+                    'amount': block.data.get('amount'),
+                    'donation_type': block.data.get('donation_type'),
+                    'purpose': block.data.get('purpose'),
+                    'user_id': block.data.get('user_id'),
+                    'hash': block.hash
+                })
         return history 

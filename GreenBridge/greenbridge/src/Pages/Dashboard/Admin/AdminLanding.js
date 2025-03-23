@@ -16,7 +16,8 @@ import {
     MonetizationOn as MoneyIcon,
     LocalShipping as ShippingIcon,
     Business as BusinessIcon,
-    Dashboard as DashboardIcon
+    Dashboard as DashboardIcon,
+    Link as LinkIcon
 } from '@mui/icons-material';
 
 const AdminLanding = () => {
@@ -29,6 +30,13 @@ const AdminLanding = () => {
             icon: <DashboardIcon sx={{ fontSize: 40, color: 'primary.main' }} />,
             path: '/admin/dashboard',
             color: '#1976d2'
+        },
+        {
+            title: 'Blockchain Explorer',
+            description: 'Monitor donation and volunteer blockchain records',
+            icon: <LinkIcon sx={{ fontSize: 40, color: 'primary.dark' }} />,
+            path: '/volunteer/blockchain',
+            color: '#0D47A1'
         },
         {
             title: 'NGO Management',

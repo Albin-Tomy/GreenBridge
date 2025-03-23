@@ -12,6 +12,7 @@ from rest_framework import viewsets, serializers
 from rest_framework.decorators import action
 from NGOs.models import NGOProfile
 from django.contrib.auth import get_user_model
+from .blockchain_service import DonationBlockchainService
 
 # Initialize Razorpay client
 razorpay_client = razorpay.Client(auth=(settings.RAZORPAY_API_KEY, settings.RAZORPAY_API_SECRET))
@@ -72,6 +73,10 @@ def verify_donation(request):
         donation.status = 'completed'
         donation.razorpay_payment_id = data['payment_id']
         donation.save()
+
+        # Record the donation in blockchain
+        blockchain_service = DonationBlockchainService()
+        blockchain_service.record_donation(donation)
 
         return Response({
             'status': 'Payment verified successfully',
