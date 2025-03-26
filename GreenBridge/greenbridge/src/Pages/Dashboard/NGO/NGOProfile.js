@@ -55,7 +55,7 @@ const NGOProfile = () => {
             };
 
             const response = await axios.post(
-                'http://127.0.0.1:8000/api/v1/ngo/profile/create/',
+                'https://greenbridgeserver.onrender.com/api/v1/ngo/profile/create/',
                 initialProfile,
                 {
                     headers: {
@@ -77,7 +77,7 @@ const NGOProfile = () => {
     const fetchRegistrationDetails = async () => {
         try {
             const token = localStorage.getItem('authToken');
-            const response = await axios.get('http://127.0.0.1:8000/api/v1/ngo/registration/', {
+            const response = await axios.get('https://greenbridgeserver.onrender.com/api/v1/ngo/registration/', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             return response.data;
@@ -92,7 +92,7 @@ const NGOProfile = () => {
             const token = localStorage.getItem('authToken');
             try {
                 // First try to fetch existing profile
-                const profileResponse = await axios.get('http://127.0.0.1:8000/api/v1/ngo/profile/', {
+                const profileResponse = await axios.get('https://greenbridgeserver.onrender.com/api/v1/ngo/profile/', {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setProfile(profileResponse.data);
@@ -101,7 +101,7 @@ const NGOProfile = () => {
                 if (profileError.response && profileError.response.status === 404) {
                     // Profile doesn't exist, create a new one
                     const response = await axios.post(
-                        'http://127.0.0.1:8000/api/v1/ngo/profile/create/',
+                        'https://greenbridgeserver.onrender.com/api/v1/ngo/profile/create/',
                         {},
                         {
                             headers: { Authorization: `Bearer ${token}` }
@@ -172,7 +172,7 @@ const NGOProfile = () => {
         try {
             const token = localStorage.getItem('authToken');
             await axios.post(
-                `http://127.0.0.1:8000/api/v1/ngo/upload-document/${type}/`,
+                `https://greenbridgeserver.onrender.com/api/v1/ngo/upload-document/${type}/`,
                 formData,
                 {
                     headers: {
@@ -255,7 +255,7 @@ const NGOProfile = () => {
             }
 
             const response = await axios.put(
-                'http://127.0.0.1:8000/api/v1/ngo/profile/update/',
+                'https://greenbridgeserver.onrender.com/api/v1/ngo/profile/update/',
                 profileUpdateData,
                 {
                     headers: {

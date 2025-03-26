@@ -33,7 +33,7 @@ const UserProfile = () => {
       if (!userId || !token) return;  // Add guard clause
       
       try {
-        const response = await axios.get(`http://127.0.0.1:8000/api/v1/auth/user_profiles/${userId}/`, {
+        const response = await axios.get(`https://greenbridgeserver.onrender.com/api/v1/auth/user_profiles/${userId}/`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -146,7 +146,7 @@ const UserProfile = () => {
 
     try {
       const response = await axios.put(
-        `http://127.0.0.1:8000/api/v1/auth/user_profiles/update/${userId}/`,
+        `https://greenbridgeserver.onrender.com/api/v1/auth/user_profiles/update/${userId}/`,
         {
           first_name: profile.first_name,
           last_name: profile.last_name,

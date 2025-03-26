@@ -39,7 +39,7 @@ const NGOMoneyRequestForm = () => {
     const fetchNGOProfile = async () => {
         try {
             const token = localStorage.getItem('authToken');
-            const response = await axios.get('http://127.0.0.1:8000/api/v1/ngo/profile/', {
+            const response = await axios.get('https://greenbridgeserver.onrender.com/api/v1/ngo/profile/', {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
@@ -174,7 +174,7 @@ const NGOMoneyRequestForm = () => {
 
             // Use the correct API endpoint for NGO money requests
             const response = await axios.post(
-                'http://127.0.0.1:8000/api/v1/donations/ngo/money-request/create/',
+                'https://greenbridgeserver.onrender.com/api/v1/donations/ngo/money-request/create/',
                 formDataToSend,
                 {
                     headers: {

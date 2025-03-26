@@ -64,7 +64,7 @@ const Header = () => {
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
-        const response = await axios.get(`http://127.0.0.1:8000/api/v1/auth/user_profiles/${userId}/`, {
+        const response = await axios.get(`https://greenbridgeserver.onrender.com/api/v1/auth/user_profiles/${userId}/`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

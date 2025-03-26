@@ -36,8 +36,8 @@ const NGOMoneyRequestList = ({ isAdmin = false }) => {
         try {
             const token = localStorage.getItem('authToken');
             const endpoint = isAdmin 
-                ? 'http://127.0.0.1:8000/api/v1/donations/ngo/money-request/all/'
-                : 'http://127.0.0.1:8000/api/v1/donations/ngo/money-request/my-requests/';
+                ? 'https://greenbridgeserver.onrender.com/api/v1/donations/ngo/money-request/all/'
+                : 'https://greenbridgeserver.onrender.com/api/v1/donations/ngo/money-request/my-requests/';
             
             const response = await axios.get(endpoint, {
                 headers: { Authorization: `Bearer ${token}` }
@@ -79,7 +79,7 @@ const NGOMoneyRequestList = ({ isAdmin = false }) => {
             }
 
             await axios.put(
-                `http://127.0.0.1:8000/api/v1/donations/ngo/money-request/${selectedRequest.id}/update-status/`,
+                `https://greenbridgeserver.onrender.com/api/v1/donations/ngo/money-request/${selectedRequest.id}/update-status/`,
                 data,
                 {
                     headers: { Authorization: `Bearer ${token}` }
@@ -105,7 +105,7 @@ const NGOMoneyRequestList = ({ isAdmin = false }) => {
         try {
             const token = localStorage.getItem('authToken');
             await axios.post(
-                `http://127.0.0.1:8000/api/v1/donations/ngo/money-request/${selectedRequest.id}/add-update/`,
+                `https://greenbridgeserver.onrender.com/api/v1/donations/ngo/money-request/${selectedRequest.id}/add-update/`,
                 { message: updateMessage },
                 {
                     headers: { Authorization: `Bearer ${token}` }

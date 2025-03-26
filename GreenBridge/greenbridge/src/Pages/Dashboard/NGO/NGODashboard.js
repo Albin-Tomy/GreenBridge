@@ -222,7 +222,7 @@ const NGODashboard = () => {
             const endpoint = type === 'food' ? 'food' : 'grocery';
             
             await axios.put(
-                `http://127.0.0.1:8000/api/v1/${endpoint}/request/${requestId}/update-status/`,
+                `https://greenbridgeserver.onrender.com/api/v1/${endpoint}/request/${requestId}/update-status/`,
                 { status: 'cancelled' },
                 {
                     headers: { Authorization: `Bearer ${token}` }
@@ -256,7 +256,7 @@ const NGODashboard = () => {
                     endpoint = 'food';
             }
             
-            const response = await axios.get(`http://127.0.0.1:8000/api/v1/${endpoint}/all/`, {
+            const response = await axios.get(`https://greenbridgeserver.onrender.com/api/v1/${endpoint}/all/`, {
                 headers: { Authorization: `Bearer ${token}` },
                 params: { status: filter !== 'all' ? filter : null }
             });
@@ -293,7 +293,7 @@ const NGODashboard = () => {
             const token = localStorage.getItem('authToken');
             const endpoint = activeTab === 0 ? 'food' : activeTab === 1 ? 'grocery' : activeTab === 2 ? 'book' : 'school-supplies';
             await axios.put(
-                `http://127.0.0.1:8000/api/v1/${endpoint}/request/${id}/update-status/`,
+                `https://greenbridgeserver.onrender.com/api/v1/${endpoint}/request/${id}/update-status/`,
                 { status: newStatus },
                 {
                     headers: { Authorization: `Bearer ${token}` }
@@ -311,7 +311,7 @@ const NGODashboard = () => {
             setLoading(true);
             const token = localStorage.getItem('authToken');
             const response = await axios.get(
-                `http://127.0.0.1:8000/api/v1/food/request/${requestId}/quality-report/view/`,
+                `https://greenbridgeserver.onrender.com/api/v1/food/request/${requestId}/quality-report/view/`,
                 {
                     headers: { Authorization: `Bearer ${token}` }
                 }
@@ -339,7 +339,7 @@ const NGODashboard = () => {
         try {
             const token = localStorage.getItem('authToken');
             const response = await axios.get(
-                `http://127.0.0.1:8000/api/v1/food/request/${requestId}/distribution/completed/`,
+                `https://greenbridgeserver.onrender.com/api/v1/food/request/${requestId}/distribution/completed/`,
                 {
                     headers: { Authorization: `Bearer ${token}` }
                 }
@@ -403,7 +403,7 @@ const NGODashboard = () => {
             
             // Create the distribution plan
             await axios.post(
-                `http://127.0.0.1:8000/api/v1/food/request/${selectedForDistribution}/distribution/`,
+                `https://greenbridgeserver.onrender.com/api/v1/food/request/${selectedForDistribution}/distribution/`,
                 distributionData,
                 {
                     headers: { 
@@ -415,7 +415,7 @@ const NGODashboard = () => {
 
             // Update the request status
             await axios.put(
-                `http://127.0.0.1:8000/api/v1/food/request/${selectedForDistribution}/update-status/`,
+                `https://greenbridgeserver.onrender.com/api/v1/food/request/${selectedForDistribution}/update-status/`,
                 { 
                     status: 'distribution_planned'
                 },
@@ -440,7 +440,7 @@ const NGODashboard = () => {
         try {
             const token = localStorage.getItem('authToken');
             await axios.post(
-                `http://127.0.0.1:8000/api/v1/grocery/request/${selectedForDistribution}/distribution/`,
+                `https://greenbridgeserver.onrender.com/api/v1/grocery/request/${selectedForDistribution}/distribution/`,
                 {
                     ...formData,
                     status: 'planned'
@@ -454,7 +454,7 @@ const NGODashboard = () => {
             );
 
             await axios.put(
-                `http://127.0.0.1:8000/api/v1/grocery/request/${selectedForDistribution}/update-status/`,
+                `https://greenbridgeserver.onrender.com/api/v1/grocery/request/${selectedForDistribution}/update-status/`,
                 { 
                     status: 'distribution_planned'
                 },
@@ -479,7 +479,7 @@ const NGODashboard = () => {
         try {
             const token = localStorage.getItem('authToken');
             await axios.post(
-                `http://127.0.0.1:8000/api/v1/book/request/${selectedForDistribution}/distribution/`,
+                `https://greenbridgeserver.onrender.com/api/v1/book/request/${selectedForDistribution}/distribution/`,
                 {
                     ...formData,
                     status: 'planned'
@@ -490,7 +490,7 @@ const NGODashboard = () => {
             );
 
             await axios.put(
-                `http://127.0.0.1:8000/api/v1/book/request/${selectedForDistribution}/update-status/`,
+                `https://greenbridgeserver.onrender.com/api/v1/book/request/${selectedForDistribution}/update-status/`,
                 { 
                     status: 'distribution_planned'
                 },
@@ -512,7 +512,7 @@ const NGODashboard = () => {
         try {
             const token = localStorage.getItem('authToken');
             await axios.post(
-                `http://127.0.0.1:8000/api/v1/school-supplies/request/${selectedForDistribution}/distribution/`,
+                `https://greenbridgeserver.onrender.com/api/v1/school-supplies/request/${selectedForDistribution}/distribution/`,
                 {
                     ...formData,
                     status: 'planned'
@@ -523,7 +523,7 @@ const NGODashboard = () => {
             );
 
             await axios.put(
-                `http://127.0.0.1:8000/api/v1/school-supplies/request/${selectedForDistribution}/update-status/`,
+                `https://greenbridgeserver.onrender.com/api/v1/school-supplies/request/${selectedForDistribution}/update-status/`,
                 { 
                     status: 'distribution_planned'
                 },

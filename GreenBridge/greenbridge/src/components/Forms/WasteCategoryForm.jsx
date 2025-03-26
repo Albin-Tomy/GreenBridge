@@ -24,11 +24,11 @@ const WasteCategoryForm = ({ onCancel, initialData, isEdit }) => {
     try {
       if (isEdit) {
         await axios.put(
-          `http://127.0.0.1:8000/api/v1/waste/categories/${initialData.id}/`,
+          `https://greenbridgeserver.onrender.com/api/v1/waste/categories/${initialData.id}/`,
           formData
         );
       } else {
-        await axios.post('http://127.0.0.1:8000/api/v1/waste/categories/', formData);
+        await axios.post('https://greenbridgeserver.onrender.com/api/v1/waste/categories/', formData);
       }
       onCancel();
       window.location.reload();

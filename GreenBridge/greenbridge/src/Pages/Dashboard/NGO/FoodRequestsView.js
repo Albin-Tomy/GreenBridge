@@ -40,7 +40,7 @@ const FoodRequestsView = () => {
     const fetchFoodRequests = async () => {
         try {
             const token = localStorage.getItem('authToken');
-            const response = await axios.get('http://127.0.0.1:8000/api/v1/food/all/', {
+            const response = await axios.get('https://greenbridgeserver.onrender.com/api/v1/food/all/', {
                 headers: { Authorization: `Bearer ${token}` },
                 params: { status: filter !== 'all' ? filter : null }
             });
@@ -56,7 +56,7 @@ const FoodRequestsView = () => {
         try {
             const token = localStorage.getItem('authToken');
             await axios.put(
-                `http://127.0.0.1:8000/api/v1/food/request/${id}/update-status/`,
+                `https://greenbridgeserver.onrender.com/api/v1/food/request/${id}/update-status/`,
                 { status: newStatus },
                 {
                     headers: { Authorization: `Bearer ${token}` }

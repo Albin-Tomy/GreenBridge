@@ -5,7 +5,7 @@
 // import './Orders.css';
 // import Header from '../../../components/Header';
 
-// const BASE_URL = 'http://127.0.0.1:8000';
+// const BASE_URL = 'https://greenbridgeserver.onrender.com';
 
 // const OrdersPage = () => {
 //     const [orders, setOrders] = useState([]);
@@ -130,7 +130,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import './Orders.css';
 import Header from '../../../components/Header';
 
-const BASE_URL = 'http://127.0.0.1:8000';
+const BASE_URL = 'https://greenbridgeserver.onrender.com';
 
 const OrdersPage = () => {
     const [orders, setOrders] = useState([]);

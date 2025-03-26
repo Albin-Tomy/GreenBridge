@@ -27,7 +27,7 @@ const AddCategoryForm = ({ onCancel, initialCategoryData, isEdit }) => {
   const checkCategoryExists = async (name) => {
     try {
       // Make an API call to check if the category name already exists
-      const response = await axios.get(`http://127.0.0.1:8000/api/v1/products/category-list/`);
+      const response = await axios.get(`https://greenbridgeserver.onrender.com/api/v1/products/category-list/`);
       const existingCategories = response.data.map((category) => category.name.toLowerCase());
       return existingCategories.includes(name.toLowerCase());
     } catch (error) {
@@ -54,10 +54,10 @@ const AddCategoryForm = ({ onCancel, initialCategoryData, isEdit }) => {
 
     const request = isEdit
       ? axios.put(
-          `http://127.0.0.1:8000/api/v1/products/category-update/${initialCategoryData.id}/`,
+          `https://greenbridgeserver.onrender.com/api/v1/products/category-update/${initialCategoryData.id}/`,
           formData
         )
-      : axios.post("http://127.0.0.1:8000/api/v1/products/category-create/", formData);
+      : axios.post("https://greenbridgeserver.onrender.com/api/v1/products/category-create/", formData);
 
     request
       .then((response) => {

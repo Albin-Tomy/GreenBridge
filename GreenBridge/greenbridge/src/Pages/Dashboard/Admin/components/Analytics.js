@@ -41,9 +41,9 @@ const Analytics = () => {
       const headers = { Authorization: `Bearer ${token}` };
 
       const [requestsRes, usersRes, activityRes] = await Promise.all([
-        axios.get('http://127.0.0.1:8000/api/v1/analytics/requests/', { headers }),
-        axios.get('http://127.0.0.1:8000/api/v1/analytics/users/', { headers }),
-        axios.get('http://127.0.0.1:8000/api/v1/analytics/activity/', { headers })
+        axios.get('https://greenbridgeserver.onrender.com/api/v1/analytics/requests/', { headers }),
+        axios.get('https://greenbridgeserver.onrender.com/api/v1/analytics/users/', { headers }),
+        axios.get('https://greenbridgeserver.onrender.com/api/v1/analytics/activity/', { headers })
       ]);
 
       setData({

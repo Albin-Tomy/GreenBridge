@@ -38,7 +38,7 @@ const AddOrderForm = ({ onCancel, initialOrderData, isEdit }) => {
     if (isEdit) {
       // Update existing order
       axios
-        .put(`http://127.0.0.1:8000/api/v1/orders/update/${initialOrderData.order_id}/`, formData, {
+        .put(`https://greenbridgeserver.onrender.com/api/v1/orders/update/${initialOrderData.order_id}/`, formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
@@ -54,7 +54,7 @@ const AddOrderForm = ({ onCancel, initialOrderData, isEdit }) => {
     } else {
       // Create a new order
       axios
-        .post('http://127.0.0.1:8000/api/v1/orders/list/', formData, {
+        .post('https://greenbridgeserver.onrender.com/api/v1/orders/list/', formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },

@@ -21,7 +21,7 @@ const WasteCollectionRequest = () => {
     useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const response = await axios.get('http://127.0.0.1:8000/api/v1/collection/waste-categories/', {
+                const response = await axios.get('https://greenbridgeserver.onrender.com/api/v1/collection/waste-categories/', {
                     headers: {
                         'Authorization': `Token ${localStorage.getItem('token')}`,
                     },
@@ -34,7 +34,7 @@ const WasteCollectionRequest = () => {
 
         const fetchLocations = async () => {
             try {
-                const response = await axios.get('http://127.0.0.1:8000/api/v1/collection/locations/', {
+                const response = await axios.get('https://greenbridgeserver.onrender.com/api/v1/collection/locations/', {
                     headers: {
                         'Authorization': `Token ${localStorage.getItem('token')}`,
                     },
@@ -54,7 +54,7 @@ const WasteCollectionRequest = () => {
         const fetchSubcategories = async () => {
             if (formData.waste_category) {
                 try {
-                    const response = await axios.get(`http://127.0.0.1:8000/api/v1/collection/waste-subcategories/?category=${formData.waste_category}`, {
+                    const response = await axios.get(`https://greenbridgeserver.onrender.com/api/v1/collection/waste-subcategories/?category=${formData.waste_category}`, {
                         headers: {
                             'Authorization': `Token ${localStorage.getItem('token')}`,
                         },
@@ -86,7 +86,7 @@ const WasteCollectionRequest = () => {
         setSuccess(null);
 
         try {
-            await axios.post('http://127.0.0.1:8000/api/v1/collection/requests/', {
+            await axios.post('https://greenbridgeserver.onrender.com/api/v1/collection/requests/', {
                 ...formData,
                 user: userId, // Include the logged-in user's ID in the request
             }, {

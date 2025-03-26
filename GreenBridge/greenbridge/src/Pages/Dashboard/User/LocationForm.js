@@ -14,7 +14,7 @@ const Location = () => {
 
     const fetchLocations = async () => {
         try {
-            const response = await axios.get('http://127.0.0.1:8000/api/v1/collection/locations/');
+            const response = await axios.get('https://greenbridgeserver.onrender.com/api/v1/collection/locations/');
             setLocations(response.data);
         } catch (err) {
             console.error('Error fetching locations:', err);
@@ -32,7 +32,7 @@ const Location = () => {
         setSuccess(null);
 
         try {
-            await axios.post('http://127.0.0.1:8000/api/v1/collection/locations/', formData, {
+            await axios.post('https://greenbridgeserver.onrender.com/api/v1/collection/locations/', formData, {
                 headers: {
                     'Authorization': `Token ${localStorage.getItem('token')}`,
                 },

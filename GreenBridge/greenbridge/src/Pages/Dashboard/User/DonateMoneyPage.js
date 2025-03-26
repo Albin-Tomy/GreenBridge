@@ -21,7 +21,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
-const BASE_URL = 'http://127.0.0.1:8000';
+const BASE_URL = 'https://greenbridgeserver.onrender.com';
 
 const DonateMoneyPage = () => {
     const navigate = useNavigate();

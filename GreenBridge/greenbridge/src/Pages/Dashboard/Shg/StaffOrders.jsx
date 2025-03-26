@@ -156,7 +156,7 @@ function Admin() {
 
   const confirmDeleteOrder = () => {
     axios
-      .delete(`http://127.0.0.1:8000/api/v1/orders/delete/${selectedId}/`)
+      .delete(`https://greenbridgeserver.onrender.com/api/v1/orders/delete/${selectedId}/`)
       .then((response) => {
         setOpen(false);
         setRows((prevRows) => prevRows.filter((row) => row.id !== selectedId));

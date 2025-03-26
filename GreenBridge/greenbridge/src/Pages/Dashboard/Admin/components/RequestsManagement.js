@@ -58,7 +58,7 @@ const RequestsManagement = ({ type }) => {
     try {
       const token = localStorage.getItem('authToken');
       const response = await axios.get(
-        `http://127.0.0.1:8000/api/v1/${getEndpoint()}`,
+        `https://greenbridgeserver.onrender.com/api/v1/${getEndpoint()}`,
         {
           headers: { Authorization: `Bearer ${token}` }
         }
@@ -75,7 +75,7 @@ const RequestsManagement = ({ type }) => {
     try {
       const token = localStorage.getItem('authToken');
       await axios.put(
-        `http://127.0.0.1:8000/api/v1/${getEndpoint()}${id}/update-status/`,
+        `https://greenbridgeserver.onrender.com/api/v1/${getEndpoint()}${id}/update-status/`,
         { status: newStatus },
         {
           headers: { Authorization: `Bearer ${token}` }

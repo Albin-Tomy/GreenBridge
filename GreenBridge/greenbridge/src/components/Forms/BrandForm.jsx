@@ -34,7 +34,7 @@ const AddBrandForm = ({onCancel,initialBrandData,isEdit}) => {
       // Update 
       axios
         .put(
-          `http://127.0.0.1:8000/api/v1/products/brand-update/${initialBrandData.brand_id}/`,
+          `https://greenbridgeserver.onrender.com/api/v1/products/brand-update/${initialBrandData.brand_id}/`,
           formData,
           {}
         )
@@ -46,7 +46,7 @@ const AddBrandForm = ({onCancel,initialBrandData,isEdit}) => {
           console.error("Error updating Brand:", error.response.data);
         });
     } else {
-    axios.post("http://127.0.0.1:8000/api/v1/products/brand-create/",formData)
+    axios.post("https://greenbridgeserver.onrender.com/api/v1/products/brand-create/",formData)
     .then((res)=>{
       alert("Brand Added !")
       window.location.reload()

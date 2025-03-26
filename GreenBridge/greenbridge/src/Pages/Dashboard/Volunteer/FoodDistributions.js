@@ -27,7 +27,7 @@ const FoodDistributions = () => {
     const fetchDistributions = async () => {
         try {
             const response = await axios.get(
-                'http://127.0.0.1:8000/api/v1/volunteer/distributions/',
+                'https://greenbridgeserver.onrender.com/api/v1/volunteer/distributions/',
                 {
                     headers: { Authorization: `Bearer ${token}` }
                 }

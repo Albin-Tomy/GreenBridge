@@ -40,7 +40,7 @@ const UserManagement = () => {
     try {
       const token = localStorage.getItem('authToken');
       const response = await axios.get(
-        'http://127.0.0.1:8000/api/v1/auth/users/',
+        'https://greenbridgeserver.onrender.com/api/v1/auth/users/',
         {
           headers: { Authorization: `Bearer ${token}` }
         }
@@ -67,7 +67,7 @@ const UserManagement = () => {
     try {
       const token = localStorage.getItem('authToken');
       await axios.put(
-        `http://127.0.0.1:8000/api/v1/auth/users/${selectedUser.id}/`,
+        `https://greenbridgeserver.onrender.com/api/v1/auth/users/${selectedUser.id}/`,
         editForm,
         {
           headers: { Authorization: `Bearer ${token}` }
@@ -85,7 +85,7 @@ const UserManagement = () => {
       try {
         const token = localStorage.getItem('authToken');
         const response = await axios.delete(
-          `http://127.0.0.1:8000/api/v1/auth/users/${userId}/delete/`,
+          `https://greenbridgeserver.onrender.com/api/v1/auth/users/${userId}/delete/`,
           {
             headers: { Authorization: `Bearer ${token}` }
           }

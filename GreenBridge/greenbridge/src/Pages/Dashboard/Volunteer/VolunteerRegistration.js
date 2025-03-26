@@ -32,7 +32,7 @@ const VolunteerRegistration = () => {
         const fetchUserProfile = async () => {
             try {
                 const response = await axios.get(
-                    `http://127.0.0.1:8000/api/v1/auth/user_profiles/${userId}/`,
+                    `https://greenbridgeserver.onrender.com/api/v1/auth/user_profiles/${userId}/`,
                     {
                         headers: { Authorization: `Bearer ${token}` }
                     }
@@ -77,7 +77,7 @@ const VolunteerRegistration = () => {
 
         try {
             const response = await axios.post(
-                'http://127.0.0.1:8000/api/v1/volunteer/register/',
+                'https://greenbridgeserver.onrender.com/api/v1/volunteer/register/',
                 formData,
                 {
                     headers: {

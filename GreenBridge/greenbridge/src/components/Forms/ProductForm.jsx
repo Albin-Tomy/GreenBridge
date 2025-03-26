@@ -92,11 +92,11 @@ const ProductForm = ({ onCancel, initialProductData, isEdit }) => {
 
     const request = isEdit
       ? axios.put(
-          `http://127.0.0.1:8000/api/v1/products/update/${initialProductData.product_id}/`,
+          `https://greenbridgeserver.onrender.com/api/v1/products/update/${initialProductData.product_id}/`,
           formData,
           { headers: { "Content-Type": "multipart/form-data" } }
         )
-      : axios.post(`http://127.0.0.1:8000/api/v1/products/create/`, formData, {
+      : axios.post(`https://greenbridgeserver.onrender.com/api/v1/products/create/`, formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
 
@@ -285,7 +285,7 @@ const ProductForm = ({ onCancel, initialProductData, isEdit }) => {
             <div className="current-image">
               <label>Current Image:</label>
               <img
-                src={`http://127.0.0.1:8000${initialProductData.image}`} // Adjust URL if necessary
+                src={`https://greenbridgeserver.onrender.com${initialProductData.image}`} // Adjust URL if necessary
                 alt="Product"
                 style={{ width: "100px", height: "100px", objectFit: "cover" }} // You can adjust styles as needed
               />
@@ -295,7 +295,7 @@ const ProductForm = ({ onCancel, initialProductData, isEdit }) => {
             <div className="current-image">
               <label>Current Image:</label>
               <img
-                src={`http://127.0.0.1:8000${initialProductData.image}`} // Adjust URL if necessary
+                src={`https://greenbridgeserver.onrender.com${initialProductData.image}`} // Adjust URL if necessary
                 alt="Product"
                 style={{ width: "100px", height: "100px", objectFit: "cover" }}
               />

@@ -14,7 +14,7 @@ const VolunteerHistory = () => {
     const fetchHistory = async () => {
         try {
             const response = await axios.get(
-                'http://127.0.0.1:8000/api/volunteer/history/',
+                'https://greenbridgeserver.onrender.com/api/volunteer/history/',
                 {
                     headers: { Authorization: `Bearer ${token}` }
                 }

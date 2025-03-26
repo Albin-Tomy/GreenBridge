@@ -33,7 +33,7 @@
 //       // Update
 //       axios
 //         .put(
-//           `http://127.0.0.1:8000/api/v1/products/madeof-update/${initialMadeOfData.madeof_id}/`,
+//           `https://greenbridgeserver.onrender.com/api/v1/products/madeof-update/${initialMadeOfData.madeof_id}/`,
 //           formData,
 //           {}
 //         )
@@ -45,7 +45,7 @@
 //           console.error("Error updating modeof:", error.response.data);
 //         });
 //     } else {
-//     axios.post("http://127.0.0.1:8000/api/v1/products/madeof-create/",formData)
+//     axios.post("https://greenbridgeserver.onrender.com/api/v1/products/madeof-create/",formData)
 //     .then((res)=>{
 //       alert("Material Added !")
 //       window.location.reload()
@@ -122,7 +122,7 @@ const AddMadeofForm = ({ onCancel, initialMadeOfData, isEdit }) => {
   // Fetch existing materials on component mount
   useEffect(() => {
     axios
-      .get('http://127.0.0.1:8000/api/v1/products/madeof-list/')
+      .get('https://greenbridgeserver.onrender.com/api/v1/products/madeof-list/')
       .then((response) => {
         const names = response.data.map((item) => item.name.toLowerCase());
         setExistingNames(names); // Store the names in state
@@ -157,7 +157,7 @@ const AddMadeofForm = ({ onCancel, initialMadeOfData, isEdit }) => {
       // Update existing material
       axios
         .put(
-          `http://127.0.0.1:8000/api/v1/products/madeof-update/${initialMadeOfData.madeof_id}/`,
+          `https://greenbridgeserver.onrender.com/api/v1/products/madeof-update/${initialMadeOfData.madeof_id}/`,
           formData,
           {}
         )
@@ -171,7 +171,7 @@ const AddMadeofForm = ({ onCancel, initialMadeOfData, isEdit }) => {
     } else {
       // Create new material
       axios
-        .post('http://127.0.0.1:8000/api/v1/products/madeof-create/', formData)
+        .post('https://greenbridgeserver.onrender.com/api/v1/products/madeof-create/', formData)
         .then((res) => {
           alert('Material Added!');
           window.location.reload();
