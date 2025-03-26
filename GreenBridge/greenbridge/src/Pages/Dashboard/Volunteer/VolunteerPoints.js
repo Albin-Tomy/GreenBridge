@@ -28,7 +28,7 @@ const VolunteerPoints = () => {
     const fetchPointsData = async () => {
         try {
             const token = localStorage.getItem('authToken');
-            const response = await axios.get('https://greenbridgeserver.onrender.com/api/volunteer/points/', {
+            const response = await axios.get('http://127.0.0.1:8000/api/volunteer/points/', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setPointsData(response.data);

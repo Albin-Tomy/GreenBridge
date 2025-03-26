@@ -36,7 +36,7 @@ const PendingNGOPage = () => {
         };
 
         const response = await axios.get(
-          'https://greenbridgeserver.onrender.com/api/ngo/pending/',
+          'http://127.0.0.1:8000/api/ngo/pending/',
           config
         );
 
@@ -78,7 +78,7 @@ const PendingNGOPage = () => {
       };
 
       const response = await axios.post(
-        'https://greenbridgeserver.onrender.com/api/ngo/approve/',
+        'http://127.0.0.1:8000/api/ngo/approve/',
         { 
           ngo_email: email, 
           action,

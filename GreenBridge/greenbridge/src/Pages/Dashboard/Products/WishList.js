@@ -10,17 +10,17 @@ import Header from '../../../components/Header';
 const Wishlist = () => {
   const [wishlistItems, setWishlistItems] = useState([]);
   const userId = localStorage.getItem('userId');
-  const BASE_URL = 'https://greenbridgeserver.onrender.com';
+  const BASE_URL = 'http://127.0.0.1:8000';
 
   useEffect(() => {
     if (userId) {
       // Step 1: Fetch the wishlist for the logged-in user
-      axios.get(`https://greenbridgeserver.onrender.com/api/v1/orders/wishlist-list/?user_id=${userId}`)
+      axios.get(`http://127.0.0.1:8000/api/v1/orders/wishlist-list/?user_id=${userId}`)
         .then(response => {
           const wishlist = response.data[0]; // Assuming only one wishlist per user
           if (wishlist) {
             // Step 2: Fetch wishlist items by wishlist_id
-            axios.get(`https://greenbridgeserver.onrender.com/api/v1/orders/wishlist-items-create/?wishlist_id=${wishlist.wishlist_id}`)
+            axios.get(`http://127.0.0.1:8000/api/v1/orders/wishlist-items-create/?wishlist_id=${wishlist.wishlist_id}`)
               .then(itemsResponse => {
                 setWishlistItems(itemsResponse.data);
               })
@@ -37,14 +37,14 @@ const Wishlist = () => {
 
   const addToCart = (productId) => {
     const quantity = 1; // Default quantity for adding to cart
-    axios.get(`https://greenbridgeserver.onrender.com/api/v1/orders/cart-list/?user_id=${userId}`)
+    axios.get(`http://127.0.0.1:8000/api/v1/orders/cart-list/?user_id=${userId}`)
       .then(response => {
         let cartId;
 
         if (response.data.length > 0) {
           cartId = response.data[0].cart_id; // Assuming first cart for the user
         } else {
-          return axios.post('https://greenbridgeserver.onrender.com/api/v1/orders/cart-list/', { user_id: userId })
+          return axios.post('http://127.0.0.1:8000/api/v1/orders/cart-list/', { user_id: userId })
             .then(response => {
               cartId = response.data.cart_id;
               return cartId;
@@ -60,7 +60,7 @@ const Wishlist = () => {
           quantity: quantity
         };
 
-        return axios.post('https://greenbridgeserver.onrender.com/api/v1/orders/cart-items-create/', dataToSend);
+        return axios.post('http://127.0.0.1:8000/api/v1/orders/cart-items-create/', dataToSend);
       })
       .then(() => {
         toast.success('Product added to cart!');
@@ -71,7 +71,7 @@ const Wishlist = () => {
   };
 
   const removeFromWishlist = (wishlistItemId) => {
-    axios.delete(`https://greenbridgeserver.onrender.com/api/v1/orders/wishlist-items/${wishlistItemId}/`)
+    axios.delete(`http://127.0.0.1:8000/api/v1/orders/wishlist-items/${wishlistItemId}/`)
       .then(() => {
         setWishlistItems(wishlistItems.filter(item => item.wishlist_item_id !== wishlistItemId));
         toast.info('Item removed from wishlist');

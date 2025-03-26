@@ -76,7 +76,7 @@ const SchoolSupplyRequestForm = () => {
         try {
             const token = localStorage.getItem('authToken');
             await axios.post(
-                'https://greenbridgeserver.onrender.com/api/v1/school-supplies/request/',
+                'http://127.0.0.1:8000/api/v1/school-supplies/request/',
                 formData,
                 {
                     headers: {

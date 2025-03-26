@@ -28,7 +28,7 @@ const PendingRequestsPage = () => {
           return;
         }
 
-        const response = await axios.get('https://greenbridgeserver.onrender.com/api/shg/pending/', {
+        const response = await axios.get('http://127.0.0.1:8000/api/shg/pending/', {
           headers: { Authorization: `Bearer ${token}` } // Pass token in headers
         });
 
@@ -58,7 +58,7 @@ const PendingRequestsPage = () => {
         return;
       }
 
-      const response = await axios.post('https://greenbridgeserver.onrender.com/api/shg/approve/', 
+      const response = await axios.post('http://127.0.0.1:8000/api/shg/approve/', 
         { shg_email: email, action },
         { headers: { Authorization: `Bearer ${token}` } } // Pass token in headers
       );

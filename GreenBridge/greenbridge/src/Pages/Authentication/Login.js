@@ -48,7 +48,7 @@ const Login = ({ setIslogin }) => {
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post('https://greenbridgeserver.onrender.com/api/v1/auth/login/', {
+      const response = await axios.post('http://127.0.0.1:8000/api/v1/auth/login/', {
         email,
         password,
       });
@@ -99,7 +99,7 @@ const Login = ({ setIslogin }) => {
     const formData = new FormData();
     formData.append("email", email);
 
-    axios.post('https://greenbridgeserver.onrender.com/api/v1/auth/password-reset/', formData)
+    axios.post('http://127.0.0.1:8000/api/v1/auth/password-reset/', formData)
       .then((response) => {
         if (response.status === 200) {
           alert('Reset password link sent to your email');
@@ -128,7 +128,7 @@ const Login = ({ setIslogin }) => {
           token: tokenResponse.access_token
         });
 
-        const response = await axios.post('https://greenbridgeserver.onrender.com/api/v1/auth/google-signin/', {
+        const response = await axios.post('http://127.0.0.1:8000/api/v1/auth/google-signin/', {
           token: tokenResponse.access_token
         });
 

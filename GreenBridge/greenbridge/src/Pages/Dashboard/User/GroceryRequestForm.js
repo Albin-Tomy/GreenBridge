@@ -135,7 +135,7 @@ const GroceryRequestForm = () => {
             };
 
             const response = await axios.post(
-                'https://greenbridgeserver.onrender.com/api/v1/grocery/request/',
+                'http://127.0.0.1:8000/api/v1/grocery/request/',
                 requestData,
                 {
                     headers: {

@@ -21,7 +21,7 @@ const ProductPage = () => {
   const [madeOf, setMadeOf] = useState('all');
   const [sortOrder, setSortOrder] = useState('default');
 
-  const BASE_URL = 'https://greenbridgeserver.onrender.com';
+  const BASE_URL = 'http://127.0.0.1:8000';
 
   const searchParams = new URLSearchParams(location.search);
   const searchQuery = searchParams.get('search') || '';

@@ -47,7 +47,7 @@ function Admin() {
 
   const fetchCategories = async () => {
     try {
-      const response = await axios.get(`https://greenbridgeserver.onrender.com/api/v1/collection/waste-categories/`);
+      const response = await axios.get(`http://127.0.0.1:8000/api/v1/collection/waste-categories/`);
       setCategories(response.data || []);
     } catch (error) {
       console.log("Error fetching categories:", error);
@@ -56,7 +56,7 @@ function Admin() {
 
   const fetchSubCategories = async () => {
     try {
-      const response = await axios.get(`https://greenbridgeserver.onrender.com/api/v1/collection/waste-subcategories/`);
+      const response = await axios.get(`http://127.0.0.1:8000/api/v1/collection/waste-subcategories/`);
       setSubCategories(response.data || []);
     } catch (error) {
       console.log("Error fetching subcategories:", error);
@@ -65,7 +65,7 @@ function Admin() {
 
   const fetchLocations = async () => {
     try {
-      const response = await axios.get(`https://greenbridgeserver.onrender.com/api/v1/collection/locations/`);
+      const response = await axios.get(`http://127.0.0.1:8000/api/v1/collection/locations/`);
       setLocations(response.data || []);
     } catch (error) {
       console.log("Error fetching locations:", error);
@@ -216,7 +216,7 @@ const handleEditSubCategory = (id) => {
 
   const confirmDelete = async () => {
     try {
-      await axios.delete(`https://greenbridgeserver.onrender.com/api/v1/collection/${menu.toLowerCase().replace(" ", "-")}/${selectedId}/`);
+      await axios.delete(`http://127.0.0.1:8000/api/v1/collection/${menu.toLowerCase().replace(" ", "-")}/${selectedId}/`);
       alert("Item deleted successfully!");
       setOpen(false);
       if (menu === "Waste Categories") fetchCategories();

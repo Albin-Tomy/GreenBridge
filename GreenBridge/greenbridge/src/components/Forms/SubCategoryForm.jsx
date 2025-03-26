@@ -13,7 +13,7 @@ const SubCategoryForm = ({ onCancel, initialSubCategoryData, isEdit }) => {
   useEffect(() => {
     // Fetch all categories to populate the category dropdown
     axios
-      .get('https://greenbridgeserver.onrender.com/api/v1/products/category-list/')
+      .get('http://127.0.0.1:8000/api/v1/products/category-list/')
       .then((response) => {
         setCategories(response.data);
       })
@@ -48,7 +48,7 @@ const SubCategoryForm = ({ onCancel, initialSubCategoryData, isEdit }) => {
       // Update existing subcategory
       axios
         .put(
-          `https://greenbridgeserver.onrender.com/api/v1/products/subcategory-update/${initialSubCategoryData.subcategory_id}/`,
+          `http://127.0.0.1:8000/api/v1/products/subcategory-update/${initialSubCategoryData.subcategory_id}/`,
           formData
         )
         .then((response) => {
@@ -62,7 +62,7 @@ const SubCategoryForm = ({ onCancel, initialSubCategoryData, isEdit }) => {
     } else {
       // Create a new subcategory
       axios
-        .post('https://greenbridgeserver.onrender.com/api/v1/products/subcategory-create/', formData)
+        .post('http://127.0.0.1:8000/api/v1/products/subcategory-create/', formData)
         .then((response) => {
           alert('Subcategory created successfully!');
           console.log('Subcategory created successfully:', response.data);

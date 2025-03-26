@@ -50,7 +50,7 @@ const AdminDashboard = () => {
       const headers = { Authorization: `Bearer ${token}` };
 
       // Fetch money requests with detailed information
-      const moneyRequestPromise = axios.get('https://greenbridgeserver.onrender.com/api/v1/donations/ngo/money-request/all/', { headers })
+      const moneyRequestPromise = axios.get('http://127.0.0.1:8000/api/v1/donations/ngo/money-request/all/', { headers })
         .then(response => {
           // Process money requests without fetching NGO profiles individually
           return response.data.map(request => ({
@@ -65,10 +65,10 @@ const AdminDashboard = () => {
         });
 
       const [foodRes, schoolRes, bookRes, groceryRes, moneyRes] = await Promise.all([
-        axios.get('https://greenbridgeserver.onrender.com/api/v1/food/all/', { headers }),
-        axios.get('https://greenbridgeserver.onrender.com/api/v1/school-supplies/all/', { headers }),
-        axios.get('https://greenbridgeserver.onrender.com/api/v1/book/all/', { headers }),
-        axios.get('https://greenbridgeserver.onrender.com/api/v1/grocery/all/', { headers }),
+        axios.get('http://127.0.0.1:8000/api/v1/food/all/', { headers }),
+        axios.get('http://127.0.0.1:8000/api/v1/school-supplies/all/', { headers }),
+        axios.get('http://127.0.0.1:8000/api/v1/book/all/', { headers }),
+        axios.get('http://127.0.0.1:8000/api/v1/grocery/all/', { headers }),
         moneyRequestPromise
       ]);
 
@@ -141,7 +141,7 @@ const AdminDashboard = () => {
     try {
       const token = localStorage.getItem('authToken');
       const response = await axios.get(
-        'https://greenbridgeserver.onrender.com/api/v1/food/metrics/analytics/',
+        'http://127.0.0.1:8000/api/v1/food/metrics/analytics/',
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setMetrics(response.data);

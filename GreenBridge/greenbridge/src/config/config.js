@@ -20,7 +20,7 @@ const config = {
     deleteCountryApi:process.env.REACT_APP_DELETE_COUNTRIES_API,
     deleteBrandApi:process.env.REACT_APP_DELETE_BRANDS_API,
 
-    // googleAuthLoginApi: 'https://greenbridgeserver.onrender.com/api/v1/auth/google-signin/'
+    // googleAuthLoginApi: 'http://127.0.0.1:8000/api/v1/auth/google-signin/'
 
   };
    

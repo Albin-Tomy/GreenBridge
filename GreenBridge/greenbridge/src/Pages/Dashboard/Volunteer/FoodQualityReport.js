@@ -55,7 +55,7 @@ const FoodQualityReport = () => {
 
         try {
             const response = await axios.post(
-                'https://greenbridgeserver.onrender.com/api/v1/volunteer/quality-report/',
+                'http://127.0.0.1:8000/api/v1/volunteer/quality-report/',
                 submitData,
                 {
                     headers: {

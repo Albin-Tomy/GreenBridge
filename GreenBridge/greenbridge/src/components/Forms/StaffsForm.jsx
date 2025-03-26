@@ -27,7 +27,7 @@ const AddStaffForm = ({onCancel}) => {
     Object.keys(staffData).forEach((key) => {
       formData.append(key, staffData[key]);
     });
-    axios.post("https://greenbridgeserver.onrender.com/api/v1/staffs/create/",formData)
+    axios.post("http://127.0.0.1:8000/api/v1/staffs/create/",formData)
     .then((res)=>{
       alert("staffData Added !")
       window.location.reload()

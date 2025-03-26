@@ -29,7 +29,7 @@ const NGOManagement = ({ type }) => {
       const token = localStorage.getItem('authToken');
       const endpoint = type === 'pending-ngos' ? 'pending' : 'all';
       const response = await axios.get(
-        `https://greenbridgeserver.onrender.com/api/ngo/${endpoint}/`,
+        `http://127.0.0.1:8000/api/ngo/${endpoint}/`,
         {
           headers: { Authorization: `Bearer ${token}` }
         }
@@ -46,7 +46,7 @@ const NGOManagement = ({ type }) => {
     try {
       const token = localStorage.getItem('authToken');
       await axios.post(
-        'https://greenbridgeserver.onrender.com/api/ngo/approve/',
+        'http://127.0.0.1:8000/api/ngo/approve/',
         { ngo_id: id, action },
         {
           headers: { Authorization: `Bearer ${token}` }

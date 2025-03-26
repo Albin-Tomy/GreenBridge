@@ -42,7 +42,7 @@ const MoneyRequestManagement = () => {
         try {
             const token = localStorage.getItem('authToken');
             const response = await axios.get(
-                'https://greenbridgeserver.onrender.com/api/v1/donations/ngo/money-request/all/',
+                'http://127.0.0.1:8000/api/v1/donations/ngo/money-request/all/',
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             console.log('Money requests:', response.data); // Debug log
@@ -67,13 +67,13 @@ const MoneyRequestManagement = () => {
             
             // Fetch money request details
             const requestResponse = await axios.get(
-                `https://greenbridgeserver.onrender.com/api/v1/donations/ngo/money-request/${requestId}/`,
+                `http://127.0.0.1:8000/api/v1/donations/ngo/money-request/${requestId}/`,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
 
             // Fetch NGO profile details using the NGO's email from the request
             const ngoProfileResponse = await axios.get(
-                `https://greenbridgeserver.onrender.com/api/v1/ngo/profile/${requestResponse.data.ngo.email}/`,
+                `http://127.0.0.1:8000/api/v1/ngo/profile/${requestResponse.data.ngo.email}/`,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
 
@@ -124,7 +124,7 @@ const MoneyRequestManagement = () => {
             }
 
             await axios.put(
-                `https://greenbridgeserver.onrender.com/api/v1/donations/ngo/money-request/${selectedRequest.id}/update-status/`,
+                `http://127.0.0.1:8000/api/v1/donations/ngo/money-request/${selectedRequest.id}/update-status/`,
                 data,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -158,7 +158,7 @@ const MoneyRequestManagement = () => {
         let fullUrl = documentUrl;
         if (!documentUrl.startsWith('http')) {
             // Add backend base URL if the path is relative
-            fullUrl = `https://greenbridgeserver.onrender.com${documentUrl}`;
+            fullUrl = `http://127.0.0.1:8000${documentUrl}`;
         }
         
         console.log('Downloading from:', fullUrl);

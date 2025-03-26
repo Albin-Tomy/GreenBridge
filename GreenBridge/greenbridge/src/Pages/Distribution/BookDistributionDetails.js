@@ -54,7 +54,7 @@ const BookDistributionDetails = ({
         try {
             const token = localStorage.getItem('authToken');
             const response = await axios.put(
-                `https://greenbridgeserver.onrender.com/api/v1/book/distribution/${distribution.id}/start/`,
+                `http://127.0.0.1:8000/api/v1/book/distribution/${distribution.id}/start/`,
                 {},
                 {
                     headers: { Authorization: `Bearer ${token}` }
@@ -80,7 +80,7 @@ const BookDistributionDetails = ({
         try {
             const token = localStorage.getItem('authToken');
             const response = await axios.put(
-                `https://greenbridgeserver.onrender.com/api/v1/book/distribution/${distribution.id}/complete/`,
+                `http://127.0.0.1:8000/api/v1/book/distribution/${distribution.id}/complete/`,
                 {},
                 {
                     headers: { Authorization: `Bearer ${token}` }

@@ -17,7 +17,7 @@ const Location = ({ onCancel, isEdit, initialLocationData, onSave }) => {
 
     const fetchLocations = async () => {
         try {
-            const response = await axios.get('https://greenbridgeserver.onrender.com/api/v1/collection/locations/');
+            const response = await axios.get('http://127.0.0.1:8000/api/v1/collection/locations/');
             setLocations(response.data);
         } catch (err) {
             console.error('Error fetching locations:', err);
@@ -36,12 +36,12 @@ const Location = ({ onCancel, isEdit, initialLocationData, onSave }) => {
 
         try {
             if (isEdit) {
-                await axios.put(`https://greenbridgeserver.onrender.com/api/v1/collection/locations/${formData.id}/`, formData, {
+                await axios.put(`http://127.0.0.1:8000/api/v1/collection/locations/${formData.id}/`, formData, {
                     headers: { 'Authorization': `Token ${localStorage.getItem('token')}` },
                 });
                 alert('Location updated successfully!');
             } else {
-                await axios.post('https://greenbridgeserver.onrender.com/api/v1/collection/locations/', formData, {
+                await axios.post('http://127.0.0.1:8000/api/v1/collection/locations/', formData, {
                     headers: { 'Authorization': `Token ${localStorage.getItem('token')}` },
                 });
                 alert('Location created successfully!');

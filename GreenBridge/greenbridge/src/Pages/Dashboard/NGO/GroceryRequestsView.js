@@ -24,7 +24,7 @@ const GroceryRequestsView = () => {
     const fetchGroceryRequests = async () => {
         try {
             const token = localStorage.getItem('authToken');
-            const response = await axios.get('https://greenbridgeserver.onrender.com/api/v1/grocery/all/', {
+            const response = await axios.get('http://127.0.0.1:8000/api/v1/grocery/all/', {
                 headers: { Authorization: `Bearer ${token}` },
                 params: { status: filter !== 'all' ? filter : null }
             });
@@ -40,7 +40,7 @@ const GroceryRequestsView = () => {
         try {
             const token = localStorage.getItem('authToken');
             await axios.put(
-                `https://greenbridgeserver.onrender.com/api/v1/grocery/request/${id}/update-status/`,
+                `http://127.0.0.1:8000/api/v1/grocery/request/${id}/update-status/`,
                 { status: newStatus },
                 {
                     headers: { Authorization: `Bearer ${token}` }

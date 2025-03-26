@@ -185,28 +185,28 @@ WSGI_APPLICATION = 'greenbridge.wsgi.application'
 #        }
 #    }
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'greenbridge',
-#         'USER': 'postgres',
-#         'PASSWORD': 'password',
-#         'HOST': 'localhost',  # Or your database host
-#         'PORT': '5432',       # Default PostgreSQL port
-#     }
-# }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'greenbridge',
+        'USER': 'postgres',
+        'PASSWORD': 'password',
+        'HOST': 'localhost',  # Or your database host
+        'PORT': '5432',       # Default PostgreSQL port
+    }
+}
 
 
 from dotenv import load_dotenv
 load_dotenv()
 
-DATABASES = {
-    'default': dj_database_url.config(
-        default=os.getenv('DATABASE_URL'),  # Reads from .env file
-        conn_max_age=600,  # Optimizes database connections
-        ssl_require=True   # Ensures secure connection
-    )
-}
+# DATABASES = {
+#     'default': dj_database_url.config(
+#         default=os.getenv('DATABASE_URL'),  # Reads from .env file
+#         conn_max_age=600,  # Optimizes database connections
+#         ssl_require=True   # Ensures secure connection
+#     )
+# }
 
 # DATABASES = {
 #     'default': {

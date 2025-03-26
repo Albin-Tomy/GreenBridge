@@ -31,7 +31,7 @@ const VolunteerProfile = () => {
     const fetchVolunteerProfile = async () => {
         try {
             const response = await axios.get(
-                'https://greenbridgeserver.onrender.com/api/v1/volunteer/profile/',
+                'http://127.0.0.1:8000/api/v1/volunteer/profile/',
                 {
                     headers: { Authorization: `Bearer ${token}` }
                 }
@@ -83,7 +83,7 @@ const VolunteerProfile = () => {
 
         try {
             const response = await axios.put(
-                'https://greenbridgeserver.onrender.com/api/v1/volunteer/update/',
+                'http://127.0.0.1:8000/api/v1/volunteer/update/',
                 formData,
                 {
                     headers: {
@@ -103,7 +103,7 @@ const VolunteerProfile = () => {
     const handleQuit = async () => {
         try {
             await axios.post(
-                'https://greenbridgeserver.onrender.com/api/v1/volunteer/quit/',
+                'http://127.0.0.1:8000/api/v1/volunteer/quit/',
                 { reason: quitReason },
                 {
                     headers: {

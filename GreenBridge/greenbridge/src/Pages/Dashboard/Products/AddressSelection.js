@@ -24,7 +24,7 @@ const AddressSelection = () => {
   const [showAddressForm, setShowAddressForm] = useState(false);
   const [cartSummaryVisible, setCartSummaryVisible] = useState(false); // State for cart summary visibility
   const [errors, setErrors] = useState({});
-  const BASE_URL = 'https://greenbridgeserver.onrender.com';
+  const BASE_URL = 'http://127.0.0.1:8000';
   const navigate = useNavigate();
 
   useEffect(() => {

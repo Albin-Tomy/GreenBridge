@@ -40,11 +40,11 @@ const DashboardOverview = () => {
       const headers = { Authorization: `Bearer ${token}` };
 
       const [foodRes, schoolRes, bookRes, groceryRes, ngoRes] = await Promise.all([
-        axios.get('https://greenbridgeserver.onrender.com/api/v1/food/all/', { headers }),
-        axios.get('https://greenbridgeserver.onrender.com/api/v1/school-supplies/all/', { headers }),
-        axios.get('https://greenbridgeserver.onrender.com/api/v1/book/all/', { headers }),
-        axios.get('https://greenbridgeserver.onrender.com/api/v1/grocery/all/', { headers }),
-        axios.get('https://greenbridgeserver.onrender.com/api/ngo/pending/', { headers })
+        axios.get('http://127.0.0.1:8000/api/v1/food/all/', { headers }),
+        axios.get('http://127.0.0.1:8000/api/v1/school-supplies/all/', { headers }),
+        axios.get('http://127.0.0.1:8000/api/v1/book/all/', { headers }),
+        axios.get('http://127.0.0.1:8000/api/v1/grocery/all/', { headers }),
+        axios.get('http://127.0.0.1:8000/api/ngo/pending/', { headers })
       ]);
 
       // Process data and update stats

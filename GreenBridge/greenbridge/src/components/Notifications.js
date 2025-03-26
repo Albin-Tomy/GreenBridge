@@ -28,7 +28,7 @@ const Notifications = () => {
     const fetchNotifications = async () => {
         try {
             const token = localStorage.getItem('authToken');
-            const response = await axios.get('https://greenbridgeserver.onrender.com/api/notifications/', {
+            const response = await axios.get('http://127.0.0.1:8000/api/notifications/', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setNotifications(response.data);
@@ -49,7 +49,7 @@ const Notifications = () => {
     const markAsRead = async (notificationId) => {
         try {
             const token = localStorage.getItem('authToken');
-            await axios.put(`https://greenbridgeserver.onrender.com/api/notifications/${notificationId}/read/`, {}, {
+            await axios.put(`http://127.0.0.1:8000/api/notifications/${notificationId}/read/`, {}, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             fetchNotifications();

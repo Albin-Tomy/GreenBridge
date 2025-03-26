@@ -270,7 +270,7 @@ const VolunteerDashboard = () => {
                     endpoint = 'food/all';
             }
             
-            const response = await axios.get(`https://greenbridgeserver.onrender.com/api/v1/${endpoint}/`, {
+            const response = await axios.get(`http://127.0.0.1:8000/api/v1/${endpoint}/`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
@@ -292,7 +292,7 @@ const VolunteerDashboard = () => {
             setLoadingActivities(true);
             const token = localStorage.getItem('authToken');
             const response = await axios.get(
-                'https://greenbridgeserver.onrender.com/api/v1/volunteer/activities/',
+                'http://127.0.0.1:8000/api/v1/volunteer/activities/',
                 {
                     headers: { Authorization: `Bearer ${token}` }
                 }
@@ -350,7 +350,7 @@ const VolunteerDashboard = () => {
             
             // First mark the request as collected in the volunteer activity system
             await axios.put(
-                `https://greenbridgeserver.onrender.com/api/v1/volunteer/request/${id}/${requestType}/collect/`,
+                `http://127.0.0.1:8000/api/v1/volunteer/request/${id}/${requestType}/collect/`,
                 {},
                 {
                     headers: { Authorization: `Bearer ${token}` }
@@ -359,7 +359,7 @@ const VolunteerDashboard = () => {
 
             // Then update the request status
             await axios.put(
-                `https://greenbridgeserver.onrender.com/api/v1/${requestType}/request/${id}/update-status/`,
+                `http://127.0.0.1:8000/api/v1/${requestType}/request/${id}/update-status/`,
                 { status: 'collected' },
                 {
                     headers: { Authorization: `Bearer ${token}` }
@@ -404,7 +404,7 @@ const VolunteerDashboard = () => {
                 }
                 
                 await axios.put(
-                    `https://greenbridgeserver.onrender.com/api/v1/${endpoint}/request/${id}/update-status/`,
+                    `http://127.0.0.1:8000/api/v1/${endpoint}/request/${id}/update-status/`,
                     { status: 'cancelled' },
                     {
                         headers: { Authorization: `Bearer ${token}` }
@@ -443,7 +443,7 @@ const VolunteerDashboard = () => {
             
             // First submit quality report
             await axios.post(
-                `https://greenbridgeserver.onrender.com/api/v1/${endpoint}/request/${selectedRequest}/quality-report/`,
+                `http://127.0.0.1:8000/api/v1/${endpoint}/request/${selectedRequest}/quality-report/`,
                 reportData,
                 {
                     headers: { 
@@ -470,7 +470,7 @@ const VolunteerDashboard = () => {
             
             // Then update status based on flow and quality report
             await axios.put(
-                `https://greenbridgeserver.onrender.com/api/v1/${endpoint}/request/${selectedRequest}/update-status/`,
+                `http://127.0.0.1:8000/api/v1/${endpoint}/request/${selectedRequest}/update-status/`,
                 { status: newStatus },
                 {
                 headers: { 
@@ -530,7 +530,7 @@ const VolunteerDashboard = () => {
             
             // First create the distribution plan
             const distributionResponse = await axios.post(
-                `https://greenbridgeserver.onrender.com/api/v1/food/request/${selectedForDistribution}/distribution/`,
+                `http://127.0.0.1:8000/api/v1/food/request/${selectedForDistribution}/distribution/`,
                 distributionData,
                 {
                     headers: { 
@@ -544,7 +544,7 @@ const VolunteerDashboard = () => {
 
             // Then update the food request status
             await axios.put(
-                `https://greenbridgeserver.onrender.com/api/v1/food/request/${selectedForDistribution}/update-status/`,
+                `http://127.0.0.1:8000/api/v1/food/request/${selectedForDistribution}/update-status/`,
                 { 
                     status: 'distribution_planned'  // Use consistent status value
                 },
@@ -579,7 +579,7 @@ const VolunteerDashboard = () => {
             
             // Get the distribution plan using the new endpoint
             const planResponse = await axios.get(
-                `https://greenbridgeserver.onrender.com/api/v1/food/request/${requestId}/distribution/get/`,
+                `http://127.0.0.1:8000/api/v1/food/request/${requestId}/distribution/get/`,
                 {
                     headers: { Authorization: `Bearer ${token}` }
                 }
@@ -605,7 +605,7 @@ const VolunteerDashboard = () => {
             
             // Update distribution status
             await axios.put(
-                `https://greenbridgeserver.onrender.com/api/v1/${requestType}/distribution/${distributionId}/update-status/`,
+                `http://127.0.0.1:8000/api/v1/${requestType}/distribution/${distributionId}/update-status/`,
                 { status: newStatus },
                 {
                     headers: { Authorization: `Bearer ${token}` }
@@ -616,7 +616,7 @@ const VolunteerDashboard = () => {
             if (newStatus === 'completed') {
                 // Record the distribution in volunteer activity
                 await axios.put(
-                    `https://greenbridgeserver.onrender.com/api/v1/volunteer/request/${requestId}/${requestType}/distribute/`,
+                    `http://127.0.0.1:8000/api/v1/volunteer/request/${requestId}/${requestType}/distribute/`,
                     {},
                     {
                         headers: { Authorization: `Bearer ${token}` }
@@ -625,7 +625,7 @@ const VolunteerDashboard = () => {
 
                 // Update request status
                 await axios.put(
-                    `https://greenbridgeserver.onrender.com/api/v1/${requestType}/request/${requestId}/update-status/`,
+                    `http://127.0.0.1:8000/api/v1/${requestType}/request/${requestId}/update-status/`,
                     { 
                         status: 'distributed',
                         distribution_id: distributionId
@@ -650,7 +650,7 @@ const VolunteerDashboard = () => {
         try {
             const token = localStorage.getItem('authToken');
             await axios.post(
-                `https://greenbridgeserver.onrender.com/api/v1/grocery/request/${selectedForDistribution}/distribution/`,
+                `http://127.0.0.1:8000/api/v1/grocery/request/${selectedForDistribution}/distribution/`,
                 {
                     ...formData,
                     status: 'planned'
@@ -664,7 +664,7 @@ const VolunteerDashboard = () => {
             );
 
             await axios.put(
-                `https://greenbridgeserver.onrender.com/api/v1/grocery/request/${selectedForDistribution}/update-status/`,
+                `http://127.0.0.1:8000/api/v1/grocery/request/${selectedForDistribution}/update-status/`,
                 { 
                     status: 'distribution_planned'
                 },
@@ -691,7 +691,7 @@ const VolunteerDashboard = () => {
         try {
             const token = localStorage.getItem('authToken');
             const planResponse = await axios.get(
-                `https://greenbridgeserver.onrender.com/api/v1/grocery/request/${requestId}/distribution/get/`,
+                `http://127.0.0.1:8000/api/v1/grocery/request/${requestId}/distribution/get/`,
                 {
                     headers: { Authorization: `Bearer ${token}` }
                 }
@@ -716,7 +716,7 @@ const VolunteerDashboard = () => {
             const token = localStorage.getItem('authToken');
             
             await axios.put(
-                `https://greenbridgeserver.onrender.com/api/v1/grocery/distribution/${selectedGroceryDistribution.id}/update-status/`,
+                `http://127.0.0.1:8000/api/v1/grocery/distribution/${selectedGroceryDistribution.id}/update-status/`,
                 { status: newStatus },
                 {
                     headers: { 
@@ -728,7 +728,7 @@ const VolunteerDashboard = () => {
 
             if (newStatus === 'completed') {
                 await axios.put(
-                    `https://greenbridgeserver.onrender.com/api/v1/grocery/request/${selectedGroceryDistribution.grocery_request}/update-status/`,
+                    `http://127.0.0.1:8000/api/v1/grocery/request/${selectedGroceryDistribution.grocery_request}/update-status/`,
                     { 
                         status: 'distributed',
                         distribution_id: selectedGroceryDistribution.id
@@ -756,7 +756,7 @@ const VolunteerDashboard = () => {
         try {
             const token = localStorage.getItem('authToken');
             await axios.post(
-                `https://greenbridgeserver.onrender.com/api/v1/school-supplies/request/${selectedRequest.id}/distribution/`,
+                `http://127.0.0.1:8000/api/v1/school-supplies/request/${selectedRequest.id}/distribution/`,
                 formData,
                 {
                     headers: { Authorization: `Bearer ${token}` }
@@ -773,7 +773,7 @@ const VolunteerDashboard = () => {
         try {
             const token = localStorage.getItem('authToken');
             const response = await axios.get(
-                `https://greenbridgeserver.onrender.com/api/v1/school-supplies/request/${requestId}/distribution/get/`,
+                `http://127.0.0.1:8000/api/v1/school-supplies/request/${requestId}/distribution/get/`,
                 {
                     headers: { Authorization: `Bearer ${token}` }
                 }
@@ -793,7 +793,7 @@ const VolunteerDashboard = () => {
         try {
             const token = localStorage.getItem('authToken');
             await axios.put(
-                `https://greenbridgeserver.onrender.com/api/v1/school-supplies/distribution/${selectedSchoolSuppliesDistribution.id}/update-status/`,
+                `http://127.0.0.1:8000/api/v1/school-supplies/distribution/${selectedSchoolSuppliesDistribution.id}/update-status/`,
                 { status: newStatus },
                 {
                     headers: { Authorization: `Bearer ${token}` }
@@ -802,7 +802,7 @@ const VolunteerDashboard = () => {
             
             if (newStatus === 'completed') {
                 await axios.put(
-                    `https://greenbridgeserver.onrender.com/api/v1/school-supplies/distribution/${selectedSchoolSuppliesDistribution.id}/complete/`,
+                    `http://127.0.0.1:8000/api/v1/school-supplies/distribution/${selectedSchoolSuppliesDistribution.id}/complete/`,
                     {},
                     {
                         headers: { Authorization: `Bearer ${token}` }
@@ -821,7 +821,7 @@ const VolunteerDashboard = () => {
         try {
             const token = localStorage.getItem('authToken');
             await axios.post(
-                `https://greenbridgeserver.onrender.com/api/v1/book/request/${selectedRequest.id}/distribution/`,
+                `http://127.0.0.1:8000/api/v1/book/request/${selectedRequest.id}/distribution/`,
                 formData,
                 {
                     headers: { Authorization: `Bearer ${token}` }
@@ -839,7 +839,7 @@ const VolunteerDashboard = () => {
         try {
             const token = localStorage.getItem('authToken');
             const response = await axios.get(
-                `https://greenbridgeserver.onrender.com/api/v1/book/request/${requestId}/distribution/get/`,
+                `http://127.0.0.1:8000/api/v1/book/request/${requestId}/distribution/get/`,
                 {
                     headers: { Authorization: `Bearer ${token}` }
                 }
@@ -859,7 +859,7 @@ const VolunteerDashboard = () => {
         try {
             const token = localStorage.getItem('authToken');
             await axios.put(
-                `https://greenbridgeserver.onrender.com/api/v1/book/distribution/${selectedBookDistribution.id}/update-status/`,
+                `http://127.0.0.1:8000/api/v1/book/distribution/${selectedBookDistribution.id}/update-status/`,
                 { status: newStatus },
                 {
                     headers: { Authorization: `Bearer ${token}` }
@@ -868,7 +868,7 @@ const VolunteerDashboard = () => {
             
             if (newStatus === 'completed') {
                 await axios.put(
-                    `https://greenbridgeserver.onrender.com/api/v1/book/distribution/${selectedBookDistribution.id}/complete/`,
+                    `http://127.0.0.1:8000/api/v1/book/distribution/${selectedBookDistribution.id}/complete/`,
                     {},
                     {
                         headers: { Authorization: `Bearer ${token}` }
