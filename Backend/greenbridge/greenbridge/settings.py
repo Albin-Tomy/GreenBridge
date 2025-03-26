@@ -15,7 +15,7 @@ import os
 from datetime import timedelta
 from dotenv import load_dotenv
 from corsheaders.defaults import default_headers
-
+import dj_database_url
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -195,6 +195,18 @@ DATABASES = {
         'PORT': '5432',       # Default PostgreSQL port
     }
 }
+
+
+from dotenv import load_dotenv
+load_dotenv()
+
+# DATABASES = {
+#     'default': dj_database_url.config(
+#         default=os.getenv('DATABASE_URL'),  # Reads from .env file
+#         conn_max_age=600,  # Optimizes database connections
+#         ssl_require=True   # Ensures secure connection
+#     )
+# }
 
 # DATABASES = {
 #     'default': {

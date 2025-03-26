@@ -209,7 +209,7 @@ const BlockchainExplorer = () => {
                 <div className="blockchain-explorer">
                     <div className="loading-container">
                         <div className="loading-spinner"></div>
-                        <h2>Loading blockchain data...</h2>
+                    <h2>Loading blockchain data...</h2>
                     </div>
                 </div>
             </div>
@@ -384,7 +384,7 @@ const BlockchainExplorer = () => {
                                                 <span className="donation-tag">Donation</span> : 
                                                 block.data.action
                                             }
-                                        </div>
+                                    </div>
                                 </div>
 
                                     <AnimatePresence>
